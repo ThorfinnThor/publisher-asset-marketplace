@@ -44,6 +44,7 @@ type RightsEvidence = {
   embed_available: boolean | null;
   chart_reuse_prohibited: boolean | null;
   evidence_conflict: boolean;
+  citation_available: boolean;
   indicator_evidence: Array<{
     indicator_url: string;
     non_redistributable: boolean | null;
