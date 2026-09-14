@@ -1,0 +1,10 @@
+node_modules
+dist
+.vinext
+.next
+.wrangler
+coverage
+worker-configuration.d.ts
+package-lock.json
+3000_reusable_embed_assets_master.xlsx
+publisher_asset_marketplace_implementation_plan.md
