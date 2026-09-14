@@ -1,0 +1,144 @@
+{
+  "contractVersion": "1.0.0",
+  "scoreScale": {
+    "0": "unusable",
+    "1": "somewhat relevant",
+    "2": "strong answer"
+  },
+  "fixtureAssets": [
+    {
+      "slug": "solar-pv-prices-safe",
+      "title": "Solar photovoltaic panel prices",
+      "description": "Average solar module price per watt, adjusted for inflation.",
+      "assetType": "chart",
+      "source": "Our World in Data",
+      "status": "published",
+      "rightsStatus": "safe",
+      "embedAllowed": true,
+      "sourceUpdatedAt": "2026-07-28",
+      "popularity": 5
+    },
+    {
+      "slug": "solar-pv-prices-restricted",
+      "title": "Solar photovoltaic panel prices",
+      "description": "Average cost of photovoltaic modules over time.",
+      "assetType": "chart",
+      "source": "Example Energy Institute",
+      "status": "published",
+      "rightsStatus": "restricted",
+      "embedAllowed": true,
+      "sourceUpdatedAt": "2026-07-28",
+      "popularity": 30
+    },
+    {
+      "slug": "solar-pv-prices-blocked",
+      "title": "Solar photovoltaic panel prices",
+      "description": "A popular but prohibited solar price chart.",
+      "assetType": "chart",
+      "source": "Blocked Example",
+      "status": "published",
+      "rightsStatus": "blocked",
+      "embedAllowed": false,
+      "sourceUpdatedAt": "2026-09-01",
+      "popularity": 1000000
+    },
+    {
+      "slug": "internet-use-share",
+      "title": "Share of the population using the Internet",
+      "description": "Internet use during the last three months by country.",
+      "assetType": "chart",
+      "source": "Our World in Data",
+      "status": "published",
+      "rightsStatus": "safe",
+      "embedAllowed": true,
+      "sourceUpdatedAt": "2026-07-27",
+      "popularity": 14
+    },
+    {
+      "slug": "active-mobile-money-accounts",
+      "title": "Active mobile money accounts",
+      "description": "Financial accounts managed via mobile devices.",
+      "assetType": "chart",
+      "source": "Our World in Data",
+      "status": "published",
+      "rightsStatus": "safe",
+      "embedAllowed": true,
+      "sourceUpdatedAt": "2026-03-09",
+      "popularity": 8
+    },
+    {
+      "slug": "genome-sequencing-cost",
+      "title": "Cost of sequencing a full human genome",
+      "description": "Cost of sequencing complete human genetic information in US dollars.",
+      "assetType": "chart",
+      "source": "Our World in Data",
+      "status": "published",
+      "rightsStatus": "restricted",
+      "embedAllowed": true,
+      "sourceUpdatedAt": "2023-11-28",
+      "popularity": 7
+    },
+    {
+      "slug": "internet-use-unknown",
+      "title": "Internet usage by country",
+      "description": "Unreviewed internet adoption data.",
+      "assetType": "dataset",
+      "source": "Unknown Example",
+      "status": "draft",
+      "rightsStatus": "unknown",
+      "embedAllowed": null,
+      "sourceUpdatedAt": "2026-09-01",
+      "popularity": 500
+    }
+  ],
+  "queries": [
+    {
+      "id": "exact-title",
+      "query": "active mobile money accounts",
+      "expectedPath": "fts",
+      "expectedOrderPrefix": ["active-mobile-money-accounts"],
+      "mustExclude": [],
+      "minimumTopGrade": 2
+    },
+    {
+      "id": "partial-phrase",
+      "query": "population using the internet",
+      "expectedPath": "fts",
+      "expectedOrderPrefix": ["internet-use-share"],
+      "mustExclude": ["internet-use-unknown"],
+      "minimumTopGrade": 2
+    },
+    {
+      "id": "typo-fallback",
+      "query": "solr photvoltaic prices",
+      "expectedPath": "trigram",
+      "expectedOrderPrefix": ["solar-pv-prices-safe", "solar-pv-prices-restricted"],
+      "mustExclude": ["solar-pv-prices-blocked"],
+      "minimumTopGrade": 2
+    },
+    {
+      "id": "zero-result",
+      "query": "medieval manuscript ink acidity",
+      "expectedPath": "none",
+      "expectedOrderPrefix": [],
+      "mustExclude": [],
+      "minimumTopGrade": 0
+    },
+    {
+      "id": "safe-restricted-tie",
+      "query": "solar photovoltaic panel prices",
+      "expectedPath": "fts",
+      "expectedOrderPrefix": ["solar-pv-prices-safe", "solar-pv-prices-restricted"],
+      "mustExclude": ["solar-pv-prices-blocked"],
+      "minimumTopGrade": 2
+    },
+    {
+      "id": "publisher-style-topic",
+      "query": "cost to sequence a human genome",
+      "expectedPath": "fts",
+      "expectedOrderPrefix": ["genome-sequencing-cost"],
+      "mustExclude": [],
+      "minimumTopGrade": 2
+    }
+  ]
+}

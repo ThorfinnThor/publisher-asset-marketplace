@@ -56,3 +56,6 @@ only for an intentional production write.
 
 Read [docs/product-adr.md](docs/product-adr.md) before changing the data model, rights behavior,
 search ranking, embed handling, or analytics definitions.
+
+The accepted V1 search contract and fixed benchmark are documented in
+[docs/search-ranking-spec.md](docs/search-ranking-spec.md).
