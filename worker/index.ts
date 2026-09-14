@@ -3,12 +3,13 @@ import handler from "vinext/server/fetch-handler";
 import { runDemandAggregation } from "../src/lib/analytics/demand-aggregation";
 import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
+import { withSecurityHeaders } from "../src/lib/security-headers";
 
 type WorkerEnv = { DB: D1Database };
 
 const worker = {
   fetch(request: Request, env: WorkerEnv, context: ExecutionContext): Promise<Response> {
-    return handler.fetch(request, env, context);
+    return handler.fetch(request, env, context).then(withSecurityHeaders);
   },
   async scheduled(
     controller: ScheduledController,
