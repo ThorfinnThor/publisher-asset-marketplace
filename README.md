@@ -69,3 +69,7 @@ The D1 query/function implementation is documented in [docs/search-sql-c2.md](do
 Run `npm run search:review` after ranking changes to execute the production search function against
 the fixed SQLite FTS5 fixture corpus and refresh
 [docs/search-quality-review-c8.md](docs/search-quality-review-c8.md).
+
+Demand intelligence starts from the versioned, meaning-preserving normalization contract in
+[docs/query-normalization-spec.md](docs/query-normalization-spec.md). Search normalization and
+demand aggregation keys are intentionally separate.

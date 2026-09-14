@@ -1,0 +1,266 @@
+{
+  "version": "demand-query-v1",
+  "cases": [
+    {
+      "id": "saas-base",
+      "input": "saas churn",
+      "search_normalized": "saas churn",
+      "aggregation_key": "saas churn",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "saas-rate",
+      "input": "saas churn rate",
+      "search_normalized": "saas churn rate",
+      "aggregation_key": "saas churn",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "saas-rates-case-space",
+      "input": "  SaaS   churn rates  ",
+      "search_normalized": "saas churn rates",
+      "aggregation_key": "saas churn",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "nfkc-fullwidth",
+      "input": "ＳａａＳ　churn",
+      "search_normalized": "saas churn",
+      "aggregation_key": "saas churn",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "solar-photovoltaic-plural",
+      "input": "Solar photovoltaic prices",
+      "search_normalized": "solar photovoltaic prices",
+      "aggregation_key": "solar pv price",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "solar-pv-dash",
+      "input": "solar-pv price",
+      "search_normalized": "solar-pv price",
+      "aggregation_key": "solar pv price",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "solar-pv-plural",
+      "input": "solar pv prices",
+      "search_normalized": "solar pv prices",
+      "aggregation_key": "solar pv price",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "gdp-long-form",
+      "input": "Gross domestic product per capita",
+      "search_normalized": "gross domestic product per capita",
+      "aggregation_key": "gdp per capita",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "gdp-short-form",
+      "input": "GDP per capita",
+      "search_normalized": "gdp per capita",
+      "aggregation_key": "gdp per capita",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "co2-unicode",
+      "input": "CO₂ emissions",
+      "search_normalized": "co2 emissions",
+      "aggregation_key": "co2 emission",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "co2-long-form",
+      "input": "carbon dioxide emission",
+      "search_normalized": "carbon dioxide emission",
+      "aggregation_key": "co2 emission",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "percent-symbol",
+      "input": "50% internet adoption",
+      "search_normalized": "50% internet adoption",
+      "aggregation_key": "50 percent internet adoption",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "percentage-word",
+      "input": "internet adoption percentages",
+      "search_normalized": "internet adoption percentages",
+      "aggregation_key": "internet adoption percent",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "ampersand",
+      "input": "research & development",
+      "search_normalized": "research & development",
+      "aggregation_key": "research and development",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "year-over-year",
+      "input": "year-over-year inflation",
+      "search_normalized": "year-over-year inflation",
+      "aggregation_key": "yoy inflation",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "apostrophe",
+      "input": "women’s employment",
+      "search_normalized": "women’s employment",
+      "aggregation_key": "womens employment",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "c-plus-plus",
+      "input": "C++ adoption",
+      "search_normalized": "c++ adoption",
+      "aggregation_key": "c++ adoption",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "diacritic-preserved",
+      "input": "énergie solaire",
+      "search_normalized": "énergie solaire",
+      "aggregation_key": "énergie solaire",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "non-latin-preserved",
+      "input": "太陽光 発電",
+      "search_normalized": "太陽光 発電",
+      "aggregation_key": "太陽光 発電",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "stop-words-preserved",
+      "input": "cost of living",
+      "search_normalized": "cost of living",
+      "aggregation_key": "cost of living",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "year-2024",
+      "input": "inflation 2024",
+      "search_normalized": "inflation 2024",
+      "aggregation_key": "inflation 2024",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "year-2025",
+      "input": "inflation 2025",
+      "search_normalized": "inflation 2025",
+      "aggregation_key": "inflation 2025",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "fts-operators-inert",
+      "input": "solar\" OR *",
+      "search_normalized": "solar\" or *",
+      "aggregation_key": "solar or",
+      "aggregation_eligible": true,
+      "suppression_reason": null
+    },
+    {
+      "id": "empty",
+      "input": "   ",
+      "search_normalized": "",
+      "aggregation_key": null,
+      "aggregation_eligible": false,
+      "suppression_reason": "empty"
+    },
+    {
+      "id": "symbol-only",
+      "input": "📈 + --",
+      "search_normalized": "📈 + --",
+      "aggregation_key": null,
+      "aggregation_eligible": false,
+      "suppression_reason": "empty"
+    },
+    {
+      "id": "email",
+      "input": "alice@example.test churn",
+      "search_normalized": "alice@example.test churn",
+      "aggregation_key": null,
+      "aggregation_eligible": false,
+      "suppression_reason": "sensitive_email"
+    },
+    {
+      "id": "api-secret",
+      "input": "api_key-1234567890abcdef leaked",
+      "search_normalized": "api_key-1234567890abcdef leaked",
+      "aggregation_key": null,
+      "aggregation_eligible": false,
+      "suppression_reason": "sensitive_secret"
+    },
+    {
+      "id": "jwt",
+      "input": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature",
+      "search_normalized": "eyjhbGcioijiuzi1nij9.eyjzdwiioiixmjm0nty3odkwin0.signature",
+      "aggregation_key": null,
+      "aggregation_eligible": false,
+      "suppression_reason": "sensitive_secret"
+    },
+    {
+      "id": "phone",
+      "input": "+49 151 23456789",
+      "search_normalized": "+49 151 23456789",
+      "aggregation_key": null,
+      "aggregation_eligible": false,
+      "suppression_reason": "sensitive_phone"
+    },
+    {
+      "id": "high-entropy",
+      "input": "a8f4d92bc617e30f5a91c6d48b02e7f9",
+      "search_normalized": "a8f4d92bc617e30f5a91c6d48b02e7f9",
+      "aggregation_key": null,
+      "aggregation_eligible": false,
+      "suppression_reason": "high_entropy_identifier"
+    }
+  ],
+  "must_match": [
+    ["saas-base", "saas-rate"],
+    ["saas-base", "saas-rates-case-space"],
+    ["saas-base", "nfkc-fullwidth"],
+    ["solar-photovoltaic-plural", "solar-pv-dash"],
+    ["solar-photovoltaic-plural", "solar-pv-plural"],
+    ["gdp-long-form", "gdp-short-form"],
+    ["co2-unicode", "co2-long-form"]
+  ],
+  "must_not_match": [
+    ["year-2024", "year-2025"],
+    ["stop-words-preserved", "saas-base"],
+    ["percent-symbol", "percentage-word"]
+  ],
+  "required_distinct_pairs": [
+    ["birth", "birth rate"],
+    ["unemployment rate", "employment rate"],
+    ["solar chart", "solar calculator"],
+    ["cost of living", "cost living"],
+    ["France population", "Germany population"]
+  ]
+}
