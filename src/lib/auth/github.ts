@@ -183,7 +183,47 @@ export async function verifyOAuthState(
   signedState: string | null,
 ): Promise<boolean> {
   if (!signedState) return false;
-  return signedState === (await signOAuthState(state));
+  const [signedValue, encodedSignature] = signedState.split(".");
+  if (signedValue !== state || !encodedSignature) return false;
+  const secret = bindings().AUTH_SECRET;
+  if (!secret) return false;
+  const key = await importHmacKey(secret);
+  return crypto.subtle.verify(
+    "HMAC",
+    key,
+    base64UrlToBytes(encodedSignature),
+    new TextEncoder().encode(state),
+  );
+}
+
+export async function csrfTokenForRequest(request: Request): Promise<string | null> {
+  const sessionToken = sessionTokenFromRequest(request);
+  const secret = bindings().AUTH_SECRET;
+  if (!sessionToken || !secret) return null;
+  const key = await importHmacKey(secret);
+  const value = `csrf:v1:${sessionToken}`;
+  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value));
+  return `v1.${bytesToBase64Url(new Uint8Array(signature))}`;
+}
+
+export async function verifyCsrfToken(request: Request, token: string | null): Promise<boolean> {
+  const sessionToken = sessionTokenFromRequest(request);
+  const secret = bindings().AUTH_SECRET;
+  if (!sessionToken || !secret || !token) return false;
+  const [version, encodedSignature] = token.split(".");
+  if (version !== "v1" || !encodedSignature) return false;
+  try {
+    const key = await importHmacKey(secret);
+    const value = `csrf:v1:${sessionToken}`;
+    return crypto.subtle.verify(
+      "HMAC",
+      key,
+      base64UrlToBytes(encodedSignature),
+      new TextEncoder().encode(value),
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function clearStateCookie(): string {
@@ -215,10 +255,31 @@ async function hashToken(value: string): Promise<string> {
   return bytesToBase64Url(new Uint8Array(digest));
 }
 
+async function importHmacKey(secret: string): Promise<CryptoKey> {
+  return crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"],
+  );
+}
+
 function bytesToBase64Url(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+}
+
+function base64UrlToBytes(value: string): Uint8Array<ArrayBuffer> {
+  const normalized = value.replaceAll("-", "+").replaceAll("_", "/");
+  const padding = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
+  const binary = atob(`${normalized}${padding}`);
+  const bytes = new Uint8Array(new ArrayBuffer(binary.length));
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
 }
 
 function normalizeWebsite(value: unknown): string | null {
@@ -244,4 +305,8 @@ function parseCookies(header: string | null): Record<string, string> {
       .filter(([name, value]) => Boolean(name && value))
       .map(([name, value]) => [name, decodeURIComponent(value as string)]),
   );
+}
+
+function sessionTokenFromRequest(request: Request): string | null {
+  return parseCookies(request.headers.get("cookie"))[sessionCookieName] ?? null;
 }

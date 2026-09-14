@@ -90,3 +90,6 @@ and keeps raw search events out of the UI.
 Creator submission and embed trust boundaries are fixed in
 [docs/submission-security-e2.md](docs/submission-security-e2.md). E3 must implement its normative
 URL, authorization, CSRF, plain-text, and embed cases without adding server-side URL fetching.
+
+The E3 submission flow and endpoint contract are documented in
+[docs/creator-submissions-e3.md](docs/creator-submissions-e3.md).
