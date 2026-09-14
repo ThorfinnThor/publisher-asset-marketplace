@@ -19,6 +19,7 @@
     "ingest:fetch": "tsx scripts/fetch-owid.ts",
     "ingest:import": "tsx scripts/import-owid.ts",
     "audit:import": "tsx scripts/audit-import.ts",
+    "refresh:assets": "tsx scripts/refresh-assets.ts",
     "lint": "eslint src scripts test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

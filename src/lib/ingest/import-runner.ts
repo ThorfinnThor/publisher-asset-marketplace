@@ -33,7 +33,7 @@ export type ImportAssetRecord = {
   rights_json: string;
   metadata_json: string;
   search_document: string;
-  status: "draft";
+  status: "draft" | "review" | "published" | "hidden";
   created_at: string;
   updated_at: string;
   last_checked_at: string;

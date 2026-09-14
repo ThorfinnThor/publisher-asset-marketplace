@@ -47,6 +47,11 @@ Run the read-only B6 audit against local D1 with `npm run audit:import -- --loca
 report, and `--enforce-gate` when a closed Gate B should return a non-zero exit code. Public
 rights badges remain disabled until Gate B is open.
 
+The B7 refresh job runs daily at 03:00 UTC from the Worker cron trigger. It refreshes only stale
+assets, hides explicit 404 sources, and records each outcome in `refresh_runs` and
+`refresh_results`. Run `npm run refresh:assets -- --local` for a dry run; use `--apply --remote`
+only for an intentional production write.
+
 ## Product boundaries
 
 Read [docs/product-adr.md](docs/product-adr.md) before changing the data model, rights behavior,
