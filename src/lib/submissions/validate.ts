@@ -1,3 +1,5 @@
+import { normalizeDemandQuery } from "../search/normalize-demand-query";
+
 const submissionKeys = new Set([
   "canonical_url",
   "asset_type",
@@ -13,6 +15,7 @@ const submissionKeys = new Set([
   "modification_allowed",
   "citation_required",
   "authorized_to_submit",
+  "opportunity_topic",
 ]);
 
 const assetTypes = new Set(["chart", "calculator", "table", "dataset", "benchmark", "widget"]);
@@ -37,6 +40,7 @@ export type ValidatedSubmission = {
     attribution_terms: string;
     submitter_authorized: true;
   };
+  opportunityTopic: string | null;
 };
 
 export type SubmissionValidationResult =
@@ -74,6 +78,18 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
   const attributionUrl = normalizePublicHttpsUrl(input.attribution_url);
   if (!attributionUrl.ok) return { ...attributionUrl, field: "attribution_url" };
 
+  let opportunityTopic: string | null = null;
+  if (input.opportunity_topic !== null && input.opportunity_topic !== undefined) {
+    if (typeof input.opportunity_topic !== "string") {
+      return { ok: false, code: "invalid_opportunity_topic", field: "opportunity_topic" };
+    }
+    const normalizedTopic = normalizeDemandQuery(input.opportunity_topic);
+    if (!normalizedTopic.aggregation_eligible || !normalizedTopic.display_query) {
+      return { ok: false, code: "invalid_opportunity_topic", field: "opportunity_topic" };
+    }
+    opportunityTopic = normalizedTopic.display_query;
+  }
+
   const rightsFields = [
     "commercial_use",
     "embed_allowed",
@@ -109,6 +125,7 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
         attribution_terms: attributionTerms.value,
         submitter_authorized: true,
       },
+      opportunityTopic,
     },
   };
 }

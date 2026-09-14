@@ -20,6 +20,7 @@ const validSubmission = {
   modification_allowed: false,
   citation_required: true,
   authorized_to_submit: true,
+  opportunity_topic: null,
 };
 
 describe("submission security validation", () => {
@@ -70,5 +71,16 @@ describe("submission security validation", () => {
       code: "boolean_required",
       field: "embed_allowed",
     });
+  });
+
+  it("normalizes an opportunity topic and rejects sensitive topics", () => {
+    const result = validateSubmissionPayload({
+      ...validSubmission,
+      opportunity_topic: "SaaS churn rate",
+    });
+    expect(result).toMatchObject({ ok: true, value: { opportunityTopic: "saas churn" } });
+    expect(
+      validateSubmissionPayload({ ...validSubmission, opportunity_topic: "alice@example.test" }),
+    ).toMatchObject({ ok: false, code: "invalid_opportunity_topic", field: "opportunity_topic" });
   });
 });

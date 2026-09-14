@@ -12,6 +12,7 @@ export type PublishableSubmission = {
   attribution_name: string;
   attribution_url: string;
   attribution_terms: string;
+  opportunity_topic?: string | null;
   declared_rights_json: string;
   created_at: string;
   authorization_version: number;
@@ -127,6 +128,7 @@ export function buildCreatorAssetRecord(
     rights_evidence_url: evidence.value,
     rights_reason_code: review.rights_reason_code,
     embed_origin: embedOrigin,
+    opportunity_topic: submission.opportunity_topic ?? null,
   };
 
   return {

@@ -92,7 +92,10 @@ function OpportunityContent({ data }: { data: PublicOpportunityData }) {
             <p className="opportunity-card__note">
               Publish a useful asset with clear source, rights and attribution details.
             </p>
-            <Link className="text-link" href="/submit">
+            <Link
+              className="text-link"
+              href={`/submit?topic=${encodeURIComponent(opportunity.query)}`}
+            >
               Submit an asset
             </Link>
           </article>

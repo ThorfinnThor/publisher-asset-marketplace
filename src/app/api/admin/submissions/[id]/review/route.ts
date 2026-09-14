@@ -56,7 +56,7 @@ export async function POST(
         `
           SELECT id, creator_id, canonical_url, embed_url, preview_url, asset_type,
             title, description, attribution_name, attribution_url, attribution_terms,
-            declared_rights_json, created_at, authorization_version, review_status, asset_id
+            opportunity_topic, declared_rights_json, created_at, authorization_version, review_status, asset_id
           FROM submissions
           WHERE id = ?
           LIMIT 1

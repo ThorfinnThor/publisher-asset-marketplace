@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { SubmissionForm } from "@/components/submission-form";
 import { csrfTokenForRequest, getAuthenticatedProfile } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
+import { normalizeDemandQuery } from "@/lib/search/normalize-demand-query";
 
 export const metadata: Metadata = {
   title: "Submit an asset",
@@ -12,8 +13,14 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function SubmitPage() {
+type SubmitPageProps = {
+  searchParams: Promise<{ topic?: string }>;
+};
+
+export default async function SubmitPage({ searchParams }: SubmitPageProps) {
+  const params = await searchParams;
   const auth = await loadAuth();
+  const opportunityTopic = parseOpportunityTopic(params.topic);
 
   return (
     <main className="page-shell submission-page">
@@ -37,7 +44,7 @@ export default async function SubmitPage() {
         </section>
       ) : auth.csrfToken ? (
         <div className="submission-layout">
-          <SubmissionForm csrfToken={auth.csrfToken} />
+          <SubmissionForm csrfToken={auth.csrfToken} opportunityTopic={opportunityTopic} />
           <aside className="submission-aside">
             <div className="notice">
               <strong>Manual review.</strong> Submissions stay pending until the source, embed and
@@ -64,6 +71,12 @@ export default async function SubmitPage() {
       )}
     </main>
   );
+}
+
+function parseOpportunityTopic(value: string | undefined): string | null {
+  if (!value) return null;
+  const normalized = normalizeDemandQuery(value);
+  return normalized.aggregation_eligible ? normalized.display_query : null;
 }
 
 async function loadAuth() {

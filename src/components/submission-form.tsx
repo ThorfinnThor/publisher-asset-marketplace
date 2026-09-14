@@ -2,9 +2,9 @@
 
 import { useState, type FormEvent } from "react";
 
-type SubmissionFormProps = { csrfToken: string };
+type SubmissionFormProps = { csrfToken: string; opportunityTopic?: string | null };
 
-export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
+export function SubmissionForm({ csrfToken, opportunityTopic = null }: SubmissionFormProps) {
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -35,6 +35,7 @@ export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
           modification_allowed: data.get("modification_allowed") === "on",
           citation_required: data.get("citation_required") === "on",
           authorized_to_submit: data.get("authorized_to_submit") === "on",
+          opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
         }),
       });
       const result = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -96,6 +97,7 @@ export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
               id="asset-title"
               name="title"
               placeholder="A clear, specific title"
+              defaultValue={opportunityTopic ?? undefined}
               required
               type="text"
             />
@@ -107,6 +109,11 @@ export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
               name="description"
               minLength={20}
               placeholder="What does this asset show or calculate?"
+              defaultValue={
+                opportunityTopic
+                  ? `A useful asset for publishers searching for “${opportunityTopic}”.`
+                  : undefined
+              }
               required
             />
           </div>
@@ -122,6 +129,13 @@ export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
           </div>
         </div>
       </section>
+
+      {opportunityTopic ? (
+        <div className="notice submission-topic-notice">
+          <strong>Demand topic:</strong> {opportunityTopic}. This is a publisher signal to consider;
+          review and edit the title, description and rights before submitting.
+        </div>
+      ) : null}
 
       <section className="form-section" aria-labelledby="source-details-heading">
         <div className="form-section__heading">
@@ -191,6 +205,8 @@ export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
           </label>
         </fieldset>
       </section>
+
+      <input name="opportunity_topic" type="hidden" value={opportunityTopic ?? ""} />
 
       <div className="submission-form__footer">
         <label className="attestation">

@@ -25,6 +25,7 @@ type SubmissionRow = {
   attribution_name: string;
   attribution_url: string;
   attribution_terms: string;
+  opportunity_topic: string | null;
   declared_rights_json: string;
   review_status: "pending" | "approved" | "rejected" | "needs_changes";
   review_notes: string | null;
@@ -127,6 +128,11 @@ function SubmissionReviewCard({
 
       <div className="moderation-card__body">
         <p className="moderation-card__description">{submission.description}</p>
+        {submission.opportunity_topic ? (
+          <p className="detail-supporting-text">
+            Demand topic: <strong>{submission.opportunity_topic}</strong>
+          </p>
+        ) : null}
         <dl className="rights-table">
           <div>
             <dt>Canonical URL</dt>
@@ -219,7 +225,7 @@ async function loadAdminQueue(): Promise<AdminQueue> {
             s.id, s.creator_id, p.display_name AS creator_name,
             s.canonical_url, s.embed_url, s.preview_url, s.asset_type,
             s.title, s.description, s.attribution_name, s.attribution_url,
-            s.attribution_terms, s.declared_rights_json, s.review_status,
+            s.attribution_terms, s.opportunity_topic, s.declared_rights_json, s.review_status,
             s.review_notes, s.rights_status, s.rights_reason_code,
             s.rights_evidence_url, s.created_at
           FROM submissions s

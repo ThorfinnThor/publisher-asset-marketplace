@@ -110,3 +110,6 @@ privacy handling and ownership boundaries.
 
 The public creator opportunity surface is available at `/opportunities` and is documented in
 [docs/public-opportunity-f1.md](docs/public-opportunity-f1.md).
+
+Opportunity cards can open a topic-tagged submission draft; see
+[docs/build-this-f2.md](docs/build-this-f2.md) for the manual-review boundaries.
