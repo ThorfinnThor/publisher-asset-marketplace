@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ArrowUpRightIcon, ChartPreview, CopyIcon, RightsBadge } from "@/components/design-system";
+import { ArrowUpRightIcon, ChartPreview, RightsBadge } from "@/components/design-system";
+import { CopyCitationButton } from "@/components/copy-citation-button";
 import { CopyEmbedButton } from "@/components/copy-embed-button";
 import { buildEmbedMarkup, canCopyEmbed } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
@@ -88,16 +89,11 @@ export default async function AssetPage({ params }: AssetPageProps) {
               disabled={!embedAllowed}
               embedMarkup={buildEmbedMarkup(asset)}
             />
-            <button
-              className="button button--secondary"
-              disabled
-              title={
-                citationAvailable ? "Citation copy will be enabled in C6" : "No citation is stored"
-              }
-              type="button"
-            >
-              <CopyIcon /> Copy citation
-            </button>
+            <CopyCitationButton
+              assetSlug={asset.slug}
+              citationText={asset.citation_text ?? ""}
+              disabled={!citationAvailable}
+            />
             <a
               className="button button--secondary"
               href={asset.canonical_url}
@@ -161,9 +157,12 @@ export default async function AssetPage({ params }: AssetPageProps) {
                 <p className="eyebrow">Publisher workflow</p>
                 <h2 id="citation-heading">Exact citation</h2>
               </div>
-              <button className="button button--secondary button--small" disabled type="button">
-                <CopyIcon /> Copy
-              </button>
+              <CopyCitationButton
+                assetSlug={asset.slug}
+                citationText={asset.citation_text ?? ""}
+                compact
+                disabled={!citationAvailable}
+              />
             </div>
             <p className="code-preview">
               {asset.citation_text ?? "Citation text is not available for this asset."}
