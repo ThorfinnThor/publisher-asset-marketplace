@@ -220,7 +220,7 @@
     {
       "id": "jwt",
       "input": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature",
-      "search_normalized": "eyjhbGcioijiuzi1nij9.eyjzdwiioiixmjm0nty3odkwin0.signature",
+      "search_normalized": "eyjhbgcioijiuzi1nij9.eyjzdwiioiixmjm0nty3odkwin0.signature",
       "aggregation_key": null,
       "aggregation_eligible": false,
       "suppression_reason": "sensitive_secret"

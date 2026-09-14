@@ -73,3 +73,8 @@ the fixed SQLite FTS5 fixture corpus and refresh
 Demand intelligence starts from the versioned, meaning-preserving normalization contract in
 [docs/query-normalization-spec.md](docs/query-normalization-spec.md). Search normalization and
 demand aggregation keys are intentionally separate.
+
+The D2 daily demand runner is documented in
+[docs/demand-aggregation-d2.md](docs/demand-aggregation-d2.md). It aggregates the previous UTC
+day at 03:00 through the Worker Cron Trigger and keeps un-attributed asset actions out of query
+buckets.
