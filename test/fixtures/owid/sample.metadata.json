@@ -1,0 +1,16 @@
+{
+  "chart": {
+    "title": "Sample chart title",
+    "subtitle": "A sample chart subtitle",
+    "citation": "Sample source citation",
+    "originalChartUrl": "https://ourworldindata.org/grapher/sample-chart"
+  },
+  "columns": {
+    "123": {
+      "title": "Sample indicator",
+      "citationShort": "Sample data provider",
+      "lastUpdated": "2025-01-15"
+    }
+  },
+  "dateDownloaded": "2026-09-14"
+}

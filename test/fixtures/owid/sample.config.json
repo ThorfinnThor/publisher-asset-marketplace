@@ -1,0 +1,8 @@
+{
+  "id": 123,
+  "slug": "sample-chart",
+  "title": "Sample chart title",
+  "originUrl": "https://ourworldindata.org/grapher/sample-chart",
+  "dimensions": [],
+  "selectedEntityNames": []
+}
