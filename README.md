@@ -93,3 +93,6 @@ URL, authorization, CSRF, plain-text, and embed cases without adding server-side
 
 The E3 submission flow and endpoint contract are documented in
 [docs/creator-submissions-e3.md](docs/creator-submissions-e3.md).
+
+The E4 moderation queue and review/audit contract are documented in
+[docs/submission-moderation-e4.md](docs/submission-moderation-e4.md).
