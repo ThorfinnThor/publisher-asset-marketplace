@@ -1,6 +1,7 @@
 import handler from "vinext/server/fetch-handler";
 
 import { runDemandAggregation } from "../src/lib/analytics/demand-aggregation";
+import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
 
 type WorkerEnv = { DB: D1Database };
@@ -14,9 +15,10 @@ const worker = {
     env: WorkerEnv,
     context: ExecutionContext,
   ): Promise<void> {
+    const scheduledAt = new Date(controller.scheduledTime).toISOString();
     context.waitUntil(
       runAssetRefresh(env.DB, {
-        now: new Date(controller.scheduledTime).toISOString(),
+        now: scheduledAt,
         max_assets: 25,
       }).then((result) => {
         console.log(
@@ -31,7 +33,7 @@ const worker = {
     );
     context.waitUntil(
       runDemandAggregation(env.DB, {
-        now: new Date(controller.scheduledTime).toISOString(),
+        now: scheduledAt,
       })
         .then((result) => {
           console.log(
@@ -43,11 +45,26 @@ const worker = {
               aggregate_count: result.aggregates.length,
             }),
           );
+          return runOpportunityScoring(env.DB, {
+            scored_at: scheduledAt,
+          });
+        })
+        .then((result) => {
+          console.log(
+            JSON.stringify({
+              event: "opportunity_scoring_completed",
+              window_start: result.window_start,
+              window_end: result.window_end,
+              snapshot_count: result.snapshots.length,
+              scored_count: result.snapshots.filter((snapshot) => snapshot.status === "scored")
+                .length,
+            }),
+          );
         })
         .catch((error: unknown) => {
           console.error(
             JSON.stringify({
-              event: "demand_aggregation_failed",
+              event: "demand_intelligence_failed",
               message: error instanceof Error ? error.message : "unknown_error",
             }),
           );
