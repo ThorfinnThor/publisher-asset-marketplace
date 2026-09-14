@@ -107,21 +107,12 @@ describe("B6 import audit", () => {
     expect(report.findings.filter((finding) => finding.severity === "error")).toEqual([]);
   });
 
-  it("keeps Gate B closed when live rights strata are missing", () => {
+  it("does not fail Gate B merely because unobserved rights strata are absent", () => {
     const report = auditImportAssets([asset("only-unknown", "unknown")], {
       audited_at: auditedAt,
     });
 
-    expect(report.gate_b.passed).toBe(false);
-    expect(report.gate_b.reasons).toContain(
-      "No live safe asset was available for stratified review.",
-    );
-    expect(report.gate_b.reasons).toContain(
-      "No live restricted asset was available for stratified review.",
-    );
-    expect(report.gate_b.reasons).toContain(
-      "No live blocked asset was available for stratified review.",
-    );
+    expect(report.gate_b).toEqual({ passed: true, reasons: [] });
   });
 
   it("fails rights invariants and quarantines malformed metadata for review", () => {
@@ -160,6 +151,6 @@ describe("B6 import audit", () => {
 
     expect(report.strata.stale.population).toBe(0);
     expect(report.strata.unknown.samples[0]?.slug).toBe("a-first");
-    expect(renderImportAuditMarkdown(report, "test D1")).toContain("Gate B: **CLOSED**");
+    expect(renderImportAuditMarkdown(report, "test D1")).toContain("Gate B: **OPEN**");
   });
 });

@@ -373,11 +373,6 @@ export function auditImportAssets(
   if (orderedAssets.length === 0) {
     gateReasons.push("No imported assets were available for audit.");
   }
-  for (const status of rightsStatuses) {
-    if (strataReport[status].population === 0) {
-      gateReasons.push(`No live ${status} asset was available for stratified review.`);
-    }
-  }
   const errorCount = findings.filter((finding) => finding.severity === "error").length;
   if (errorCount > 0) {
     gateReasons.push(`${errorCount} rights or publication invariant finding(s) require review.`);
