@@ -82,3 +82,7 @@ buckets.
 The transparent D3 scoring contract and fixed examples are documented in
 [docs/opportunity-score-spec.md](docs/opportunity-score-spec.md). Score implementation must retain
 its demand, scarcity, and engagement factors instead of exposing an unexplained number.
+
+The D4 internal demand dashboard is documented in
+[docs/demand-dashboard-d4.md](docs/demand-dashboard-d4.md). It compares complete 28-day windows
+and keeps raw search events out of the UI.

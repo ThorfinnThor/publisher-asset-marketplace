@@ -1555,6 +1555,125 @@ summary {
   margin-top: 36px;
 }
 
+.dashboard-snapshot {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.demand-dashboard__section,
+.demand-dashboard__panel {
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+.demand-dashboard__section {
+  margin-top: 28px;
+}
+
+.demand-dashboard__heading {
+  padding: 19px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.demand-dashboard__heading .eyebrow {
+  margin-bottom: 7px;
+}
+
+.demand-dashboard__heading h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 720;
+  letter-spacing: -0.02em;
+}
+
+.demand-dashboard__heading p:last-child {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.demand-dashboard__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.demand-dashboard__grid .demand-dashboard__panel {
+  min-width: 0;
+}
+
+.demand-table th[scope="row"] {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.demand-list {
+  display: grid;
+  margin: 0;
+  padding: 0 20px;
+  list-style: none;
+}
+
+.demand-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 68px;
+  border-bottom: 1px solid var(--border);
+}
+
+.demand-list li:last-child {
+  border-bottom: 0;
+}
+
+.demand-list li > span {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.demand-list strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demand-list small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.demand-list b {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.demand-dashboard__empty {
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -1899,6 +2018,14 @@ summary {
   .dashboard-table__heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .demand-dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-snapshot {
+    text-align: left;
   }
 
   .search-results__heading {
