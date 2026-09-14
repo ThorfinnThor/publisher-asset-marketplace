@@ -21,6 +21,7 @@ npm install
 npm run cf:typegen
 npm run db:migrate:local
 npm run ingest:dry-run
+npm run audit:import -- --local
 npm run dev
 ```
 
@@ -38,6 +39,13 @@ automatic provisioning is not enabled for the account, then run the workflow or 
 
 The deployment workflow applies D1 migrations before deploying the Worker. Production deployment
 is intentionally not run from a local developer machine by default.
+
+## Import rights audit
+
+Run the read-only B6 audit against local D1 with `npm run audit:import -- --local`. Use
+`--remote` explicitly for production, `--output docs/import-audit-b6.md` to save the Markdown
+report, and `--enforce-gate` when a closed Gate B should return a non-zero exit code. Public
+rights badges remain disabled until Gate B is open.
 
 ## Product boundaries
 
