@@ -1,4 +1,5 @@
 const OWID_HOST = "ourworldindata.org";
+const OWID_API_HOST = "api.ourworldindata.org";
 const DEFAULT_USER_AGENT =
   "publisher-asset-marketplace/0.1 (OWID source ingestion; contact: maintainers)";
 const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
@@ -16,7 +17,7 @@ export type OwidLogEvent = {
   level: "warn" | "error";
   event: "retry" | "request_failed";
   slug: string;
-  endpoint: "metadata" | "config";
+  endpoint: OwidEndpoint;
   attempt: number;
   status?: number;
   code?: string;
@@ -25,7 +26,7 @@ export type OwidLogEvent = {
 
 export type OwidSourceErrorDetails = {
   slug: string;
-  endpoint: "metadata" | "config";
+  endpoint: OwidEndpoint;
   code: string;
   message: string;
   status?: number;
@@ -77,6 +78,37 @@ export type OwidConfigDocument = {
   [key: string]: unknown;
 };
 
+export type OwidIndicatorMetadataDocument = {
+  id?: unknown;
+  name?: unknown;
+  processingLevel?: unknown;
+  nonRedistributable?: unknown;
+  origins?: Array<{
+    id?: unknown;
+    title?: unknown;
+    producer?: unknown;
+    citationFull?: unknown;
+    attributionShort?: unknown;
+    urlMain?: unknown;
+    urlDownload?: unknown;
+    dateAccessed?: unknown;
+    datePublished?: unknown;
+    license?: {
+      name?: unknown;
+      url?: unknown;
+    };
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+};
+
+export type OwidEndpoint = "metadata" | "config" | "indicator";
+
+export type OwidIndicatorEvidence = {
+  url: string;
+  metadata: OwidIndicatorMetadataDocument;
+};
+
 export type OwidNormalizedAsset = {
   externalId: string | null;
   title: string;
@@ -88,7 +120,7 @@ export type OwidNormalizedAsset = {
   previewUrl: string;
   assetType: "chart";
   licenseCode: null;
-  licenseEvidenceUrl: string;
+  sourcePolicyUrl: string;
 };
 
 export type OwidAssetFetch = {
@@ -96,10 +128,12 @@ export type OwidAssetFetch = {
   urls: OwidSourceUrls;
   metadata: OwidMetadataDocument;
   config: OwidConfigDocument;
+  indicators: OwidIndicatorEvidence[];
   normalized: OwidNormalizedAsset;
   raw: {
     metadata: OwidMetadataDocument;
     config: OwidConfigDocument;
+    indicators: OwidIndicatorEvidence[];
   };
 };
 
@@ -195,8 +229,44 @@ function normalizeMetadata(
     // OWID policy interpretation belongs to B3. Preserve the source evidence now,
     // but do not infer a license from an absent field.
     licenseCode: null,
-    licenseEvidenceUrl: "https://ourworldindata.org/faqs",
+    sourcePolicyUrl: "https://ourworldindata.org/faqs",
   };
+}
+
+function indicatorMetadataUrls(slug: string, metadata: OwidMetadataDocument): string[] {
+  const urls = new Set<string>();
+  for (const column of Object.values(metadata.columns ?? {})) {
+    const value = readString(column.fullMetadata);
+    if (!value) {
+      continue;
+    }
+    let url: URL;
+    try {
+      url = new URL(value);
+    } catch {
+      throw new OwidSourceClientError({
+        slug,
+        endpoint: "indicator",
+        code: "invalid_indicator_url",
+        message: "OWID metadata contained an invalid indicator metadata URL",
+        attempts: 0,
+      });
+    }
+    const validPath = /^\/v1\/indicators\/[0-9]+\.metadata\.json$/.test(url.pathname);
+    if (url.protocol !== "https:" || url.hostname !== OWID_API_HOST || !validPath) {
+      throw new OwidSourceClientError({
+        slug,
+        endpoint: "indicator",
+        code: "invalid_indicator_url",
+        message: "OWID metadata contained an unsupported indicator metadata URL",
+        attempts: 0,
+      });
+    }
+    url.search = "";
+    url.hash = "";
+    urls.add(url.toString());
+  }
+  return [...urls].sort();
 }
 
 function isRetryableError(error: unknown): boolean {
@@ -246,14 +316,21 @@ export class OwidSourceClient {
       this.fetchJson<OwidMetadataDocument>(slug, "metadata", urls.metadataUrl),
       this.fetchJson<OwidConfigDocument>(slug, "config", urls.configUrl),
     ]);
+    const indicators = await Promise.all(
+      indicatorMetadataUrls(slug, metadata).map(async (url) => ({
+        url,
+        metadata: await this.fetchJson<OwidIndicatorMetadataDocument>(slug, "indicator", url),
+      })),
+    );
 
     return {
       slug,
       urls,
       metadata,
       config,
+      indicators,
       normalized: normalizeMetadata(slug, urls, metadata, config),
-      raw: { metadata, config },
+      raw: { metadata, config, indicators },
     };
   }
 
@@ -293,11 +370,7 @@ export class OwidSourceClient {
     return { successful, failed };
   }
 
-  private async fetchJson<T>(
-    slug: string,
-    endpoint: "metadata" | "config",
-    url: string,
-  ): Promise<T> {
+  private async fetchJson<T>(slug: string, endpoint: OwidEndpoint, url: string): Promise<T> {
     let lastError: unknown;
 
     for (let attempt = 1; attempt <= this.maxAttempts; attempt += 1) {

@@ -1,0 +1,22 @@
+{
+  "id": 456,
+  "name": "Sample indicator",
+  "processingLevel": "minor",
+  "nonRedistributable": false,
+  "origins": [
+    {
+      "id": 789,
+      "title": "Sample source dataset",
+      "producer": "Sample data provider",
+      "citationFull": "Sample data provider (2025). Sample source dataset.",
+      "attributionShort": "Sample provider",
+      "urlMain": "https://example.org/sample-data",
+      "dateAccessed": "2025-02-01",
+      "datePublished": "2025-01-15",
+      "license": {
+        "name": "CC BY 4.0",
+        "url": "https://example.org/sample-data/license"
+      }
+    }
+  ]
+}

@@ -37,6 +37,7 @@ describe("OwidSourceClient", () => {
   it("normalizes metadata while preserving raw endpoint responses", async () => {
     const metadata = await fixture("sample.metadata.json");
     const config = await fixture("sample.config.json");
+    const indicator = await fixture("sample.indicator.metadata.json");
     const requests: Array<{ url: string; userAgent: string | undefined }> = [];
     const client = new OwidSourceClient({
       fetchImpl: async (input, init) => {
@@ -45,7 +46,12 @@ describe("OwidSourceClient", () => {
           url,
           userAgent: new Headers(init?.headers).get("user-agent") ?? undefined,
         });
-        return new Response(JSON.stringify(url.endsWith("metadata.json") ? metadata : config), {
+        const body = url.includes("api.ourworldindata.org")
+          ? indicator
+          : url.endsWith("metadata.json")
+            ? metadata
+            : config;
+        return new Response(JSON.stringify(body), {
           status: 200,
           headers: { "content-type": "application/json" },
         });
@@ -62,10 +68,17 @@ describe("OwidSourceClient", () => {
       citationText: "Sample source citation",
       sourceUpdatedAt: "2025-01-15",
       licenseCode: null,
+      sourcePolicyUrl: "https://ourworldindata.org/faqs",
     });
     expect(result.raw.metadata).toEqual(metadata);
     expect(result.raw.config).toEqual(config);
-    expect(requests).toHaveLength(2);
+    expect(result.raw.indicators).toEqual([
+      {
+        url: "https://api.ourworldindata.org/v1/indicators/456.metadata.json",
+        metadata: indicator,
+      },
+    ]);
+    expect(requests).toHaveLength(3);
     expect(requests.every((request) => request.userAgent === "test-agent/1.0")).toBe(true);
   });
 
@@ -114,6 +127,33 @@ describe("OwidSourceClient", () => {
     });
     expect(attempts).toBe(2);
     expect(events).toContain("request_failed:http_404");
+  });
+
+  it("rejects indicator metadata URLs outside the documented OWID API path", async () => {
+    const client = new OwidSourceClient({
+      logger: () => undefined,
+      fetchImpl: async (input) => {
+        if (String(input).endsWith("metadata.json")) {
+          return new Response(
+            JSON.stringify({
+              chart: { originalChartUrl: "https://ourworldindata.org/grapher/sample-chart" },
+              columns: { one: { fullMetadata: "https://example.org/private.json" } },
+            }),
+            { status: 200 },
+          );
+        }
+        return new Response("{}", { status: 200 });
+      },
+    });
+
+    await expect(client.fetchAsset("sample-chart")).rejects.toMatchObject({
+      details: {
+        slug: "sample-chart",
+        endpoint: "indicator",
+        code: "invalid_indicator_url",
+        attempts: 0,
+      },
+    });
   });
 
   it("keeps batch concurrency bounded and separates failures", async () => {

@@ -9,7 +9,12 @@
     "123": {
       "title": "Sample indicator",
       "citationShort": "Sample data provider",
-      "lastUpdated": "2025-01-15"
+      "lastUpdated": "2025-01-15",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/456.metadata.json"
+    },
+    "124": {
+      "title": "Sample indicator duplicate view",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/456.metadata.json"
     }
   },
   "dateDownloaded": "2026-09-14"

@@ -1,14 +1,17 @@
 # OWID source client
 
-The B2 client in `src/lib/ingest/owid-source-client.ts` fetches the two documented
+The B2 client in `src/lib/ingest/owid-source-client.ts` fetches the documented
 Grapher source documents needed by the first ingestion pass:
 
 - `https://ourworldindata.org/grapher/<slug>.metadata.json`
 - `https://ourworldindata.org/grapher/<slug>.config.json`
+- every unique `https://api.ourworldindata.org/v1/indicators/<id>.metadata.json`
+  URL referenced by the chart metadata
 
 It derives source-hosted canonical, embed, and thumbnail preview URLs without
-fetching unbounded chart data. Each result keeps both endpoint responses under
-`raw`, and exposes a small normalized record for the future D1 importer.
+fetching unbounded chart data. Each result keeps the chart, config, and indicator
+responses under `raw`, and exposes a small normalized record for the future D1
+importer. Indicator metadata provides the origin and license evidence required by B3.
 
 Safety and reliability are explicit in the client:
 
