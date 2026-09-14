@@ -114,5 +114,9 @@ The public creator opportunity surface is available at `/opportunities` and is d
 Opportunity cards can open a topic-tagged submission draft; see
 [docs/build-this-f2.md](docs/build-this-f2.md) for the manual-review boundaries.
 
+The F3 source connector contract and World Bank candidate policy are documented
+in [docs/source-connectors.md](docs/source-connectors.md). The source remains a
+candidate until the F4 parser and rights fixtures pass.
+
 The final launch search/rights gate is recorded in
 [docs/launch-search-rights-review-r3.md](docs/launch-search-rights-review-r3.md).
