@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { SearchAnalyticsBeacon, TrackedSourceLink } from "@/components/analytics-components";
 import {
   ArrowUpRightIcon,
   ChartPreview,
@@ -126,6 +127,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <SearchResultCard key={result.asset.id} result={result} />
             ))}
           </div>
+          <SearchAnalyticsBeacon
+            query={parsed.query}
+            resultCount={loaded.results.length}
+            resultIds={loaded.results.map((result) => result.asset.id)}
+          />
         </section>
       </div>
     </main>
@@ -289,14 +295,15 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
             >
               Cite
             </button>
-            <a
+            <TrackedSourceLink
+              assetSlug={asset.slug}
               className="button button--text button--small"
               href={asset.canonical_url ?? `/asset/${asset.slug}`}
               rel="noreferrer"
               target="_blank"
             >
               Source <ArrowUpRightIcon />
-            </a>
+            </TrackedSourceLink>
           </div>
         </div>
       </div>

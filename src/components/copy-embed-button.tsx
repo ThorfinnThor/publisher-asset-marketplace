@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { recordAssetAction } from "./analytics-client";
 import { CopyIcon } from "./design-system";
 
 type CopyEmbedButtonProps = {
@@ -54,7 +55,7 @@ export function CopyActionButton({
     try {
       await navigator.clipboard.writeText(copyText);
       setState("copied");
-      void recordAction(assetSlug, action);
+      void recordAssetAction(assetSlug, action);
       window.setTimeout(() => setState("ready"), 2_000);
     } catch {
       setState("failed");
@@ -86,31 +87,4 @@ function copyLabel(state: CopyState, action: "embed" | "citation"): string {
   if (state === "copied") return "Copied";
   if (state === "failed") return "Copy failed";
   return action === "embed" ? "Copy embed" : "Copy citation";
-}
-
-async function recordAction(assetSlug: string, action: "embed" | "citation"): Promise<void> {
-  const sessionId = getAnonymousSessionId();
-  if (!sessionId) return;
-  try {
-    await fetch(`/api/assets/${encodeURIComponent(assetSlug)}/${action}-copy`, {
-      method: "POST",
-      headers: { "x-anonymous-session-id": sessionId },
-      keepalive: true,
-    });
-  } catch {
-    // Copying remains successful even when analytics is temporarily unavailable.
-  }
-}
-
-function getAnonymousSessionId(): string | null {
-  try {
-    const key = "publisher_asset_anonymous_session";
-    const existing = window.localStorage.getItem(key);
-    if (existing && /^[A-Za-z0-9_-]{8,128}$/.test(existing)) return existing;
-    const generated = crypto.randomUUID();
-    window.localStorage.setItem(key, generated);
-    return generated;
-  } catch {
-    return null;
-  }
 }

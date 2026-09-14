@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AssetAnalyticsBeacon, TrackedSourceLink } from "@/components/analytics-components";
 import { ArrowUpRightIcon, ChartPreview, RightsBadge } from "@/components/design-system";
 import { CopyCitationButton } from "@/components/copy-citation-button";
 import { CopyEmbedButton } from "@/components/copy-embed-button";
@@ -40,6 +41,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
 
   return (
     <main className="asset-detail page-shell">
+      <AssetAnalyticsBeacon assetSlug={asset.slug} />
       <nav aria-label="Breadcrumb" className="breadcrumb">
         <Link href="/search">Browse</Link>
         <span aria-hidden="true">/</span>
@@ -60,9 +62,14 @@ export default async function AssetPage({ params }: AssetPageProps) {
             <div>
               <dt>Source</dt>
               <dd>
-                <a href={asset.canonical_url} rel="noreferrer" target="_blank">
+                <TrackedSourceLink
+                  assetSlug={asset.slug}
+                  href={asset.canonical_url}
+                  rel="noreferrer"
+                  target="_blank"
+                >
                   {asset.source_name || "View canonical source"} <ArrowUpRightIcon />
-                </a>
+                </TrackedSourceLink>
               </dd>
             </div>
             <div>
@@ -94,14 +101,15 @@ export default async function AssetPage({ params }: AssetPageProps) {
               citationText={asset.citation_text ?? ""}
               disabled={!citationAvailable}
             />
-            <a
+            <TrackedSourceLink
+              assetSlug={asset.slug}
               className="button button--secondary"
               href={asset.canonical_url}
               rel="noreferrer"
               target="_blank"
             >
               View source <ArrowUpRightIcon />
-            </a>
+            </TrackedSourceLink>
           </div>
           <p className="action-note">
             Copy actions remain gated until the corresponding audited action is implemented.
