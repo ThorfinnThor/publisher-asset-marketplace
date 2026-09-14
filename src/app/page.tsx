@@ -160,9 +160,14 @@ export default function HomePage() {
             </p>
             <span>See what publishers need and where good sources are missing.</span>
           </div>
-          <Link className="button button--secondary" href="/submit">
-            Publish an asset <ArrowUpRightIcon />
-          </Link>
+          <div className="creator-cta__actions">
+            <Link className="button button--secondary" href="/opportunities">
+              See publisher demand <ArrowUpRightIcon />
+            </Link>
+            <Link className="text-link" href="/submit">
+              Publish an asset
+            </Link>
+          </div>
         </div>
       </section>
     </main>
