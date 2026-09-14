@@ -96,3 +96,7 @@ The E3 submission flow and endpoint contract are documented in
 
 The E4 moderation queue and review/audit contract are documented in
 [docs/submission-moderation-e4.md](docs/submission-moderation-e4.md).
+
+Approved creator submissions are promoted into the shared public asset index with the reviewed
+rights evidence and embed origin captured in the same D1 batch.
+See [docs/creator-asset-publishing-e5.md](docs/creator-asset-publishing-e5.md) for the E5 contract.

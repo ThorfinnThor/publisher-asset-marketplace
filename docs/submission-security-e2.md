@@ -150,8 +150,8 @@ identity or moderation state.
 
 - A creator submits only an `embed_url`, never iframe markup.
 - Approval snapshots an exact normalized embed origin for the asset. Public embed generation
-  requires `status = published`, rights status `safe` or `restricted`, and reviewed
-  `embed_allowed = true`.
+  requires `status = published`, rights status `safe` or `restricted`, reviewed
+  `embed_allowed = true`, and an exact origin match with that snapshot.
 - Blocked, unknown, draft, review, or hidden assets cannot generate an embed action or markup.
 - The embed URL must remain source-hosted according to the reviewed source/creator domain policy.
 - Generated markup escapes every attribute and includes `title`, `loading="lazy"`, and

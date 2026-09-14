@@ -21,6 +21,7 @@ export async function POST(
           SELECT
             a.id,
             a.embed_url,
+            a.embed_origin,
             a.rights_json,
             a.rights_status,
             a.title,

@@ -27,6 +27,10 @@ The current decision is stored on `submissions`. Each successful change also app
 `submission_reviews` row with reviewer, decision, evidence and timestamp. D1 batch execution keeps
 the current-state update and audit insert together.
 
+An approved decision promotes the submission in the same batch to a published creator asset; the
+submission stores the resulting `asset_id` and the asset receives reviewed attribution terms plus
+a reviewed embed-origin snapshot.
+
 Submitted URLs are displayed as escaped text/links only. The queue never fetches a creator URL or
 renders submitted HTML/iframe markup.
 
@@ -35,6 +39,6 @@ Implementation:
 - Migration: `migrations/0008_submission_moderation.sql`
 - Contract: `src/lib/admin/moderation.ts`
 - Queue: `src/app/admin/submissions/page.tsx`
-- Mutation: `src/app/api/admin/submissions/[id]/review/route.ts`
+- Mutation and promotion: `src/app/api/admin/submissions/[id]/review/route.ts`
 - UI actions: `src/components/admin-review-actions.tsx`
 - Tests: `test/moderation.test.ts`

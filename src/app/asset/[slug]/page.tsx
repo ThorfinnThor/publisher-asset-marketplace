@@ -185,6 +185,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
                 ) : (
                   asset.attribution_name
                 )}
+                {asset.attribution_terms ? ` · ${asset.attribution_terms}` : ""}
               </p>
             ) : null}
           </section>

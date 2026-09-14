@@ -7,10 +7,12 @@ export type PublishedAssetDetail = {
   description: string;
   canonical_url: string;
   embed_url: string | null;
+  embed_origin: string | null;
   preview_url: string | null;
   citation_text: string | null;
   attribution_name: string | null;
   attribution_url: string | null;
+  attribution_terms: string;
   source_updated_at: string | null;
   last_checked_at: string | null;
   license_code: string | null;
@@ -46,14 +48,16 @@ const detailSql = `
     a.citation_text,
     a.attribution_name,
     a.attribution_url,
+    a.attribution_terms,
     a.source_updated_at,
     a.last_checked_at,
     a.license_code,
     a.rights_status,
     a.rights_json,
-    COALESCE(s.name, '') AS source_name,
+    COALESCE(s.name, a.attribution_name, '') AS source_name,
     s.base_url AS source_base_url,
-    s.policy_url AS source_policy_url
+    s.policy_url AS source_policy_url,
+    a.embed_origin AS embed_origin
   FROM assets a
   LEFT JOIN sources s ON s.id = a.source_id
   WHERE a.slug = ?
@@ -68,7 +72,7 @@ const relatedSql = `
     a.slug,
     a.title,
     a.asset_type,
-    COALESCE(s.name, '') AS source_name,
+    COALESCE(s.name, a.attribution_name, '') AS source_name,
     a.source_updated_at
   FROM assets a
   LEFT JOIN sources s ON s.id = a.source_id

@@ -71,8 +71,8 @@ export default async function AdminSubmissionsPage() {
       </header>
 
       <div className="notice dashboard-notice">
-        <strong>Nothing publishes automatically.</strong> Approval records a decision and rights
-        evidence; E5 separately promotes approved submissions into the public asset index.
+        <strong>Approval publishes the reviewed asset.</strong> Only safe or restricted submissions
+        with recorded rights evidence enter the public asset index.
       </div>
 
       {data.submissions.length === 0 ? (

@@ -38,8 +38,21 @@ describe("C5 source-hosted embed", () => {
 
   it("builds escaped iframe markup for clipboard copy", () => {
     expect(buildEmbedMarkup(safeAsset)).toBe(
-      '<iframe src="https://ourworldindata.org/grapher/solar-pv-prices?embed=1" title="Solar prices &quot;overview&quot;" loading="lazy"></iframe>',
+      '<iframe src="https://ourworldindata.org/grapher/solar-pv-prices?embed=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts"></iframe>',
     );
     expect(parseEmbedRights(null)).toEqual({});
+  });
+
+  it("permits a creator asset only against its reviewed embed origin", () => {
+    const creatorAsset = {
+      ...safeAsset,
+      embed_url: "https://tools.example/embed/chart?id=1",
+      embed_origin: "https://tools.example",
+      source_base_url: null,
+    };
+    expect(canCopyEmbed(creatorAsset)).toBe(true);
+    expect(
+      canCopyEmbed({ ...creatorAsset, embed_url: "https://evil.example/embed/chart?id=1" }),
+    ).toBe(false);
   });
 });

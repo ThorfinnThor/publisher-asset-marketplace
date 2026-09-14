@@ -241,7 +241,7 @@ export function buildPrimarySearchSql(filters: SearchRequest["filters"] = {}): s
   const eligibility = filterSql(filters).sql;
   return `
     WITH ranked AS (
-      SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, '') AS source_name,
+      SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
         a.rights_status, a.rights_json, a.source_updated_at, a.canonical_url, a.embed_url, a.preview_url,
         a.citation_text,
         ROW_NUMBER() OVER (ORDER BY bm25(assets_fts, 0.0, 10.0, 4.0, 6.0, 1.0), a.slug) AS bm25_rank
@@ -263,7 +263,7 @@ export function buildFallbackSearchSql(
   const eligibility = filterSql(filters).sql;
   const placeholders = Array.from({ length: trigramCount }, () => "?").join(", ");
   return `
-    SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, '') AS source_name,
+    SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
       a.rights_status, a.rights_json, a.source_updated_at, a.canonical_url, a.embed_url, a.preview_url,
       a.citation_text,
       COUNT(DISTINCT index_trigrams.trigram) AS shared_trigrams,
