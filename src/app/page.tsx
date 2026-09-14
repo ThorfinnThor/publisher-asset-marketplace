@@ -1,75 +1,168 @@
 import Link from "next/link";
 
-const principles = [
-  ["Publisher-first", "Search, preview, cite, and embed without an account."],
-  ["Source-hosted", "Use approved canonical embeds instead of rebuilding third-party assets."],
-  [
-    "Rights-aware",
-    "Keep embed, commercial, modification, attribution, and raw-data rights separate.",
-  ],
-] as const;
+import {
+  ArrowUpRightIcon,
+  ChartPreview,
+  RightsBadge,
+  SearchIcon,
+} from "@/components/design-system";
+import { designAssets } from "@/lib/design-assets";
+
+const trendingQueries = ["AI adoption", "SaaS churn", "German salary", "Ecommerce benchmarks"];
+const trustedSources = ["Our World in Data", "World Bank", "OECD", "United Nations", "Eurostat"];
 
 export default function HomePage() {
   return (
     <main>
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[1.25fr_0.75fr] lg:py-28">
-        <div>
-          <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
-            Publisher utility first
-          </p>
-          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.04] tracking-[-0.04em] text-emerald-950 sm:text-7xl">
-            Find charts and tools you can confidently publish.
-          </h1>
-          <p className="mt-7 max-w-2xl text-lg leading-8 text-emerald-950/70">
-            Search reusable calculators, charts, benchmarks, datasets, and mini-tools. See the
-            source, freshness, citation, and exact reuse conditions before you publish.
-          </p>
-          <form action="/search" className="mt-10 flex max-w-2xl flex-col gap-3 sm:flex-row">
-            <label className="sr-only" htmlFor="home-search">
-              Search publisher-ready assets
-            </label>
-            <input
-              className="min-w-0 flex-1 rounded-xl border border-emerald-950/15 bg-white px-5 py-4 text-base shadow-sm outline-none placeholder:text-emerald-950/35 focus:border-emerald-700 focus:ring-4 focus:ring-emerald-700/10"
-              id="home-search"
-              name="q"
-              placeholder="Try: life expectancy Germany"
-              type="search"
-            />
-            <button
-              className="rounded-xl bg-emerald-950 px-6 py-4 font-semibold text-white shadow-sm transition hover:bg-emerald-800"
-              type="submit"
-            >
-              Find assets
-            </button>
-          </form>
-        </div>
+      <section className="home-hero" id="publishers">
+        <div className="page-shell home-hero__grid">
+          <div className="home-hero__copy">
+            <p className="eyebrow">Publisher research, made reusable</p>
+            <h1>Find data worth citing.</h1>
+            <p className="home-hero__intro">
+              Search charts, statistics, calculators and datasets you can actually publish in your
+              content—with the source, freshness and reuse conditions in view.
+            </p>
+            <form action="/search" className="search-control home-search">
+              <label className="sr-only" htmlFor="home-search">
+                Search charts, statistics, calculators and datasets
+              </label>
+              <div className="search-field">
+                <SearchIcon />
+                <input
+                  id="home-search"
+                  name="q"
+                  placeholder="Search charts, statistics, calculators…"
+                  type="search"
+                />
+              </div>
+              <button className="button button--primary" type="submit">
+                Search
+              </button>
+            </form>
+            <div className="trending" aria-label="Trending searches">
+              <span>Trending</span>
+              <div>
+                {trendingQueries.map((query) => (
+                  <Link href={`/search?q=${encodeURIComponent(query)}`} key={query}>
+                    {query}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
 
-        <aside className="rounded-3xl border border-emerald-950/10 bg-emerald-950 p-8 text-white shadow-xl shadow-emerald-950/10">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-200">
-            First validation slice
-          </p>
-          <p className="mt-5 text-3xl font-semibold tracking-tight">10 audited OWID assets</p>
-          <p className="mt-4 leading-7 text-emerald-50/75">
-            The complete 3,000-item corpus stays out of public search until ingestion and
-            asset-level rights checks are proven end to end.
-          </p>
-          <Link
-            className="mt-8 inline-flex rounded-lg bg-white px-4 py-3 text-sm font-semibold text-emerald-950"
-            href="/search"
-          >
-            View search foundation
-          </Link>
-        </aside>
+          <div className="hero-previews" aria-label="Product preview">
+            <article className="hero-preview hero-preview--chart">
+              <div className="hero-preview__heading">
+                <div>
+                  <p>Chart preview</p>
+                  <h2>Share of individuals using the Internet</h2>
+                </div>
+                <span className="source-monogram" aria-label="Source: Our World in Data">
+                  OWID
+                </span>
+              </div>
+              <ChartPreview variant="line" />
+              <div className="hero-preview__footer">
+                <div>
+                  <strong>Our World in Data</strong>
+                  <span>Checked Sep 2026</span>
+                </div>
+                <RightsBadge state="restricted">Rights review pending</RightsBadge>
+              </div>
+            </article>
+
+            <article className="hero-preview hero-preview--calculator">
+              <div className="calculator-copy">
+                <p>Calculator preview</p>
+                <h2>SaaS churn rate</h2>
+                <span>Interface example</span>
+              </div>
+              <div className="calculator-fields" aria-label="Calculator interface preview">
+                <label>
+                  Monthly revenue
+                  <span>€10,000</span>
+                </label>
+                <label>
+                  Churn rate
+                  <span>5%</span>
+                </label>
+              </div>
+              <button className="button button--secondary" disabled type="button">
+                Calculate
+              </button>
+            </article>
+          </div>
+        </div>
       </section>
 
-      <section className="border-y border-emerald-950/10 bg-white/60">
-        <div className="mx-auto grid max-w-6xl gap-6 px-6 py-14 md:grid-cols-3">
-          {principles.map(([title, description]) => (
-            <article className="rounded-2xl border border-emerald-950/10 bg-white p-6" key={title}>
-              <h2 className="font-semibold text-emerald-950">{title}</h2>
-              <p className="mt-3 text-sm leading-6 text-emerald-950/65">{description}</p>
-            </article>
-          ))}
+      <section className="trusted-sources" aria-labelledby="trusted-sources-heading">
+        <div className="page-shell trusted-sources__inner">
+          <div>
+            <h2 id="trusted-sources-heading">Trusted public sources</h2>
+            <p>Source candidates, not implied partnerships.</p>
+          </div>
+          <ul>
+            {trustedSources.map((source) => (
+              <li key={source}>{source}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="featured-section" id="topics">
+        <div className="page-shell">
+          <div className="section-header">
+            <div>
+              <p className="eyebrow">Validation collection</p>
+              <h2 className="section-heading">Recently checked charts</h2>
+            </div>
+            <Link className="text-link" href="/search">
+              Browse the interface <ArrowUpRightIcon />
+            </Link>
+          </div>
+          <div className="featured-grid">
+            {designAssets.map((asset) => (
+              <article className="featured-card" key={asset.slug}>
+                <Link className="featured-card__preview" href={`/asset/${asset.slug}`}>
+                  <ChartPreview compact variant={asset.preview} />
+                </Link>
+                <div className="featured-card__body">
+                  <p>
+                    {asset.assetType} · {asset.topic}
+                  </p>
+                  <h3>
+                    <Link href={`/asset/${asset.slug}`}>{asset.title}</Link>
+                  </h3>
+                  <div className="featured-card__meta">
+                    <span>{asset.source}</span>
+                    <RightsBadge>Review pending</RightsBadge>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="validation-note">
+            These records demonstrate the interface only. Reuse actions remain unavailable until
+            asset-level rights evidence passes review.
+          </p>
+        </div>
+      </section>
+
+      <section className="creator-cta" id="creators">
+        <div className="page-shell creator-cta__inner">
+          <div>
+            <p className="eyebrow">For creators</p>
+            <h2 className="section-heading editorial-heading">Have useful data or a tool?</h2>
+            <p>
+              Publish a chart, calculator, benchmark or dataset and get discovered by publishers.
+            </p>
+            <span>See what publishers need and where good sources are missing.</span>
+          </div>
+          <Link className="button button--secondary" href="/submit">
+            Publish an asset <ArrowUpRightIcon />
+          </Link>
         </div>
       </section>
     </main>

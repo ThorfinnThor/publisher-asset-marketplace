@@ -16,27 +16,48 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="en">
       <body>
-        <header className="border-b border-emerald-950/10 bg-[#f6f5ef]/90 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-            <Link className="font-semibold tracking-tight text-emerald-950" href="/">
-              Publisher Asset Marketplace
+        <header className="site-header">
+          <div className="site-header__inner">
+            <Link className="brand" href="/" aria-label="Publisher Assets home">
+              <span aria-hidden="true" className="brand__mark">
+                PA
+              </span>
+              <span>Publisher Assets</span>
             </Link>
-            <nav
-              aria-label="Primary"
-              className="flex items-center gap-5 text-sm text-emerald-950/75"
-            >
-              <Link className="hover:text-emerald-950" href="/search">
-                Search
-              </Link>
-              <Link className="hover:text-emerald-950" href="/submit">
-                Submit
-              </Link>
+            <nav aria-label="Primary" className="site-nav">
+              <Link href="/search">Browse</Link>
+              <Link href="/#topics">Topics</Link>
+              <Link href="/#publishers">For publishers</Link>
+              <Link href="/#creators">For creators</Link>
             </nav>
+            <div className="site-header__actions">
+              <Link className="mobile-browse" href="/search">
+                Browse
+              </Link>
+              <Link className="header-login" href="/dashboard">
+                Log in
+              </Link>
+              <Link className="button button--secondary button--small" href="/submit">
+                Publish an asset
+              </Link>
+            </div>
           </div>
         </header>
         {children}
-        <footer className="mx-auto max-w-6xl px-6 py-12 text-sm text-emerald-950/60">
-          Source links and rights evidence stay visible. Backlinks are never guaranteed.
+        <footer className="site-footer">
+          <div className="site-footer__inner">
+            <Link className="brand brand--footer" href="/">
+              <span aria-hidden="true" className="brand__mark">
+                PA
+              </span>
+              <span>Publisher Assets</span>
+            </Link>
+            <p>Source links and rights evidence stay visible. Backlinks are never guaranteed.</p>
+            <nav aria-label="Footer">
+              <Link href="/search">Browse</Link>
+              <Link href="/submit">Publish</Link>
+            </nav>
+          </div>
         </footer>
       </body>
     </html>
