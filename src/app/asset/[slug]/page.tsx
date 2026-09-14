@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArrowUpRightIcon, ChartPreview, CopyIcon, RightsBadge } from "@/components/design-system";
-import { findDesignAsset } from "@/lib/design-assets";
+import { getDatabase } from "@/lib/db/client";
+import {
+  getPublishedAssetBySlug,
+  type PublishedAssetDetail,
+  type RelatedAsset,
+} from "@/lib/assets/get-asset";
 
 export const metadata: Metadata = {
   title: "Asset",
@@ -12,28 +18,41 @@ type AssetPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+type AssetRights = {
+  embed_allowed?: boolean | null;
+  commercial_use?: boolean | null;
+  modification_allowed?: boolean | null;
+  citation_required?: boolean | null;
+  raw_data_redistribution?: boolean | null;
+  attribution_required?: boolean | null;
+  evidence_url?: string | null;
+  evidence_checked_at?: string | null;
+};
+
 export default async function AssetPage({ params }: AssetPageProps) {
   const { slug } = await params;
-  const asset = findDesignAsset(slug);
+  const record = await loadAsset(slug);
+  if (!record) notFound();
 
-  if (!asset) {
-    notFound();
-  }
+  const { asset, related } = record;
+  const rights = parseRights(asset.rights_json);
+  const embedAllowed = rights.embed_allowed === true && Boolean(asset.embed_url);
+  const citationAvailable = Boolean(asset.citation_text);
 
   return (
     <main className="asset-detail page-shell">
       <nav aria-label="Breadcrumb" className="breadcrumb">
-        <a href="/search">Browse</a>
+        <Link href="/search">Browse</Link>
         <span aria-hidden="true">/</span>
-        <span>{asset.topic}</span>
+        <span>{asset.source_name || "Publisher asset"}</span>
       </nav>
 
       <section className="asset-detail__hero">
         <div className="asset-detail__copy">
           <div className="asset-type-line">
-            <span>{asset.assetType}</span>
+            <span>{formatAssetType(asset.asset_type)}</span>
             <span aria-hidden="true">·</span>
-            <span>{asset.topic}</span>
+            <span>{asset.source_name || "Independent source"}</span>
           </div>
           <h1>{asset.title}</h1>
           <p>{asset.description}</p>
@@ -41,30 +60,56 @@ export default async function AssetPage({ params }: AssetPageProps) {
           <dl className="asset-detail__meta">
             <div>
               <dt>Source</dt>
-              <dd>{asset.source}</dd>
+              <dd>
+                <a href={asset.canonical_url} rel="noreferrer" target="_blank">
+                  {asset.source_name || "View canonical source"} <ArrowUpRightIcon />
+                </a>
+              </dd>
             </div>
             <div>
-              <dt>Freshness</dt>
-              <dd>{asset.checkedAt}</dd>
+              <dt>Updated</dt>
+              <dd>{formatDate(asset.source_updated_at)}</dd>
+            </div>
+            <div>
+              <dt>Last checked</dt>
+              <dd>{formatDate(asset.last_checked_at)}</dd>
             </div>
             <div>
               <dt>Rights status</dt>
               <dd>
-                <RightsBadge state="restricted">Review pending</RightsBadge>
+                <RightsBadge state={asset.rights_status === "safe" ? "verified" : "restricted"}>
+                  {asset.rights_status === "safe" ? "Safe to reuse" : "Restricted"}
+                </RightsBadge>
               </dd>
             </div>
           </dl>
 
           <div className="asset-detail__actions">
-            <button className="button" disabled type="button">
+            <button
+              className="button"
+              disabled
+              title={
+                embedAllowed
+                  ? "Embed copy will be enabled in C5"
+                  : "Embed permission is not approved"
+              }
+              type="button"
+            >
               <CopyIcon /> Copy embed
             </button>
-            <button className="button button--secondary" disabled type="button">
+            <button
+              className="button button--secondary"
+              disabled
+              title={
+                citationAvailable ? "Citation copy will be enabled in C6" : "No citation is stored"
+              }
+              type="button"
+            >
               <CopyIcon /> Copy citation
             </button>
             <a
               className="button button--secondary"
-              href={asset.sourceUrl}
+              href={asset.canonical_url}
               rel="noreferrer"
               target="_blank"
             >
@@ -72,12 +117,12 @@ export default async function AssetPage({ params }: AssetPageProps) {
             </a>
           </div>
           <p className="action-note">
-            Copy actions become available only after asset-level rights review.
+            Copy actions remain gated until the corresponding audited action is implemented.
           </p>
         </div>
 
         <div className="asset-detail__preview">
-          <ChartPreview variant={asset.preview} />
+          <ChartPreview variant={previewVariant(asset.asset_type)} />
           <p>Interface preview only—not source data.</p>
         </div>
       </section>
@@ -89,29 +134,29 @@ export default async function AssetPage({ params }: AssetPageProps) {
               <p className="eyebrow">Reuse conditions</p>
               <h2 id="rights-heading">Usage rights</h2>
             </div>
-            <RightsBadge state="restricted">Awaiting evidence review</RightsBadge>
+            <RightsBadge state={asset.rights_status === "safe" ? "verified" : "restricted"}>
+              {asset.license_code ?? "License evidence reviewed"}
+            </RightsBadge>
           </div>
           <dl className="rights-table">
-            {[
-              "Commercial use",
-              "Embed",
-              "Modification",
-              "Attribution",
-              "Raw data redistribution",
-            ].map((right) => (
-              <div key={right}>
-                <dt>{right}</dt>
-                <dd>Unknown</dd>
-              </div>
-            ))}
+            <PermissionRow label="Chart / embed use" value={rights.embed_allowed} />
+            <PermissionRow label="Commercial use" value={rights.commercial_use} />
+            <PermissionRow label="Modification" value={rights.modification_allowed} />
+            <PermissionRow label="Attribution" value={rights.attribution_required} />
+            <PermissionRow label="Citation" value={rights.citation_required} />
+            <PermissionRow label="Raw-data redistribution" value={rights.raw_data_redistribution} />
           </dl>
+          <p className="rights-separation-note">
+            Chart and embed permission is separate from raw-data redistribution. The raw dataset is
+            not included in this marketplace asset unless that right is explicitly marked allowed.
+          </p>
           <a
             className="evidence-link"
-            href="https://ourworldindata.org/faqs"
+            href={rights.evidence_url ?? asset.source_policy_url ?? asset.canonical_url}
             rel="noreferrer"
             target="_blank"
           >
-            View source policy awaiting classification <ArrowUpRightIcon />
+            View rights evidence <ArrowUpRightIcon />
           </a>
         </section>
 
@@ -123,31 +168,142 @@ export default async function AssetPage({ params }: AssetPageProps) {
             <div className="detail-panel__heading">
               <div>
                 <p className="eyebrow">Publisher workflow</p>
-                <h2 id="citation-heading">Citation</h2>
+                <h2 id="citation-heading">Exact citation</h2>
               </div>
               <button className="button button--secondary button--small" disabled type="button">
                 <CopyIcon /> Copy
               </button>
             </div>
             <p className="code-preview">
-              Citation text will be generated from reviewed source metadata.
+              {asset.citation_text ?? "Citation text is not available for this asset."}
             </p>
+            {asset.attribution_name ? (
+              <p className="detail-supporting-text">
+                Attribution:{" "}
+                {asset.attribution_url ? (
+                  <a href={asset.attribution_url} rel="noreferrer" target="_blank">
+                    {asset.attribution_name}
+                  </a>
+                ) : (
+                  asset.attribution_name
+                )}
+              </p>
+            ) : null}
           </section>
 
           <section className="detail-panel detail-panel--compact" aria-labelledby="embed-heading">
             <div className="detail-panel__heading">
               <div>
                 <p className="eyebrow">Source-hosted only</p>
-                <h2 id="embed-heading">Embed</h2>
+                <h2 id="embed-heading">Embed instructions</h2>
               </div>
               <button className="button button--secondary button--small" disabled type="button">
                 <CopyIcon /> Copy
               </button>
             </div>
-            <p className="code-preview">Approved embed code will appear after review.</p>
+            <p className="code-preview">
+              {embedAllowed && asset.embed_url
+                ? buildEmbedMarkup(asset)
+                : "An approved source-hosted embed is not available for this asset."}
+            </p>
+            <p className="detail-supporting-text">
+              Embeds stay hosted by the source; this marketplace does not proxy or republish the
+              underlying chart.
+            </p>
           </section>
         </div>
       </div>
+
+      {related.length > 0 ? <RelatedAssets assets={related} /> : null}
     </main>
   );
+}
+
+async function loadAsset(slug: string) {
+  try {
+    return await getPublishedAssetBySlug(getDatabase(), slug);
+  } catch {
+    return null;
+  }
+}
+
+function RelatedAssets({ assets }: { assets: RelatedAsset[] }) {
+  return (
+    <section className="related-assets" aria-labelledby="related-heading">
+      <div className="section-header">
+        <div>
+          <p className="eyebrow">Keep exploring</p>
+          <h2 className="section-heading" id="related-heading">
+            Related assets
+          </h2>
+        </div>
+        <Link className="text-link" href="/search">
+          Back to search
+        </Link>
+      </div>
+      <div className="related-assets__grid">
+        {assets.map((asset) => (
+          <article className="related-asset" key={asset.id}>
+            <p>
+              {formatAssetType(asset.asset_type)} · {asset.source_name || "Source"}
+            </p>
+            <h3>
+              <Link href={`/asset/${asset.slug}`}>{asset.title}</Link>
+            </h3>
+            <span>Updated {formatDate(asset.source_updated_at)}</span>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PermissionRow({ label, value }: { label: string; value: boolean | null | undefined }) {
+  const state = value === true ? "allowed" : value === false ? "not-allowed" : "unknown";
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd className={`permission permission--${state}`}>{permissionLabel(value)}</dd>
+    </div>
+  );
+}
+
+function parseRights(value: string | null): AssetRights {
+  if (!value) return {};
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return typeof parsed === "object" && parsed !== null ? (parsed as AssetRights) : {};
+  } catch {
+    return {};
+  }
+}
+
+function permissionLabel(value: boolean | null | undefined): string {
+  if (value === true) return "Allowed";
+  if (value === false) return "Not allowed";
+  return "Unknown";
+}
+
+function formatAssetType(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function formatDate(value: string | null): string {
+  if (!value || Number.isNaN(Date.parse(value))) return "Date unavailable";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(value));
+}
+
+function previewVariant(assetType: string): "line" | "bars" | "steps" {
+  if (assetType === "calculator" || assetType === "benchmark") return "steps";
+  if (assetType === "dataset" || assetType === "table") return "bars";
+  return "line";
+}
+
+function buildEmbedMarkup(asset: PublishedAssetDetail): string {
+  return `<iframe src="${asset.embed_url}" title="${asset.title}" loading="lazy"></iframe>`;
 }
