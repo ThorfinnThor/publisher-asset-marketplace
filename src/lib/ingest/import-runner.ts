@@ -1,5 +1,6 @@
 import { normalizeOwidInput, type NormalizeReport } from "./normalize-input";
 import { OwidSourceClient, type OwidAssetFetch, type OwidBatchResult } from "./owid-source-client";
+import { rebuildAssetSearchTrigrams, rebuildAssetSearchTrigramsSql } from "../search/search-index";
 import {
   classifyRights,
   type IndicatorRightsEvidence,
@@ -419,6 +420,7 @@ export async function writeOwidImport(
     for (const statementBatch of chunk(statements, Math.max(1, batchSize))) {
       await db.batch(statementBatch);
     }
+    await rebuildAssetSearchTrigrams(db);
     await db
       .prepare(updateRunSql)
       .bind(
@@ -496,6 +498,8 @@ export function buildOwidImportSql(plan: OwidImportPlan): string {
       (result) =>
         `INSERT INTO ingest_results (id, ingest_run_id, external_id, status, reason_code, detail_json, created_at) VALUES (${[result.id, plan.run_id, result.external_id, result.status, result.reason_code, result.detail_json, result.created_at].map(sqlLiteral).join(", ")});`,
     ),
+    "DELETE FROM asset_search_trigrams;",
+    rebuildAssetSearchTrigramsSql.trim(),
     `UPDATE ingest_runs SET status = ${sqlLiteral(plan.status)}, accepted_count = ${plan.counts.accepted}, duplicate_count = ${plan.counts.duplicates}, invalid_count = ${plan.counts.invalid}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
     "COMMIT;",
   ];

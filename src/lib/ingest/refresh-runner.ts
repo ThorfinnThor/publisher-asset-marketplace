@@ -2,6 +2,7 @@ import { buildImportAssetRecord, type ImportAssetRecord } from "./import-runner"
 import { OwidSourceClient, type OwidAssetFetch } from "./owid-source-client";
 import { classifyRights, type RightsEvidence } from "../rights/classify-rights";
 import type { RightsStatus } from "../rights/contracts";
+import { rebuildAssetSearchTrigrams, rebuildAssetSearchTrigramsSql } from "../search/search-index";
 
 const DEFAULT_SOURCE_ID = "source_owid";
 const DEFAULT_MAX_ASSETS = 25;
@@ -409,6 +410,7 @@ export async function writeAssetRefresh(
     if (statements.length > 0) {
       await db.batch(statements);
     }
+    await rebuildAssetSearchTrigrams(db);
     await db
       .prepare(updateRunSql)
       .bind(
@@ -474,6 +476,8 @@ export function buildAssetRefreshSql(plan: RefreshPlan): string {
       (result) =>
         `INSERT INTO refresh_results (id, refresh_run_id, asset_id, outcome, reason_code, detail_json, created_at) VALUES (${[result.id, plan.run_id, result.asset_id, result.outcome, result.reason_code, result.detail_json, result.created_at].map(sqlLiteral).join(", ")});`,
     ),
+    "DELETE FROM asset_search_trigrams;",
+    rebuildAssetSearchTrigramsSql.trim(),
     `UPDATE refresh_runs SET status = ${sqlLiteral(plan.status)}, candidate_count = ${plan.counts.candidates}, refreshed_count = ${plan.counts.refreshed}, hidden_count = ${plan.counts.hidden}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
     "COMMIT;",
   ];

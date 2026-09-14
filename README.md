@@ -59,3 +59,4 @@ search ranking, embed handling, or analytics definitions.
 
 The accepted V1 search contract and fixed benchmark are documented in
 [docs/search-ranking-spec.md](docs/search-ranking-spec.md).
+The D1 query/function implementation is documented in [docs/search-sql-c2.md](docs/search-sql-c2.md).

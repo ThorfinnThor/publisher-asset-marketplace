@@ -1,0 +1,44 @@
+export type SearchIndexAsset = {
+  id: string;
+  title: string;
+  asset_type: string;
+};
+
+export function normalizeSearchIndexText(value: string): string {
+  return value.normalize("NFKC").toLocaleLowerCase("en").replace(/\s+/g, " ").trim();
+}
+
+export function buildTrigrams(value: string): string[] {
+  const padded = `  ${normalizeSearchIndexText(value)}  `;
+  const trigrams = new Set<string>();
+  for (let index = 0; index + 3 <= padded.length; index += 1) {
+    trigrams.add(padded.slice(index, index + 3));
+  }
+  return [...trigrams].sort();
+}
+
+export function buildAssetSearchTrigrams(asset: SearchIndexAsset): string[] {
+  return buildTrigrams(`${asset.title} ${asset.asset_type}`);
+}
+
+export const rebuildAssetSearchTrigramsSql = `
+  WITH RECURSIVE normalized(asset_id, value) AS (
+    SELECT id, lower('  ' || title || ' ' || asset_type || '  ')
+    FROM assets
+  ), positions(asset_id, value, position) AS (
+    SELECT asset_id, value, 1 FROM normalized
+    UNION ALL
+    SELECT asset_id, value, position + 1
+    FROM positions
+    WHERE position + 3 <= length(value)
+  )
+  INSERT INTO asset_search_trigrams (asset_id, trigram)
+  SELECT DISTINCT asset_id, substr(value, position, 3)
+  FROM positions
+  WHERE length(substr(value, position, 3)) = 3
+`;
+
+export async function rebuildAssetSearchTrigrams(db: D1Database): Promise<void> {
+  await db.prepare("DELETE FROM asset_search_trigrams").bind().run();
+  await db.prepare(rebuildAssetSearchTrigramsSql).bind().run();
+}
