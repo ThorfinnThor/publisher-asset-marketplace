@@ -34,7 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               <Link className="mobile-browse" href="/search">
                 Browse
               </Link>
-              <Link className="header-login" href="/dashboard">
+              <Link className="header-login" href="/creator/dashboard">
                 Log in
               </Link>
               <Link className="button button--secondary button--small" href="/submit">

@@ -1,6 +1,6 @@
 # D4 internal opportunity dashboard
 
-The `/dashboard` route now renders the internal demand dashboard specified in the implementation
+The `/admin/demand` route now renders the internal demand dashboard specified in the implementation
 plan. It is server-rendered, marked `noindex`, and reads only aggregate D2/D3 rows plus attributed
 copy events.
 
