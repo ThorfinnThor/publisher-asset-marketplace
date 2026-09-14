@@ -99,6 +99,7 @@ export function AdminReviewActions({
             required
             type="text"
           />
+          <p className="form-hint">Visible anchor text: source or brand only, never keywords.</p>
         </div>
         <div className="form-field form-field--wide">
           <label htmlFor={`review-description-${submissionId}`}>Normalized description</label>

@@ -135,6 +135,9 @@ export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
           <div className="form-field">
             <label htmlFor="source-name">Source or brand name</label>
             <input id="source-name" name="attribution_name" required type="text" />
+            <p className="form-hint">
+              Used as visible link text. Enter a real source or brand, not SEO keywords.
+            </p>
           </div>
           <div className="form-field">
             <label htmlFor="attribution-url">Attribution URL</label>
@@ -155,6 +158,7 @@ export function SubmissionForm({ csrfToken }: SubmissionFormProps) {
               required
               type="text"
             />
+            <p className="form-hint">Shown to publishers exactly as reviewed.</p>
           </div>
         </div>
       </section>

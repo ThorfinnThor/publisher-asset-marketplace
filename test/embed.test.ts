@@ -3,15 +3,19 @@ import { describe, expect, it } from "vitest";
 import {
   buildEmbedMarkup,
   canCopyEmbed,
+  hasReviewedCreatorAttribution,
   isSourceHostedEmbed,
   parseEmbedRights,
 } from "../src/lib/assets/embed";
 
 const safeAsset = {
   embed_url: "https://ourworldindata.org/grapher/solar-pv-prices?embed=1",
-  rights_json: JSON.stringify({ embed_allowed: true }),
+  rights_json: JSON.stringify({ embed_allowed: true, attribution_required: true }),
   rights_status: "safe" as const,
+  source_id: "source_owid",
   source_base_url: "https://ourworldindata.org",
+  attribution_name: "Our World in Data",
+  attribution_url: "https://ourworldindata.org/",
   title: 'Solar prices "overview"',
 };
 
@@ -48,11 +52,38 @@ describe("C5 source-hosted embed", () => {
       ...safeAsset,
       embed_url: "https://tools.example/embed/chart?id=1",
       embed_origin: "https://tools.example",
+      source_id: null,
       source_base_url: null,
+      attribution_name: "Example Tools",
+      attribution_url: "https://tools.example/",
     };
     expect(canCopyEmbed(creatorAsset)).toBe(true);
     expect(
       canCopyEmbed({ ...creatorAsset, embed_url: "https://evil.example/embed/chart?id=1" }),
     ).toBe(false);
+    const markup = buildEmbedMarkup(creatorAsset);
+    expect(markup).toBe(
+      '<figure><iframe src="https://tools.example/embed/chart?id=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts"></iframe><figcaption>Source: <a href="https://tools.example/">Example Tools</a></figcaption></figure>',
+    );
+    expect(markup).not.toContain(">Solar prices");
+    expect(markup).not.toContain("target=");
+    expect(markup).not.toContain("rel=");
+  });
+
+  it("fails closed without reviewed brand attribution and escapes visible anchor text", () => {
+    const creatorAsset = {
+      ...safeAsset,
+      embed_url: "https://tools.example/embed/chart",
+      embed_origin: "https://tools.example",
+      source_id: null,
+      source_base_url: null,
+      attribution_name: "Example <Tools>",
+      attribution_url: "https://tools.example/",
+    };
+    expect(hasReviewedCreatorAttribution(creatorAsset)).toBe(true);
+    expect(buildEmbedMarkup(creatorAsset)).toContain("Example &lt;Tools&gt;");
+    expect(buildEmbedMarkup({ ...creatorAsset, attribution_name: null })).toBe("");
+    expect(buildEmbedMarkup({ ...creatorAsset, attribution_name: " Example Tools " })).toBe("");
+    expect(buildEmbedMarkup({ ...creatorAsset, attribution_url: "javascript:alert(1)" })).toBe("");
   });
 });

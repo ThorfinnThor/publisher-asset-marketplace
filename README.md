@@ -100,3 +100,6 @@ The E4 moderation queue and review/audit contract are documented in
 Approved creator submissions are promoted into the shared public asset index with the reviewed
 rights evidence and embed origin captured in the same D1 batch.
 See [docs/creator-asset-publishing-e5.md](docs/creator-asset-publishing-e5.md) for the E5 contract.
+
+Creator source links and copied embed attribution follow the accepted
+[E6 attribution/link policy](docs/creator-attribution-link-policy-e6.md).

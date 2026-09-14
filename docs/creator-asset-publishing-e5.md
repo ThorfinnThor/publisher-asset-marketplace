@@ -24,7 +24,8 @@ the creator's reviewed attribution name when no source record exists.
 The promotion revalidates the stored canonical, embed, preview, attribution and evidence URLs as
 public HTTPS URLs without fetching them. Public embed copy requires the reviewed `embed_allowed`
 flag and an exact HTTPS origin match against `assets.embed_origin`. Generated markup escapes the URL
-and title and includes a restrictive sandbox, lazy loading and a strict referrer policy.
+and title and includes a restrictive sandbox, lazy loading and a strict referrer policy. Creator
+markup also includes the visible, reviewed source/brand attribution defined by E6.
 
 ## Implementation
 

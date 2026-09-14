@@ -20,11 +20,14 @@ export async function POST(
         `
           SELECT
             a.id,
+            a.source_id,
             a.embed_url,
             a.embed_origin,
             a.rights_json,
             a.rights_status,
             a.title,
+            a.attribution_name,
+            a.attribution_url,
             s.base_url AS source_base_url
           FROM assets a
           LEFT JOIN sources s ON s.id = a.source_id

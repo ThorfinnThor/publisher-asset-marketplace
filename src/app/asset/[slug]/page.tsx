@@ -112,7 +112,8 @@ export default async function AssetPage({ params }: AssetPageProps) {
             </TrackedSourceLink>
           </div>
           <p className="action-note">
-            Copy actions remain gated until the corresponding audited action is implemented.
+            Copy actions record publisher intent only. They do not confirm publication, citation or
+            a backlink.
           </p>
         </div>
 
@@ -209,8 +210,9 @@ export default async function AssetPage({ params }: AssetPageProps) {
                 : "An approved source-hosted embed is not available for this asset."}
             </p>
             <p className="detail-supporting-text">
-              Embeds stay hosted by the source; this marketplace does not proxy or republish the
-              underlying chart.
+              {asset.source_id === null
+                ? "Creator embeds include visible reviewed source attribution. The exact markup shown above is copied."
+                : "Embeds stay hosted by the source; this marketplace does not proxy or republish the underlying chart."}
             </p>
           </section>
         </div>
