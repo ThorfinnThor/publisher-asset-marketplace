@@ -56,8 +56,7 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
           <p className="eyebrow">Creator workspace</p>
           <h1 className="page-title">Welcome, {profile.display_name}.</h1>
           <p className="page-intro">
-            Your profile is ready. Submission review and creator analytics open in the next
-            marketplace milestones.
+            Your profile is ready. Submit a useful asset for manual review and publication.
           </p>
         </div>
         <form action="/api/auth/sign-out" method="post">
@@ -98,7 +97,12 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
           </div>
           <div>
             <strong>Submit for review</strong>
-            <span>The submission form opens after the security and validation milestone.</span>
+            <span>
+              Your submission remains pending until its source and declared rights are checked.
+            </span>
+            <a className="text-link" href="/submit">
+              Open submission form
+            </a>
           </div>
         </div>
       </section>
