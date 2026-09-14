@@ -16,6 +16,7 @@
     {
       "binding": "DB",
       "database_name": "publisher-asset-marketplace",
+      "database_id": "93b3f1b1-a71e-4387-bbfc-64d237e9551d",
       "migrations_dir": "migrations",
     },
   ],
