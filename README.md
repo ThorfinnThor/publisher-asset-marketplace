@@ -47,6 +47,12 @@ Run the read-only B6 audit against local D1 with `npm run audit:import -- --loca
 report, and `--enforce-gate` when a closed Gate B should return a non-zero exit code. Public
 rights badges remain disabled until Gate B is open.
 
+The reviewed ten-asset OWID evidence set is documented in
+[docs/owid-seed-rights-review.md](docs/owid-seed-rights-review.md). Run
+`npm run rights:review -- --local` for a fail-closed dry run. A database write requires explicit
+`--apply --local|--remote`; publication additionally requires `--publish` and is limited to
+classifier-approved `safe` or `restricted` assets.
+
 The B7 refresh job runs daily at 03:00 UTC from the Worker cron trigger. It refreshes only stale
 assets, hides explicit 404 sources, and records each outcome in `refresh_runs` and
 `refresh_results`. Run `npm run refresh:assets -- --local` for a dry run; use `--apply --remote`
