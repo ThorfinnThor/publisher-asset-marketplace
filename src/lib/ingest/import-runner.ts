@@ -491,7 +491,6 @@ ON CONFLICT(slug) DO UPDATE SET
 
 export function buildOwidImportSql(plan: OwidImportPlan): string {
   const statements = [
-    "BEGIN TRANSACTION;",
     `INSERT INTO ingest_runs (id, source_id, status, accepted_count, duplicate_count, invalid_count, error_count, started_at, completed_at) VALUES (${sqlLiteral(plan.run_id)}, ${sqlLiteral(plan.source_id)}, 'running', 0, 0, 0, 0, ${sqlLiteral(plan.started_at)}, NULL);`,
     ...plan.assets.map(sqlAssetStatement),
     ...plan.results.map(
@@ -501,7 +500,6 @@ export function buildOwidImportSql(plan: OwidImportPlan): string {
     "DELETE FROM asset_search_trigrams;",
     rebuildAssetSearchTrigramsSql.trim(),
     `UPDATE ingest_runs SET status = ${sqlLiteral(plan.status)}, accepted_count = ${plan.counts.accepted}, duplicate_count = ${plan.counts.duplicates}, invalid_count = ${plan.counts.invalid}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
-    "COMMIT;",
   ];
   return `${statements.join("\n\n")}\n`;
 }

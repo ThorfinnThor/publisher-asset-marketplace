@@ -100,11 +100,11 @@ describe("rights evidence review", () => {
     const sql = buildRightsReviewSql(plan);
 
     expect(plan.updates.every((update) => update.status === "published")).toBe(true);
-    expect(sql).toContain("BEGIN TRANSACTION;");
+    expect(sql).not.toContain("BEGIN TRANSACTION;");
     expect(sql).toContain("INSERT OR IGNORE INTO rights_reviews");
     expect(sql).toContain("rights_review_owid-seed-v1_active-mobile-money-accounts");
     expect(sql).toContain("status = 'published'");
-    expect(sql).toContain("COMMIT;");
+    expect(sql).not.toContain("COMMIT;");
   });
 
   it("fails closed when a reviewed URL drifts or a decision no longer matches evidence", () => {

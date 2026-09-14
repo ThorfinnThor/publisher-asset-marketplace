@@ -332,5 +332,5 @@ export function buildRightsReviewSql(plan: RightsReviewPlan): string {
     `UPDATE assets SET license_code = ${sqlLiteral(update.license_code)}, rights_status = ${sqlLiteral(update.rights_status)}, rights_json = ${sqlLiteral(update.rights_json)}, metadata_json = ${sqlLiteral(update.metadata_json)}, status = ${sqlLiteral(update.status)}, updated_at = ${sqlLiteral(update.updated_at)} WHERE id = ${sqlLiteral(update.asset_id)} AND slug = ${sqlLiteral(update.slug)} AND canonical_url = ${sqlLiteral(update.canonical_url)};`,
     `INSERT OR IGNORE INTO rights_reviews (id, asset_id, decision, reason_code, notes, evidence_url, reviewed_by, created_at) VALUES (${sqlLiteral(update.review.id)}, ${sqlLiteral(update.asset_id)}, ${sqlLiteral(update.rights_status)}, ${sqlLiteral(update.reason_code)}, ${sqlLiteral(update.review.notes)}, ${sqlLiteral(update.review.evidence_url)}, NULL, ${sqlLiteral(update.review.created_at)});`,
   ]);
-  return `${["BEGIN TRANSACTION;", ...statements, "COMMIT;"].join("\n\n")}\n`;
+  return `${statements.join("\n\n")}\n`;
 }
