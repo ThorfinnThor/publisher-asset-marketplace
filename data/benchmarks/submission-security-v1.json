@@ -1,0 +1,279 @@
+{
+  "version": 1,
+  "contract": "docs/submission-security-e2.md",
+  "url_cases": [
+    {
+      "id": "https-public",
+      "input": "https://Example.COM:443/chart?q=solar#section",
+      "accepted": true,
+      "normalized": "https://example.com/chart?q=solar"
+    },
+    {
+      "id": "https-idna",
+      "input": "https://münchen.example/chart",
+      "accepted": true,
+      "normalized": "https://xn--mnchen-3ya.example/chart"
+    },
+    {
+      "id": "http-rejected",
+      "input": "http://example.com/chart",
+      "accepted": false,
+      "reason": "scheme_not_https"
+    },
+    {
+      "id": "javascript-rejected",
+      "input": "javascript:alert(1)",
+      "accepted": false,
+      "reason": "scheme_not_https"
+    },
+    {
+      "id": "data-rejected",
+      "input": "data:text/html,<script>alert(1)</script>",
+      "accepted": false,
+      "reason": "scheme_not_https"
+    },
+    {
+      "id": "userinfo-rejected",
+      "input": "https://user:password@example.com/chart",
+      "accepted": false,
+      "reason": "credentials_not_allowed"
+    },
+    {
+      "id": "non-default-port-rejected",
+      "input": "https://example.com:8443/chart",
+      "accepted": false,
+      "reason": "port_not_allowed"
+    },
+    {
+      "id": "localhost-rejected",
+      "input": "https://localhost/chart",
+      "accepted": false,
+      "reason": "host_not_public"
+    },
+    {
+      "id": "localhost-subdomain-rejected",
+      "input": "https://preview.localhost/chart",
+      "accepted": false,
+      "reason": "host_not_public"
+    },
+    {
+      "id": "private-ipv4-rejected",
+      "input": "https://192.168.1.20/chart",
+      "accepted": false,
+      "reason": "address_not_public"
+    },
+    {
+      "id": "loopback-ipv4-rejected",
+      "input": "https://127.0.0.1/chart",
+      "accepted": false,
+      "reason": "address_not_public"
+    },
+    {
+      "id": "integer-loopback-rejected",
+      "input": "https://2130706433/chart",
+      "accepted": false,
+      "reason": "address_not_public"
+    },
+    {
+      "id": "link-local-ipv4-rejected",
+      "input": "https://169.254.169.254/latest/meta-data",
+      "accepted": false,
+      "reason": "address_not_public"
+    },
+    {
+      "id": "private-ipv6-rejected",
+      "input": "https://[fc00::1]/chart",
+      "accepted": false,
+      "reason": "address_not_public"
+    },
+    {
+      "id": "loopback-ipv6-rejected",
+      "input": "https://[::1]/chart",
+      "accepted": false,
+      "reason": "address_not_public"
+    },
+    {
+      "id": "internal-suffix-rejected",
+      "input": "https://charts.service.internal/embed",
+      "accepted": false,
+      "reason": "host_not_public"
+    },
+    {
+      "id": "metadata-host-rejected",
+      "input": "https://metadata.google.internal/computeMetadata/v1/",
+      "accepted": false,
+      "reason": "metadata_host_not_allowed"
+    },
+    {
+      "id": "protocol-relative-rejected",
+      "input": "//example.com/chart",
+      "accepted": false,
+      "reason": "absolute_url_required"
+    },
+    {
+      "id": "single-label-rejected",
+      "input": "https://intranet/chart",
+      "accepted": false,
+      "reason": "host_not_public"
+    }
+  ],
+  "text_cases": [
+    {
+      "id": "html-stays-text",
+      "field": "description",
+      "input": "Useful chart <img src=x onerror=alert(1)>",
+      "accepted": true,
+      "rendered_as": "text"
+    },
+    {
+      "id": "script-stays-text",
+      "field": "title",
+      "input": "<script>alert(1)</script>",
+      "accepted": true,
+      "rendered_as": "text"
+    },
+    {
+      "id": "control-character-rejected",
+      "field": "title",
+      "input": "Chart\u0000title",
+      "accepted": false,
+      "reason": "control_character"
+    }
+  ],
+  "authorization_cases": [
+    {
+      "id": "anonymous-create",
+      "actor": "anonymous",
+      "action": "create_submission",
+      "allowed": false,
+      "status": 401
+    },
+    {
+      "id": "creator-create-as-self",
+      "actor": "creator_a",
+      "action": "create_submission",
+      "requested_creator_id": "creator_b",
+      "allowed": true,
+      "effective_creator_id": "creator_a"
+    },
+    {
+      "id": "owner-edit-pending",
+      "actor": "creator_a",
+      "owner": "creator_a",
+      "review_status": "pending",
+      "action": "edit_submission",
+      "allowed": true
+    },
+    {
+      "id": "other-creator-edit",
+      "actor": "creator_b",
+      "owner": "creator_a",
+      "review_status": "pending",
+      "action": "edit_submission",
+      "allowed": false,
+      "status": 404
+    },
+    {
+      "id": "owner-edit-approved",
+      "actor": "creator_a",
+      "owner": "creator_a",
+      "review_status": "approved",
+      "action": "edit_submission",
+      "allowed": false,
+      "status": 409
+    },
+    {
+      "id": "creator-moderate",
+      "actor": "creator_a",
+      "role": "creator",
+      "action": "moderate_submission",
+      "allowed": false,
+      "status": 403
+    },
+    {
+      "id": "admin-moderate",
+      "actor": "admin_a",
+      "role": "admin",
+      "action": "moderate_submission",
+      "allowed": true
+    }
+  ],
+  "request_cases": [
+    {
+      "id": "cross-origin-post",
+      "session": "valid",
+      "origin": "https://attacker.example",
+      "request_origin": "https://marketplace.example",
+      "allowed": false,
+      "status": 403
+    },
+    {
+      "id": "missing-origin-post",
+      "session": "valid",
+      "origin": null,
+      "request_origin": "https://marketplace.example",
+      "allowed": false,
+      "status": 403
+    },
+    {
+      "id": "oversized-body",
+      "body_bytes": 32769,
+      "allowed": false,
+      "status": 413
+    },
+    {
+      "id": "duplicate-canonical-url",
+      "normalized_url_exists": true,
+      "allowed": false,
+      "status": 409
+    },
+    {
+      "id": "rate-limit",
+      "new_submissions_last_24_hours": 10,
+      "allowed": false,
+      "status": 429
+    }
+  ],
+  "embed_cases": [
+    {
+      "id": "published-reviewed-embed",
+      "asset_status": "published",
+      "rights_status": "safe",
+      "embed_allowed": true,
+      "origin_reviewed": true,
+      "allowed": true
+    },
+    {
+      "id": "blocked-asset",
+      "asset_status": "published",
+      "rights_status": "blocked",
+      "embed_allowed": true,
+      "origin_reviewed": true,
+      "allowed": false
+    },
+    {
+      "id": "unknown-rights",
+      "asset_status": "published",
+      "rights_status": "unknown",
+      "embed_allowed": true,
+      "origin_reviewed": true,
+      "allowed": false
+    },
+    {
+      "id": "unreviewed-origin",
+      "asset_status": "published",
+      "rights_status": "safe",
+      "embed_allowed": true,
+      "origin_reviewed": false,
+      "allowed": false
+    },
+    {
+      "id": "pending-submission",
+      "asset_status": "review",
+      "rights_status": "safe",
+      "embed_allowed": true,
+      "origin_reviewed": true,
+      "allowed": false
+    }
+  ]
+}

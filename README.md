@@ -86,3 +86,7 @@ its demand, scarcity, and engagement factors instead of exposing an unexplained 
 The D4 internal demand dashboard is documented in
 [docs/demand-dashboard-d4.md](docs/demand-dashboard-d4.md). It compares complete 28-day windows
 and keeps raw search events out of the UI.
+
+Creator submission and embed trust boundaries are fixed in
+[docs/submission-security-e2.md](docs/submission-security-e2.md). E3 must implement its normative
+URL, authorization, CSRF, plain-text, and embed cases without adding server-side URL fetching.
