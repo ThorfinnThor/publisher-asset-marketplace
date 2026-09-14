@@ -17,6 +17,7 @@
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "ingest:dry-run": "tsx scripts/ingest-owid.ts data/seed/owid-first-10.csv",
     "ingest:fetch": "tsx scripts/fetch-owid.ts",
+    "ingest:import": "tsx scripts/import-owid.ts",
     "lint": "eslint src scripts test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

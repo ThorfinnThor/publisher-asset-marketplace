@@ -1,6 +1,6 @@
 export function refreshAssetsNotYetEnabled(): never {
   throw new Error(
-    "Asset refresh is disabled until the OWID source contract and rights decision table are approved.",
+    "Scheduled asset refresh is not enabled yet. Use npm run ingest:import for an initial idempotent OWID import.",
   );
 }
 

@@ -32,3 +32,23 @@ NODE_OPTIONS=--use-openssl-ca SSL_CERT_FILE=/etc/ssl/cert.pem \
 
 Use `--json` when a later importer needs the normalized records and preserved
 source JSON. This command does not write to D1.
+
+## Import runner
+
+The B5 runner builds a restartable import plan and emits idempotent D1 SQL. It is
+safe by default and only fetches/builds the plan:
+
+```sh
+npm run ingest:import -- data/seed/owid-first-10.csv --sql-out /tmp/owid-import.sql
+```
+
+Apply explicitly to local or remote D1:
+
+```sh
+npm run ingest:import -- data/seed/owid-first-10.csv --apply --local
+npm run ingest:import -- data/seed/owid-first-10.csv --apply --remote
+```
+
+The runner preserves existing asset review/published status during upsert, writes
+`ingest_runs` and `ingest_results`, and leaves imported assets in `draft` when they
+have not passed the rights audit.

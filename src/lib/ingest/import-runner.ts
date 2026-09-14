@@ -1,0 +1,503 @@
+import { normalizeOwidInput, type NormalizeReport } from "./normalize-input";
+import { OwidSourceClient, type OwidAssetFetch, type OwidBatchResult } from "./owid-source-client";
+import {
+  classifyRights,
+  type IndicatorRightsEvidence,
+  type RightsEvidence,
+  type RightsClassification,
+} from "../rights/classify-rights";
+import { normalizeSupportedLicense } from "../rights/classify-rights";
+
+const DEFAULT_SOURCE_ID = "source_owid";
+const DEFAULT_BATCH_SIZE = 50;
+
+export type ImportAssetRecord = {
+  id: string;
+  source_id: string;
+  external_id: string | null;
+  slug: string;
+  asset_type: "chart";
+  title: string;
+  description: string;
+  canonical_url: string;
+  canonical_url_normalized: string;
+  embed_url: string;
+  preview_url: string;
+  citation_text: string | null;
+  attribution_name: string | null;
+  attribution_url: string | null;
+  published_at: string | null;
+  source_updated_at: string | null;
+  license_code: string | null;
+  rights_status: RightsClassification["rights_status"];
+  rights_json: string;
+  metadata_json: string;
+  search_document: string;
+  status: "draft";
+  created_at: string;
+  updated_at: string;
+  last_checked_at: string;
+};
+
+export type ImportResultRecord = {
+  id: string;
+  external_id: string | null;
+  status: "accepted" | "duplicate" | "invalid" | "failed" | "upserted";
+  reason_code: string | null;
+  detail_json: string | null;
+  created_at: string;
+};
+
+export type OwidImportPlan = {
+  run_id: string;
+  source_id: string;
+  started_at: string;
+  completed_at: string;
+  status: "succeeded" | "failed" | "partial";
+  normalize_report: NormalizeReport;
+  fetched: OwidBatchResult;
+  assets: ImportAssetRecord[];
+  results: ImportResultRecord[];
+  counts: {
+    accepted: number;
+    duplicates: number;
+    invalid: number;
+    errors: number;
+  };
+};
+
+export type ImportRunnerOptions = {
+  source_id?: string;
+  now?: string;
+  run_id?: string;
+  source_client?: Pick<OwidSourceClient, "fetchAssets">;
+};
+
+export type ImportRunResult = {
+  plan: OwidImportPlan;
+  database_written: boolean;
+};
+
+function nowIso(): string {
+  return new Date().toISOString();
+}
+
+function createRunId(startedAt: string): string {
+  const compact = startedAt.replace(/[^0-9]/g, "").slice(0, 17);
+  return `ingest_owid_${compact}_${crypto.randomUUID().slice(0, 8)}`;
+}
+
+function createAssetId(slug: string): string {
+  return `asset_owid_${slug}`;
+}
+
+function firstOrigin(asset: OwidAssetFetch): {
+  attributionName: string | null;
+  attributionUrl: string | null;
+  publishedAt: string | null;
+} {
+  const origin = asset.raw.indicators[0]?.metadata.origins?.[0];
+  if (!origin) {
+    return { attributionName: null, attributionUrl: null, publishedAt: null };
+  }
+  const name =
+    typeof origin.attributionShort === "string"
+      ? origin.attributionShort
+      : typeof origin.producer === "string"
+        ? origin.producer
+        : null;
+  return {
+    attributionName: name,
+    attributionUrl: typeof origin.urlMain === "string" ? origin.urlMain : null,
+    publishedAt: typeof origin.datePublished === "string" ? origin.datePublished : null,
+  };
+}
+
+function buildRightsEvidence(asset: OwidAssetFetch, checkedAt: string): RightsEvidence {
+  const indicatorEvidence: IndicatorRightsEvidence[] = asset.raw.indicators.map((indicator) => ({
+    indicator_url: indicator.url,
+    non_redistributable:
+      typeof indicator.metadata.nonRedistributable === "boolean"
+        ? indicator.metadata.nonRedistributable
+        : null,
+    origins: (indicator.metadata.origins ?? []).map((origin) => ({
+      license_code: normalizeSupportedLicense(
+        typeof origin.license?.name === "string" ? origin.license.name : null,
+      ),
+      license_raw: typeof origin.license?.name === "string" ? origin.license.name : null,
+      license_url: typeof origin.license?.url === "string" ? origin.license.url : null,
+    })),
+  }));
+
+  return {
+    // B2 does not fetch chart footer ownership notices. Keep ownership and chart
+    // license unknown until B6/manual evidence supplies chart-specific proof.
+    chart_owner: null,
+    chart_license_code: null,
+    chart_license_raw: null,
+    chart_license_url: null,
+    chart_license_explicit: false,
+    manual_review_completed: false,
+    embed_available: true,
+    chart_reuse_prohibited: null,
+    evidence_conflict: false,
+    citation_available: asset.normalized.citationText !== null,
+    indicator_evidence: indicatorEvidence,
+    evidence_url: asset.urls.canonicalUrl,
+    evidence_checked_at: checkedAt,
+  };
+}
+
+function buildMetadataJson(asset: OwidAssetFetch, rightsEvidence: RightsEvidence): string {
+  return JSON.stringify({
+    source: "owid",
+    metadata: asset.raw.metadata,
+    config: asset.raw.config,
+    indicators: asset.raw.indicators,
+    rights_evidence: rightsEvidence,
+  });
+}
+
+export function buildImportAssetRecord(
+  asset: OwidAssetFetch,
+  checkedAt: string,
+  sourceId = DEFAULT_SOURCE_ID,
+): ImportAssetRecord {
+  const rightsEvidence = buildRightsEvidence(asset, checkedAt);
+  const classification = classifyRights(rightsEvidence);
+  const origin = firstOrigin(asset);
+  const licenseCode =
+    classification.chart_license === "CUSTOM_OR_UNKNOWN" ? null : classification.chart_license;
+  const description = asset.normalized.description;
+
+  return {
+    id: createAssetId(asset.slug),
+    source_id: sourceId,
+    external_id: asset.normalized.externalId,
+    slug: asset.slug,
+    asset_type: "chart",
+    title: asset.normalized.title,
+    description,
+    canonical_url: asset.urls.canonicalUrl,
+    canonical_url_normalized: asset.urls.canonicalUrl,
+    embed_url: asset.urls.embedUrl,
+    preview_url: asset.urls.previewUrl,
+    citation_text: asset.normalized.citationText,
+    attribution_name: origin.attributionName,
+    attribution_url: origin.attributionUrl,
+    published_at: origin.publishedAt,
+    source_updated_at: asset.normalized.sourceUpdatedAt,
+    license_code: licenseCode,
+    rights_status: classification.rights_status,
+    rights_json: JSON.stringify(classification.rights),
+    metadata_json: buildMetadataJson(asset, rightsEvidence),
+    search_document: [asset.normalized.title, description, "chart", "Our World in Data"]
+      .filter(Boolean)
+      .join(" "),
+    status: "draft",
+    created_at: checkedAt,
+    updated_at: checkedAt,
+    last_checked_at: checkedAt,
+  };
+}
+
+function resultId(runId: string, index: number): string {
+  return `ingest_result_${runId}_${index}`;
+}
+
+function detailJson(value: unknown): string {
+  return JSON.stringify(value);
+}
+
+function buildNormalizeResults(
+  report: NormalizeReport,
+  runId: string,
+  now: string,
+): ImportResultRecord[] {
+  const results: ImportResultRecord[] = [];
+  let index = 0;
+  for (const duplicate of report.duplicates) {
+    results.push({
+      id: resultId(runId, index++),
+      external_id: duplicate.slug,
+      status: "duplicate",
+      reason_code: "duplicate_slug",
+      detail_json: detailJson(duplicate),
+      created_at: now,
+    });
+  }
+  for (const invalid of report.invalid) {
+    results.push({
+      id: resultId(runId, index++),
+      external_id: null,
+      status: "invalid",
+      reason_code: "invalid_input",
+      detail_json: detailJson(invalid),
+      created_at: now,
+    });
+  }
+  return results;
+}
+
+export async function prepareOwidImport(
+  input: string,
+  format: "csv" | "json" | "txt",
+  options: ImportRunnerOptions = {},
+): Promise<OwidImportPlan> {
+  const startedAt = options.now ?? nowIso();
+  const completedAt = options.now ?? nowIso();
+  const runId = options.run_id ?? createRunId(startedAt);
+  const sourceId = options.source_id ?? DEFAULT_SOURCE_ID;
+  const normalizeReport = normalizeOwidInput(input, format);
+  const sourceClient = options.source_client ?? new OwidSourceClient({ concurrency: 4 });
+  const fetched = await sourceClient.fetchAssets(
+    normalizeReport.accepted.map((accepted) => accepted.slug),
+  );
+  const assets = fetched.successful.map((asset) =>
+    buildImportAssetRecord(asset, completedAt, sourceId),
+  );
+  const results = buildNormalizeResults(normalizeReport, runId, completedAt);
+  let resultIndex = results.length;
+
+  for (const asset of assets) {
+    results.push({
+      id: resultId(runId, resultIndex++),
+      external_id: asset.external_id,
+      status: "upserted",
+      reason_code: null,
+      detail_json: detailJson({ slug: asset.slug, rights_status: asset.rights_status }),
+      created_at: completedAt,
+    });
+  }
+  for (const failure of fetched.failed) {
+    results.push({
+      id: resultId(runId, resultIndex++),
+      external_id: failure.slug,
+      status: "failed",
+      reason_code: failure.error.code,
+      detail_json: detailJson(failure.error),
+      created_at: completedAt,
+    });
+  }
+
+  const errors = fetched.failed.length;
+  const partial = errors > 0 || normalizeReport.invalid.length > 0;
+  const status = partial ? (assets.length > 0 ? "partial" : "failed") : "succeeded";
+  return {
+    run_id: runId,
+    source_id: sourceId,
+    started_at: startedAt,
+    completed_at: completedAt,
+    status,
+    normalize_report: normalizeReport,
+    fetched,
+    assets,
+    results,
+    counts: {
+      accepted: assets.length,
+      duplicates: normalizeReport.duplicates.length,
+      invalid: normalizeReport.invalid.length,
+      errors,
+    },
+  };
+}
+
+const insertRunSql = `
+  INSERT INTO ingest_runs (
+    id, source_id, status, accepted_count, duplicate_count, invalid_count, error_count,
+    started_at, completed_at
+  ) VALUES (?, ?, 'running', 0, 0, 0, 0, ?, NULL)
+`;
+
+const upsertAssetSql = `
+  INSERT INTO assets (
+    id, source_id, creator_id, external_id, slug, asset_type, title, description,
+    canonical_url, canonical_url_normalized, embed_url, preview_url, citation_text,
+    attribution_name, attribution_url, published_at, source_updated_at, license_code,
+    rights_status, rights_json, metadata_json, search_document, status, created_at,
+    updated_at, last_checked_at
+  ) VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(slug) DO UPDATE SET
+    source_id = excluded.source_id,
+    external_id = excluded.external_id,
+    asset_type = excluded.asset_type,
+    title = excluded.title,
+    description = excluded.description,
+    canonical_url = excluded.canonical_url,
+    canonical_url_normalized = excluded.canonical_url_normalized,
+    embed_url = excluded.embed_url,
+    preview_url = excluded.preview_url,
+    citation_text = excluded.citation_text,
+    attribution_name = excluded.attribution_name,
+    attribution_url = excluded.attribution_url,
+    published_at = excluded.published_at,
+    source_updated_at = excluded.source_updated_at,
+    license_code = excluded.license_code,
+    rights_status = excluded.rights_status,
+    rights_json = excluded.rights_json,
+    metadata_json = excluded.metadata_json,
+    search_document = excluded.search_document,
+    updated_at = excluded.updated_at,
+    last_checked_at = excluded.last_checked_at
+`;
+
+const insertResultSql = `
+  INSERT INTO ingest_results (
+    id, ingest_run_id, external_id, status, reason_code, detail_json, created_at
+  ) VALUES (?, ?, ?, ?, ?, ?, ?)
+`;
+
+const updateRunSql = `
+  UPDATE ingest_runs
+  SET status = ?, accepted_count = ?, duplicate_count = ?, invalid_count = ?,
+      error_count = ?, completed_at = ?
+  WHERE id = ?
+`;
+
+function assetBindings(asset: ImportAssetRecord): unknown[] {
+  return [
+    asset.id,
+    asset.source_id,
+    asset.external_id,
+    asset.slug,
+    asset.asset_type,
+    asset.title,
+    asset.description,
+    asset.canonical_url,
+    asset.canonical_url_normalized,
+    asset.embed_url,
+    asset.preview_url,
+    asset.citation_text,
+    asset.attribution_name,
+    asset.attribution_url,
+    asset.published_at,
+    asset.source_updated_at,
+    asset.license_code,
+    asset.rights_status,
+    asset.rights_json,
+    asset.metadata_json,
+    asset.search_document,
+    asset.status,
+    asset.created_at,
+    asset.updated_at,
+    asset.last_checked_at,
+  ];
+}
+
+function chunk<T>(values: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let index = 0; index < values.length; index += size) {
+    chunks.push(values.slice(index, index + size));
+  }
+  return chunks;
+}
+
+export async function writeOwidImport(
+  db: D1Database,
+  plan: OwidImportPlan,
+  batchSize = DEFAULT_BATCH_SIZE,
+): Promise<ImportRunResult> {
+  await db.prepare(insertRunSql).bind(plan.run_id, plan.source_id, plan.started_at).run();
+
+  try {
+    const statements = [
+      ...plan.assets.map((asset) => db.prepare(upsertAssetSql).bind(...assetBindings(asset))),
+      ...plan.results.map((result) =>
+        db
+          .prepare(insertResultSql)
+          .bind(
+            result.id,
+            plan.run_id,
+            result.external_id,
+            result.status,
+            result.reason_code,
+            result.detail_json,
+            result.created_at,
+          ),
+      ),
+    ];
+    for (const statementBatch of chunk(statements, Math.max(1, batchSize))) {
+      await db.batch(statementBatch);
+    }
+    await db
+      .prepare(updateRunSql)
+      .bind(
+        plan.status,
+        plan.counts.accepted,
+        plan.counts.duplicates,
+        plan.counts.invalid,
+        plan.counts.errors,
+        plan.completed_at,
+        plan.run_id,
+      )
+      .run();
+    return { plan, database_written: true };
+  } catch (error) {
+    await db
+      .prepare(updateRunSql)
+      .bind(
+        "failed",
+        plan.counts.accepted,
+        plan.counts.duplicates,
+        plan.counts.invalid,
+        plan.counts.errors + 1,
+        plan.completed_at,
+        plan.run_id,
+      )
+      .run();
+    throw error;
+  }
+}
+
+function sqlLiteral(value: unknown): string {
+  if (value === null || value === undefined) {
+    return "NULL";
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  const stringValue = String(value).replace(/'/g, "''");
+  return `'${stringValue}'`;
+}
+
+function sqlAssetValues(asset: ImportAssetRecord): string {
+  return [asset.id, asset.source_id, null, ...assetBindings(asset).slice(2)]
+    .map(sqlLiteral)
+    .join(", ");
+}
+
+function sqlAssetStatement(asset: ImportAssetRecord): string {
+  return `INSERT INTO assets (
+  id, source_id, creator_id, external_id, slug, asset_type, title, description,
+  canonical_url, canonical_url_normalized, embed_url, preview_url, citation_text,
+  attribution_name, attribution_url, published_at, source_updated_at, license_code,
+  rights_status, rights_json, metadata_json, search_document, status, created_at,
+  updated_at, last_checked_at
+) VALUES (${sqlAssetValues(asset)})
+ON CONFLICT(slug) DO UPDATE SET
+  source_id = excluded.source_id, external_id = excluded.external_id,
+  asset_type = excluded.asset_type, title = excluded.title, description = excluded.description,
+  canonical_url = excluded.canonical_url, canonical_url_normalized = excluded.canonical_url_normalized,
+  embed_url = excluded.embed_url, preview_url = excluded.preview_url, citation_text = excluded.citation_text,
+  attribution_name = excluded.attribution_name, attribution_url = excluded.attribution_url,
+  published_at = excluded.published_at, source_updated_at = excluded.source_updated_at,
+  license_code = excluded.license_code, rights_status = excluded.rights_status,
+  rights_json = excluded.rights_json, metadata_json = excluded.metadata_json,
+  search_document = excluded.search_document, updated_at = excluded.updated_at,
+  last_checked_at = excluded.last_checked_at;`;
+}
+
+export function buildOwidImportSql(plan: OwidImportPlan): string {
+  const statements = [
+    "BEGIN TRANSACTION;",
+    `INSERT INTO ingest_runs (id, source_id, status, accepted_count, duplicate_count, invalid_count, error_count, started_at, completed_at) VALUES (${sqlLiteral(plan.run_id)}, ${sqlLiteral(plan.source_id)}, 'running', 0, 0, 0, 0, ${sqlLiteral(plan.started_at)}, NULL);`,
+    ...plan.assets.map(sqlAssetStatement),
+    ...plan.results.map(
+      (result) =>
+        `INSERT INTO ingest_results (id, ingest_run_id, external_id, status, reason_code, detail_json, created_at) VALUES (${[result.id, plan.run_id, result.external_id, result.status, result.reason_code, result.detail_json, result.created_at].map(sqlLiteral).join(", ")});`,
+    ),
+    `UPDATE ingest_runs SET status = ${sqlLiteral(plan.status)}, accepted_count = ${plan.counts.accepted}, duplicate_count = ${plan.counts.duplicates}, invalid_count = ${plan.counts.invalid}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
+    "COMMIT;",
+  ];
+  return `${statements.join("\n\n")}\n`;
+}
