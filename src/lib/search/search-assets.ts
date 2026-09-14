@@ -21,6 +21,10 @@ export type SearchCandidate = {
   rights_status: "safe" | "restricted";
   rights_json: string | null;
   source_updated_at: string | null;
+  canonical_url?: string;
+  embed_url?: string | null;
+  preview_url?: string | null;
+  citation_text?: string | null;
   fts_rank?: number;
   trigram_similarity?: number;
 };
@@ -129,6 +133,10 @@ function publicAsset(candidate: SearchCandidate): SearchAsset {
     rights_status: candidate.rights_status,
     rights_json: candidate.rights_json,
     source_updated_at: candidate.source_updated_at,
+    canonical_url: candidate.canonical_url,
+    embed_url: candidate.embed_url,
+    preview_url: candidate.preview_url,
+    citation_text: candidate.citation_text,
   };
 }
 
@@ -234,7 +242,8 @@ export function buildPrimarySearchSql(filters: SearchRequest["filters"] = {}): s
   return `
     WITH ranked AS (
       SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, '') AS source_name,
-        a.rights_status, a.rights_json, a.source_updated_at,
+        a.rights_status, a.rights_json, a.source_updated_at, a.canonical_url, a.embed_url, a.preview_url,
+        a.citation_text,
         ROW_NUMBER() OVER (ORDER BY bm25(assets_fts, 0.0, 10.0, 4.0, 6.0, 1.0), a.slug) AS bm25_rank
       FROM assets_fts
       JOIN assets a ON a.id = assets_fts.asset_id
@@ -255,7 +264,8 @@ export function buildFallbackSearchSql(
   const placeholders = Array.from({ length: trigramCount }, () => "?").join(", ");
   return `
     SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, '') AS source_name,
-      a.rights_status, a.rights_json, a.source_updated_at,
+      a.rights_status, a.rights_json, a.source_updated_at, a.canonical_url, a.embed_url, a.preview_url,
+      a.citation_text,
       COUNT(DISTINCT index_trigrams.trigram) AS shared_trigrams,
       (SELECT COUNT(*) FROM asset_search_trigrams all_trigrams WHERE all_trigrams.asset_id = a.id) AS asset_trigram_count
     FROM asset_search_trigrams index_trigrams
