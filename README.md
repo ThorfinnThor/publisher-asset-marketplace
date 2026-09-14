@@ -113,3 +113,6 @@ The public creator opportunity surface is available at `/opportunities` and is d
 
 Opportunity cards can open a topic-tagged submission draft; see
 [docs/build-this-f2.md](docs/build-this-f2.md) for the manual-review boundaries.
+
+The final launch search/rights gate is recorded in
+[docs/launch-search-rights-review-r3.md](docs/launch-search-rights-review-r3.md).

@@ -8,7 +8,11 @@ import { CopyCitationButton } from "@/components/copy-citation-button";
 import { CopyEmbedButton } from "@/components/copy-embed-button";
 import { buildEmbedMarkup, canCopyEmbed } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
-import { getPublishedAssetBySlug, type RelatedAsset } from "@/lib/assets/get-asset";
+import {
+  getPublishedAssetBySlug,
+  type PublishedAssetDetail,
+  type RelatedAsset,
+} from "@/lib/assets/get-asset";
 
 export const metadata: Metadata = {
   title: "Asset",
@@ -83,8 +87,8 @@ export default async function AssetPage({ params }: AssetPageProps) {
             <div>
               <dt>Rights status</dt>
               <dd>
-                <RightsBadge state={asset.rights_status === "safe" ? "verified" : "restricted"}>
-                  {asset.rights_status === "safe" ? "Safe to reuse" : "Restricted"}
+                <RightsBadge state={rightsBadgeState(rights.commercial_use, asset.rights_status)}>
+                  {commercialUseLabel(rights.commercial_use, asset.rights_status)}
                 </RightsBadge>
               </dd>
             </div>
@@ -286,6 +290,24 @@ function permissionLabel(value: boolean | null | undefined): string {
   if (value === true) return "Allowed";
   if (value === false) return "Not allowed";
   return "Unknown";
+}
+
+function rightsBadgeState(
+  commercialUse: boolean | null | undefined,
+  status: PublishedAssetDetail["rights_status"],
+): "verified" | "restricted" | "unknown" {
+  if (commercialUse === true) return "verified";
+  if (commercialUse === false || status === "restricted") return "restricted";
+  return "unknown";
+}
+
+function commercialUseLabel(
+  commercialUse: boolean | null | undefined,
+  status: PublishedAssetDetail["rights_status"],
+): string {
+  if (commercialUse === true) return "Commercial use allowed";
+  if (commercialUse === false) return "Non-commercial only";
+  return status === "restricted" ? "Restricted use" : "Commercial use unknown";
 }
 
 function formatAssetType(value: string): string {

@@ -267,8 +267,8 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
         </dl>
         <div className="asset-card__footer">
           <div className="rights-badges" aria-label="Rights status">
-            <RightsBadge state={asset.rights_status === "safe" ? "verified" : "restricted"}>
-              {asset.rights_status === "safe" ? "Commercial use ✓" : "Restricted"}
+            <RightsBadge state={rightsBadgeState(rights.commercial_use, asset.rights_status)}>
+              {commercialUseLabel(rights.commercial_use, asset.rights_status)}
             </RightsBadge>
             {embedAllowed ? <RightsBadge state="verified">Embed ✓</RightsBadge> : null}
             <RightsBadge state={asset.citation_text ? "verified" : "unknown"}>
@@ -311,16 +311,37 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
   );
 }
 
-function parseRights(value: string | null): { embed_allowed?: boolean | null } {
+function parseRights(value: string | null): {
+  embed_allowed?: boolean | null;
+  commercial_use?: boolean | null;
+} {
   if (!value) return {};
   try {
     const parsed: unknown = JSON.parse(value);
     return typeof parsed === "object" && parsed !== null
-      ? (parsed as { embed_allowed?: boolean | null })
+      ? (parsed as { embed_allowed?: boolean | null; commercial_use?: boolean | null })
       : {};
   } catch {
     return {};
   }
+}
+
+function rightsBadgeState(
+  commercialUse: boolean | null | undefined,
+  status: SearchAsset["rights_status"],
+): "verified" | "restricted" | "unknown" {
+  if (commercialUse === true) return "verified";
+  if (commercialUse === false || status === "restricted") return "restricted";
+  return "unknown";
+}
+
+function commercialUseLabel(
+  commercialUse: boolean | null | undefined,
+  status: SearchAsset["rights_status"],
+): string {
+  if (commercialUse === true) return "Commercial use ✓";
+  if (commercialUse === false) return "Non-commercial";
+  return status === "restricted" ? "Restricted" : "Commercial use unknown";
 }
 
 function formatAssetType(value: string): string {
