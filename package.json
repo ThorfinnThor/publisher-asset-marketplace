@@ -20,6 +20,7 @@
     "ingest:import": "tsx scripts/import-owid.ts",
     "audit:import": "tsx scripts/audit-import.ts",
     "refresh:assets": "tsx scripts/refresh-assets.ts",
+    "search:review": "tsx scripts/review-search-quality.ts --output docs/search-quality-review-c8.md",
     "lint": "eslint src scripts test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

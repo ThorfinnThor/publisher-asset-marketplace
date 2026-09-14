@@ -60,3 +60,6 @@ search ranking, embed handling, or analytics definitions.
 The accepted V1 search contract and fixed benchmark are documented in
 [docs/search-ranking-spec.md](docs/search-ranking-spec.md).
 The D1 query/function implementation is documented in [docs/search-sql-c2.md](docs/search-sql-c2.md).
+Run `npm run search:review` after ranking changes to execute the production search function against
+the fixed SQLite FTS5 fixture corpus and refresh
+[docs/search-quality-review-c8.md](docs/search-quality-review-c8.md).

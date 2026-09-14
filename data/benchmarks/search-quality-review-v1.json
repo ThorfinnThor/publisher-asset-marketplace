@@ -1,0 +1,47 @@
+{
+  "reviewVersion": "1.0.0",
+  "rankingContractVersion": "1.0.0",
+  "reviewedAt": "2026-09-14T12:00:00.000Z",
+  "model": "Sol",
+  "acceptance": {
+    "minimumStrongAnswerRate": 1
+  },
+  "queryGrades": [
+    {
+      "queryId": "exact-title",
+      "answerable": true,
+      "grade": 2,
+      "rationale": "The exact named asset is the first result and is clearly publisher-ready."
+    },
+    {
+      "queryId": "partial-phrase",
+      "answerable": true,
+      "grade": 2,
+      "rationale": "The Internet-use chart is the first result while the draft unknown-rights asset is excluded."
+    },
+    {
+      "queryId": "typo-fallback",
+      "answerable": true,
+      "grade": 2,
+      "rationale": "The typo fallback recovers the solar-price intent and prefers the safe asset."
+    },
+    {
+      "queryId": "zero-result",
+      "answerable": false,
+      "grade": 0,
+      "rationale": "The fixture corpus has no relevant asset; returning no result is safer than an unrelated answer."
+    },
+    {
+      "queryId": "safe-restricted-tie",
+      "answerable": true,
+      "grade": 2,
+      "rationale": "Both exact matches are relevant and the safe embeddable asset wins the tie."
+    },
+    {
+      "queryId": "publisher-style-topic",
+      "answerable": true,
+      "grade": 2,
+      "rationale": "The natural-language publisher query retrieves the genome-cost chart first."
+    }
+  ]
+}
