@@ -73,7 +73,9 @@ Preview the exact publication plan without writing:
 npm run rights:review -- --local --publish --sql-out /tmp/owid-rights-review.sql
 ```
 
-The production write is a separate Luna implementation step:
+The production write was completed by Luna after the import audit. The resulting remote audit is
+recorded in [docs/import-audit-b6-remote.md](import-audit-b6-remote.md) and Gate B is open. The
+reproducible command used was:
 
 ```bash
 npm run rights:review -- --remote --apply --publish
