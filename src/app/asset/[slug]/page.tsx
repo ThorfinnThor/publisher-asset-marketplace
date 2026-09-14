@@ -3,12 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArrowUpRightIcon, ChartPreview, CopyIcon, RightsBadge } from "@/components/design-system";
+import { CopyEmbedButton } from "@/components/copy-embed-button";
+import { buildEmbedMarkup, canCopyEmbed } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
-import {
-  getPublishedAssetBySlug,
-  type PublishedAssetDetail,
-  type RelatedAsset,
-} from "@/lib/assets/get-asset";
+import { getPublishedAssetBySlug, type RelatedAsset } from "@/lib/assets/get-asset";
 
 export const metadata: Metadata = {
   title: "Asset",
@@ -36,7 +34,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
 
   const { asset, related } = record;
   const rights = parseRights(asset.rights_json);
-  const embedAllowed = rights.embed_allowed === true && Boolean(asset.embed_url);
+  const embedAllowed = canCopyEmbed(asset);
   const citationAvailable = Boolean(asset.citation_text);
 
   return (
@@ -85,18 +83,11 @@ export default async function AssetPage({ params }: AssetPageProps) {
           </dl>
 
           <div className="asset-detail__actions">
-            <button
-              className="button"
-              disabled
-              title={
-                embedAllowed
-                  ? "Embed copy will be enabled in C5"
-                  : "Embed permission is not approved"
-              }
-              type="button"
-            >
-              <CopyIcon /> Copy embed
-            </button>
+            <CopyEmbedButton
+              assetSlug={asset.slug}
+              disabled={!embedAllowed}
+              embedMarkup={buildEmbedMarkup(asset)}
+            />
             <button
               className="button button--secondary"
               disabled
@@ -197,12 +188,15 @@ export default async function AssetPage({ params }: AssetPageProps) {
                 <p className="eyebrow">Source-hosted only</p>
                 <h2 id="embed-heading">Embed instructions</h2>
               </div>
-              <button className="button button--secondary button--small" disabled type="button">
-                <CopyIcon /> Copy
-              </button>
+              <CopyEmbedButton
+                assetSlug={asset.slug}
+                compact
+                disabled={!embedAllowed}
+                embedMarkup={buildEmbedMarkup(asset)}
+              />
             </div>
             <p className="code-preview">
-              {embedAllowed && asset.embed_url
+              {embedAllowed
                 ? buildEmbedMarkup(asset)
                 : "An approved source-hosted embed is not available for this asset."}
             </p>
@@ -302,8 +296,4 @@ function previewVariant(assetType: string): "line" | "bars" | "steps" {
   if (assetType === "calculator" || assetType === "benchmark") return "steps";
   if (assetType === "dataset" || assetType === "table") return "bars";
   return "line";
-}
-
-function buildEmbedMarkup(asset: PublishedAssetDetail): string {
-  return `<iframe src="${asset.embed_url}" title="${asset.title}" loading="lazy"></iframe>`;
 }
