@@ -78,3 +78,7 @@ The D2 daily demand runner is documented in
 [docs/demand-aggregation-d2.md](docs/demand-aggregation-d2.md). It aggregates the previous UTC
 day at 03:00 through the Worker Cron Trigger and keeps un-attributed asset actions out of query
 buckets.
+
+The transparent D3 scoring contract and fixed examples are documented in
+[docs/opportunity-score-spec.md](docs/opportunity-score-spec.md). Score implementation must retain
+its demand, scarcity, and engagement factors instead of exposing an unexplained number.

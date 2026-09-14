@@ -1,0 +1,150 @@
+{
+  "version": "opportunity-v1",
+  "normalization_version": "demand-query-v1",
+  "window_days": 28,
+  "cases": [
+    {
+      "id": "insufficient-volume",
+      "searches": 4,
+      "unique_anonymous_sessions": 4,
+      "result_count_distribution": { "0": 4 },
+      "no_result_searches": 4,
+      "asset_clicks": 0,
+      "embed_copies": 0,
+      "citation_copies": 0,
+      "safe_asset_count": 0,
+      "embeddable_asset_count": 0,
+      "expected": { "status": "insufficient_data", "opportunity_score": null }
+    },
+    {
+      "id": "single-session-repeat",
+      "searches": 100,
+      "unique_anonymous_sessions": 1,
+      "result_count_distribution": { "0": 100 },
+      "no_result_searches": 100,
+      "asset_clicks": 0,
+      "embed_copies": 0,
+      "citation_copies": 0,
+      "safe_asset_count": 0,
+      "embeddable_asset_count": 0,
+      "expected": { "status": "insufficient_data", "opportunity_score": null }
+    },
+    {
+      "id": "high-demand-no-results",
+      "searches": 100,
+      "unique_anonymous_sessions": 50,
+      "result_count_distribution": { "0": 100 },
+      "no_result_searches": 100,
+      "asset_clicks": 0,
+      "embed_copies": 0,
+      "citation_copies": 0,
+      "safe_asset_count": 0,
+      "embeddable_asset_count": 0,
+      "expected": {
+        "status": "scored",
+        "median_result_count": 0,
+        "demand_points": 5,
+        "scarcity_points": 5,
+        "engagement_intent": 1,
+        "opportunity_score": 50
+      }
+    },
+    {
+      "id": "high-demand-scarce-engaged",
+      "searches": 100,
+      "unique_anonymous_sessions": 50,
+      "result_count_distribution": { "0": 50, "2": 50 },
+      "no_result_searches": 50,
+      "asset_clicks": 50,
+      "embed_copies": 5,
+      "citation_copies": 5,
+      "safe_asset_count": 1,
+      "embeddable_asset_count": 0,
+      "expected": {
+        "status": "scored",
+        "median_result_count": 0,
+        "demand_points": 5,
+        "scarcity_points": 4,
+        "engagement_intent": 1.7,
+        "opportunity_score": 68
+      }
+    },
+    {
+      "id": "moderate-demand-abundant",
+      "searches": 25,
+      "unique_anonymous_sessions": 10,
+      "result_count_distribution": { "10": 25 },
+      "no_result_searches": 0,
+      "asset_clicks": 5,
+      "embed_copies": 0,
+      "citation_copies": 0,
+      "safe_asset_count": 10,
+      "embeddable_asset_count": 5,
+      "expected": {
+        "status": "scored",
+        "median_result_count": 10,
+        "demand_points": 3,
+        "scarcity_points": 1,
+        "engagement_intent": 1.2,
+        "opportunity_score": 7
+      }
+    },
+    {
+      "id": "moderate-demand-low-supply",
+      "searches": 25,
+      "unique_anonymous_sessions": 10,
+      "result_count_distribution": { "0": 7, "2": 18 },
+      "no_result_searches": 7,
+      "asset_clicks": 10,
+      "embed_copies": 3,
+      "citation_copies": 2,
+      "safe_asset_count": 2,
+      "embeddable_asset_count": 1,
+      "expected": {
+        "status": "scored",
+        "median_result_count": 2,
+        "demand_points": 3,
+        "scarcity_points": 3,
+        "engagement_intent": 1.8,
+        "opportunity_score": 32
+      }
+    },
+    {
+      "id": "maximum-bounded-score",
+      "searches": 100,
+      "unique_anonymous_sessions": 50,
+      "result_count_distribution": { "0": 50, "1": 50 },
+      "no_result_searches": 50,
+      "asset_clicks": 100,
+      "embed_copies": 15,
+      "citation_copies": 10,
+      "safe_asset_count": 0,
+      "embeddable_asset_count": 0,
+      "expected": {
+        "status": "scored",
+        "median_result_count": 0,
+        "demand_points": 5,
+        "scarcity_points": 5,
+        "engagement_intent": 2,
+        "opportunity_score": 100
+      }
+    },
+    {
+      "id": "invalid-distribution",
+      "searches": 10,
+      "unique_anonymous_sessions": 5,
+      "result_count_distribution": { "0": 9 },
+      "no_result_searches": 9,
+      "asset_clicks": 0,
+      "embed_copies": 0,
+      "citation_copies": 0,
+      "safe_asset_count": 0,
+      "embeddable_asset_count": 0,
+      "expected": {
+        "status": "unavailable",
+        "reason_code": "invalid_result_distribution",
+        "opportunity_score": null
+      }
+    }
+  ]
+}
