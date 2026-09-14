@@ -103,3 +103,7 @@ See [docs/creator-asset-publishing-e5.md](docs/creator-asset-publishing-e5.md) f
 
 Creator source links and copied embed attribution follow the accepted
 [E6 attribution/link policy](docs/creator-attribution-link-policy-e6.md).
+
+Creator-owned published assets expose bounded first-party publisher signals in the dashboard.
+See [docs/creator-analytics-e7.md](docs/creator-analytics-e7.md) for the E7 metric definitions,
+privacy handling and ownership boundaries.

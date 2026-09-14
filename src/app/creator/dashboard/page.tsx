@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 
+import {
+  getCreatorDashboard,
+  type CreatorAssetAnalytics,
+  type CreatorDashboardData,
+} from "@/lib/analytics/creator-dashboard";
 import { getAuthenticatedProfile } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
 
@@ -49,6 +54,8 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
     );
   }
 
+  const analytics = await loadCreatorDashboard(profile.id);
+
   return (
     <main className="page-shell dashboard-page">
       <header className="dashboard-header">
@@ -81,6 +88,8 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
         <span className="profile-role">{profile.role}</span>
       </section>
 
+      <CreatorAnalyticsSection data={analytics} />
+
       <section className="dashboard-table" aria-labelledby="creator-next-heading">
         <div className="dashboard-table__heading">
           <div>
@@ -110,6 +119,110 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
   );
 }
 
+function CreatorAnalyticsSection({ data }: { data: CreatorDashboardData | null }) {
+  if (!data) {
+    return (
+      <div className="notice dashboard-notice" role="status">
+        <strong>Creator analytics temporarily unavailable.</strong> Your published assets remain
+        available; try again after the next Worker request.
+      </div>
+    );
+  }
+
+  return (
+    <section className="creator-analytics" aria-labelledby="creator-analytics-heading">
+      <div className="creator-analytics__heading">
+        <div>
+          <p className="eyebrow">Publisher signals</p>
+          <h2 id="creator-analytics-heading">Published assets</h2>
+          <p>
+            Activity from the latest complete 28-day window ({data.window.start} to{" "}
+            {data.window.end}) for assets published under your creator profile.
+          </p>
+        </div>
+      </div>
+      {data.assets.length === 0 ? (
+        <div className="empty-state">
+          <strong>No published assets yet.</strong>
+          <span>Submit an asset for manual review to see publisher signals here.</span>
+          <a className="text-link" href="/submit">
+            Open submission form
+          </a>
+        </div>
+      ) : (
+        <div className="creator-assets-list">
+          {data.assets.map((asset) => (
+            <CreatorAssetCard key={asset.id} asset={asset} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CreatorAssetCard({ asset }: { asset: CreatorAssetAnalytics }) {
+  return (
+    <article className="creator-asset-card">
+      <header className="creator-asset-card__header">
+        <div>
+          <p className="eyebrow">
+            {asset.asset_type} · {asset.status}
+          </p>
+          <h3>
+            <a href={`/asset/${asset.slug}`}>{asset.title}</a>
+          </h3>
+          <p>/{asset.slug}</p>
+        </div>
+        <a className="text-link" href={`/asset/${asset.slug}`}>
+          View asset
+        </a>
+      </header>
+      <div className="creator-asset-card__metrics" aria-label={`${asset.title} activity metrics`}>
+        <Metric label="Search impressions" value={asset.impressions} />
+        <Metric label="Detail views" value={asset.detail_views} />
+        <Metric label="Embed copies (intent)" value={asset.embed_copies} />
+        <Metric label="Citation copies" value={asset.citation_copies} />
+        <Metric label="Source clicks" value={asset.source_clicks} />
+      </div>
+      <div className="creator-asset-card__discovery">
+        <div>
+          <strong>Top discovery queries</strong>
+          <span>Normalized search wording linked to this asset&apos;s impressions.</span>
+        </div>
+        {asset.top_discovery_queries.length === 0 ? (
+          <p>No discovery query is available in this window.</p>
+        ) : (
+          <ul>
+            {asset.top_discovery_queries.map((query) => (
+              <li key={query.query}>
+                <span>{query.query}</span>
+                <b>{formatInteger(query.impressions)}</b>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <p className="creator-asset-card__note">
+        Embed copies and source clicks are publisher intent signals, not confirmed embeds, citations
+        or backlinks.
+      </p>
+    </article>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <strong>{formatInteger(value)}</strong>
+    </div>
+  );
+}
+
+function formatInteger(value: number): string {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
 async function loadProfile() {
   try {
     const requestHeaders = await headers();
@@ -117,6 +230,14 @@ async function loadProfile() {
       new Request("http://internal.invalid/", { headers: requestHeaders }),
       getDatabase(),
     );
+  } catch {
+    return null;
+  }
+}
+
+async function loadCreatorDashboard(creatorId: string): Promise<CreatorDashboardData | null> {
+  try {
+    return await getCreatorDashboard(getDatabase(), creatorId);
   } catch {
     return null;
   }
