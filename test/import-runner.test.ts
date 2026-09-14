@@ -133,7 +133,11 @@ describe("import runner", () => {
       "invalid",
       "upserted",
     ]);
-    expect(buildOwidImportSql(plan)).toContain("ON CONFLICT(slug) DO UPDATE SET");
+    expect(buildOwidImportSql(plan)).toContain("INSERT OR IGNORE INTO assets");
+    expect(buildOwidImportSql(plan)).toContain("UPDATE assets SET source_id");
+    expect(buildOwidImportSql(plan)).toContain(
+      "WHERE length(substr(value, position, 3)) = 3;\n\nUPDATE ingest_runs",
+    );
     expect(buildOwidImportSql(plan)).toContain("asset_owid_sample-chart");
   });
 
@@ -163,7 +167,7 @@ describe("import runner", () => {
     const result = await writeOwidImport(db, plan, 1);
 
     expect(result.database_written).toBe(true);
-    expect(calls.filter((call) => call.startsWith("batch:")).length).toBe(2);
+    expect(calls.filter((call) => call.startsWith("batch:")).length).toBe(3);
     expect(calls.some((call) => call.startsWith("UPDATE ingest_runs"))).toBe(true);
   });
 });

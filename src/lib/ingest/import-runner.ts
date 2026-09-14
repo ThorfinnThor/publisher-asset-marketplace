@@ -310,36 +310,23 @@ const insertRunSql = `
   ) VALUES (?, ?, 'running', 0, 0, 0, 0, ?, NULL)
 `;
 
-const upsertAssetSql = `
-  INSERT INTO assets (
+const insertAssetSql = `
+  INSERT OR IGNORE INTO assets (
     id, source_id, creator_id, external_id, slug, asset_type, title, description,
     canonical_url, canonical_url_normalized, embed_url, preview_url, citation_text,
     attribution_name, attribution_url, published_at, source_updated_at, license_code,
     rights_status, rights_json, metadata_json, search_document, status, created_at,
     updated_at, last_checked_at
   ) VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  ON CONFLICT(slug) DO UPDATE SET
-    source_id = excluded.source_id,
-    external_id = excluded.external_id,
-    asset_type = excluded.asset_type,
-    title = excluded.title,
-    description = excluded.description,
-    canonical_url = excluded.canonical_url,
-    canonical_url_normalized = excluded.canonical_url_normalized,
-    embed_url = excluded.embed_url,
-    preview_url = excluded.preview_url,
-    citation_text = excluded.citation_text,
-    attribution_name = excluded.attribution_name,
-    attribution_url = excluded.attribution_url,
-    published_at = excluded.published_at,
-    source_updated_at = excluded.source_updated_at,
-    license_code = excluded.license_code,
-    rights_status = excluded.rights_status,
-    rights_json = excluded.rights_json,
-    metadata_json = excluded.metadata_json,
-    search_document = excluded.search_document,
-    updated_at = excluded.updated_at,
-    last_checked_at = excluded.last_checked_at
+`;
+
+const updateImportedAssetSql = `
+  UPDATE assets SET
+    source_id = ?, external_id = ?, asset_type = ?, title = ?, description = ?,
+    canonical_url = ?, canonical_url_normalized = ?, embed_url = ?, preview_url = ?,
+    citation_text = ?, attribution_name = ?, attribution_url = ?, published_at = ?,
+    source_updated_at = ?, search_document = ?, updated_at = ?, last_checked_at = ?
+  WHERE slug = ?
 `;
 
 const insertResultSql = `
@@ -385,6 +372,29 @@ function assetBindings(asset: ImportAssetRecord): unknown[] {
   ];
 }
 
+function importedAssetUpdateBindings(asset: ImportAssetRecord): unknown[] {
+  return [
+    asset.source_id,
+    asset.external_id,
+    asset.asset_type,
+    asset.title,
+    asset.description,
+    asset.canonical_url,
+    asset.canonical_url_normalized,
+    asset.embed_url,
+    asset.preview_url,
+    asset.citation_text,
+    asset.attribution_name,
+    asset.attribution_url,
+    asset.published_at,
+    asset.source_updated_at,
+    asset.search_document,
+    asset.updated_at,
+    asset.last_checked_at,
+    asset.slug,
+  ];
+}
+
 function chunk<T>(values: T[], size: number): T[][] {
   const chunks: T[][] = [];
   for (let index = 0; index < values.length; index += size) {
@@ -402,7 +412,10 @@ export async function writeOwidImport(
 
   try {
     const statements = [
-      ...plan.assets.map((asset) => db.prepare(upsertAssetSql).bind(...assetBindings(asset))),
+      ...plan.assets.flatMap((asset) => [
+        db.prepare(insertAssetSql).bind(...assetBindings(asset)),
+        db.prepare(updateImportedAssetSql).bind(...importedAssetUpdateBindings(asset)),
+      ]),
       ...plan.results.map((result) =>
         db
           .prepare(insertResultSql)
@@ -468,37 +481,34 @@ function sqlAssetValues(asset: ImportAssetRecord): string {
     .join(", ");
 }
 
-function sqlAssetStatement(asset: ImportAssetRecord): string {
-  return `INSERT INTO assets (
+function sqlAssetInsertStatement(asset: ImportAssetRecord): string {
+  return `INSERT OR IGNORE INTO assets (
   id, source_id, creator_id, external_id, slug, asset_type, title, description,
   canonical_url, canonical_url_normalized, embed_url, preview_url, citation_text,
   attribution_name, attribution_url, published_at, source_updated_at, license_code,
   rights_status, rights_json, metadata_json, search_document, status, created_at,
   updated_at, last_checked_at
-) VALUES (${sqlAssetValues(asset)})
-ON CONFLICT(slug) DO UPDATE SET
-  source_id = excluded.source_id, external_id = excluded.external_id,
-  asset_type = excluded.asset_type, title = excluded.title, description = excluded.description,
-  canonical_url = excluded.canonical_url, canonical_url_normalized = excluded.canonical_url_normalized,
-  embed_url = excluded.embed_url, preview_url = excluded.preview_url, citation_text = excluded.citation_text,
-  attribution_name = excluded.attribution_name, attribution_url = excluded.attribution_url,
-  published_at = excluded.published_at, source_updated_at = excluded.source_updated_at,
-  license_code = excluded.license_code, rights_status = excluded.rights_status,
-  rights_json = excluded.rights_json, metadata_json = excluded.metadata_json,
-  search_document = excluded.search_document, updated_at = excluded.updated_at,
-  last_checked_at = excluded.last_checked_at;`;
+) VALUES (${sqlAssetValues(asset)});`;
+}
+
+function sqlAssetUpdateStatement(asset: ImportAssetRecord): string {
+  const values = importedAssetUpdateBindings(asset).map(sqlLiteral);
+  return `UPDATE assets SET source_id = ${values[0]}, external_id = ${values[1]}, asset_type = ${values[2]}, title = ${values[3]}, description = ${values[4]}, canonical_url = ${values[5]}, canonical_url_normalized = ${values[6]}, embed_url = ${values[7]}, preview_url = ${values[8]}, citation_text = ${values[9]}, attribution_name = ${values[10]}, attribution_url = ${values[11]}, published_at = ${values[12]}, source_updated_at = ${values[13]}, search_document = ${values[14]}, updated_at = ${values[15]}, last_checked_at = ${values[16]} WHERE slug = ${values[17]};`;
 }
 
 export function buildOwidImportSql(plan: OwidImportPlan): string {
   const statements = [
     `INSERT INTO ingest_runs (id, source_id, status, accepted_count, duplicate_count, invalid_count, error_count, started_at, completed_at) VALUES (${sqlLiteral(plan.run_id)}, ${sqlLiteral(plan.source_id)}, 'running', 0, 0, 0, 0, ${sqlLiteral(plan.started_at)}, NULL);`,
-    ...plan.assets.map(sqlAssetStatement),
+    ...plan.assets.flatMap((asset) => [
+      sqlAssetInsertStatement(asset),
+      sqlAssetUpdateStatement(asset),
+    ]),
     ...plan.results.map(
       (result) =>
         `INSERT INTO ingest_results (id, ingest_run_id, external_id, status, reason_code, detail_json, created_at) VALUES (${[result.id, plan.run_id, result.external_id, result.status, result.reason_code, result.detail_json, result.created_at].map(sqlLiteral).join(", ")});`,
     ),
     "DELETE FROM asset_search_trigrams;",
-    rebuildAssetSearchTrigramsSql.trim(),
+    `${rebuildAssetSearchTrigramsSql.trim()};`,
     `UPDATE ingest_runs SET status = ${sqlLiteral(plan.status)}, accepted_count = ${plan.counts.accepted}, duplicate_count = ${plan.counts.duplicates}, invalid_count = ${plan.counts.invalid}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
   ];
   return `${statements.join("\n\n")}\n`;

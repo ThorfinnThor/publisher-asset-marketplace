@@ -477,7 +477,7 @@ export function buildAssetRefreshSql(plan: RefreshPlan): string {
         `INSERT INTO refresh_results (id, refresh_run_id, asset_id, outcome, reason_code, detail_json, created_at) VALUES (${[result.id, plan.run_id, result.asset_id, result.outcome, result.reason_code, result.detail_json, result.created_at].map(sqlLiteral).join(", ")});`,
     ),
     "DELETE FROM asset_search_trigrams;",
-    rebuildAssetSearchTrigramsSql.trim(),
+    `${rebuildAssetSearchTrigramsSql.trim()};`,
     `UPDATE refresh_runs SET status = ${sqlLiteral(plan.status)}, candidate_count = ${plan.counts.candidates}, refreshed_count = ${plan.counts.refreshed}, hidden_count = ${plan.counts.hidden}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
     "COMMIT;",
   ];
