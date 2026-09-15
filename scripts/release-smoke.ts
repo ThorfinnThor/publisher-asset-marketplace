@@ -5,6 +5,7 @@ type SmokeCheck = {
   path: string;
   expectedStatus: number;
   includes?: string[];
+  excludes?: string[];
   headers?: Record<string, string>;
   init?: RequestInit;
 };
@@ -19,7 +20,14 @@ const checks: SmokeCheck[] = [
   {
     path: "/asset/solar-pv-prices",
     expectedStatus: 200,
-    includes: ["Solar photovoltaic panel prices", "Copy citation", "Copy embed"],
+    includes: [
+      "Solar photovoltaic panel prices",
+      "Copy citation",
+      "Copy embed",
+      'src="https://ourworldindata.org/grapher/solar-pv-prices?embed=1"',
+      "Interactive chart loaded directly from the source.",
+    ],
+    excludes: ["Interface preview only—not source data."],
   },
   {
     path: "/asset/absolute-number-of-deaths-from-outdoor-air-pollution",
@@ -76,6 +84,9 @@ async function run(): Promise<void> {
     }
     for (const expected of check.includes ?? []) {
       if (!body.includes(expected)) failures.push(`${check.path}: missing text ${expected}`);
+    }
+    for (const unexpected of check.excludes ?? []) {
+      if (body.includes(unexpected)) failures.push(`${check.path}: unexpected text ${unexpected}`);
     }
     if (check.path === "/" && response.headers.get("x-frame-options") !== "DENY") {
       failures.push("/: missing x-frame-options=DENY");

@@ -8,6 +8,7 @@ import { CopyCitationButton } from "@/components/copy-citation-button";
 import { CopyEmbedButton } from "@/components/copy-embed-button";
 import { buildEmbedMarkup, canCopyEmbed } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
+import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import {
   getPublishedAssetBySlug,
   type PublishedAssetDetail,
@@ -42,6 +43,8 @@ export default async function AssetPage({ params }: AssetPageProps) {
   const rights = parseRights(asset.rights_json);
   const embedAllowed = canCopyEmbed(asset);
   const citationAvailable = Boolean(asset.citation_text);
+  const normalizedPreview = normalizePublicHttpsUrl(asset.preview_url);
+  const previewUrl = normalizedPreview.ok ? normalizedPreview.value : null;
 
   return (
     <main className="asset-detail page-shell">
@@ -122,8 +125,32 @@ export default async function AssetPage({ params }: AssetPageProps) {
         </div>
 
         <div className="asset-detail__preview">
-          <ChartPreview variant={previewVariant(asset.asset_type)} />
-          <p>Interface preview only—not source data.</p>
+          {embedAllowed && asset.embed_url ? (
+            <iframe
+              className="asset-detail__source-embed"
+              src={asset.embed_url}
+              title={`${asset.title} — interactive source chart`}
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+              sandbox="allow-scripts"
+            />
+          ) : previewUrl ? (
+            <img
+              className="asset-detail__source-image"
+              src={previewUrl}
+              alt={`Source preview of ${asset.title}`}
+              loading="eager"
+            />
+          ) : (
+            <ChartPreview variant={previewVariant(asset.asset_type)} />
+          )}
+          <p>
+            {embedAllowed && asset.embed_url
+              ? "Interactive chart loaded directly from the source."
+              : previewUrl
+                ? "Data preview loaded directly from the source."
+                : "A source preview is not available for this asset."}
+          </p>
         </div>
       </section>
 
