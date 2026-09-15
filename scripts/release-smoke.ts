@@ -11,11 +11,25 @@ type SmokeCheck = {
 
 const checks: SmokeCheck[] = [
   { path: "/", expectedStatus: 200, includes: ["Find data worth citing."] },
-  { path: "/search?q=solar", expectedStatus: 200, includes: ["Results for"] },
+  {
+    path: "/search?q=solar",
+    expectedStatus: 200,
+    includes: ["Results for", "Solar photovoltaic panel prices"],
+  },
   {
     path: "/asset/solar-pv-prices",
     expectedStatus: 200,
-    includes: ["Copy citation", "Copy embed"],
+    includes: ["Solar photovoltaic panel prices", "Copy citation", "Copy embed"],
+  },
+  {
+    path: "/asset/absolute-number-of-deaths-from-outdoor-air-pollution",
+    expectedStatus: 200,
+    includes: ["Copy citation", "Copy embed", "Commercial use"],
+  },
+  {
+    path: "/asset/children-not-in-school",
+    expectedStatus: 404,
+    includes: ["Not found"],
   },
   {
     path: "/opportunities",

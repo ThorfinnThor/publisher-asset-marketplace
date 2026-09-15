@@ -16,6 +16,11 @@ It also checks negative API boundaries for missing anonymous-session, submission
 sign-out-origin headers, plus the production `X-Frame-Options` header. The smoke script does not
 create analytics events, submissions or moderation changes.
 
+The post-import checks additionally require a published OWID result in live search, open one
+`safe` and one `restricted` asset detail page, and confirm that an `unknown` draft asset returns
+404 publicly. The Cloudflare deployment workflow runs this smoke automatically after each
+successful production deploy.
+
 The protected state-changing journey is covered by the existing deterministic suites:
 
 - `test/submissions.test.ts`: creator payload validation, rights declarations and opportunity-topic
