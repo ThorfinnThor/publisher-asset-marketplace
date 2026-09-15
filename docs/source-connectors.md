@@ -1,6 +1,7 @@
 # F3 source connector contract
 
-Status: **design complete; not onboarded**  
+Status: **F4 parser implemented; no production records onboarded**
+
 Design owner: **SOL**  
 Implementation owner: **LUNA (F4)**
 
@@ -137,3 +138,33 @@ LUNA may implement the connector only after these checks are encoded in tests:
 
 No production World Bank records should be imported until the F4 tests pass and
 the source policy evidence has been rechecked against the live item metadata.
+
+## F4 implementation
+
+The parser is implemented in:
+
+- `src/lib/ingest/worldbank-source-client.ts` — allow-listed API client with
+  bounded rows, retries, timeout, concurrency, structured failures, and raw
+  evidence preservation;
+- `src/lib/ingest/worldbank-import-runner.ts` — mapping into the common
+  idempotent D1 import pipeline;
+- `scripts/import-worldbank.ts` — explicit dry-run/SQL/apply entry point;
+- `migrations/0013_worldbank_source.sql` — source registry row only.
+
+Run a dry run for one or more indicator codes:
+
+```sh
+npm run ingest:worldbank -- SP.POP.TOTL
+```
+
+Applying data remains explicit and should only happen after item-level rights
+review:
+
+```sh
+npm run ingest:worldbank -- SP.POP.TOTL --apply --remote
+```
+
+The parser currently imports records as `draft`, uses `embed_url = null`, and
+keeps rights `unknown` until the evidence is manually reviewed. The F4 fixture
+suite covers the acceptance gates above; no production World Bank records have
+been imported by this change.

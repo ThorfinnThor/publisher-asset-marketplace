@@ -17,13 +17,13 @@ export type ImportAssetRecord = {
   source_id: string;
   external_id: string | null;
   slug: string;
-  asset_type: "chart";
+  asset_type: "chart" | "calculator" | "table" | "dataset" | "benchmark" | "widget";
   title: string;
   description: string;
   canonical_url: string;
   canonical_url_normalized: string;
-  embed_url: string;
-  preview_url: string;
+  embed_url: string | null;
+  preview_url: string | null;
   citation_text: string | null;
   attribution_name: string | null;
   attribution_url: string | null;
@@ -40,6 +40,27 @@ export type ImportAssetRecord = {
   last_checked_at: string;
 };
 
+export type SourceAssetRecordInput = {
+  id: string;
+  source_id: string;
+  external_id: string | null;
+  slug: string;
+  asset_type: ImportAssetRecord["asset_type"];
+  title: string;
+  description: string;
+  canonical_url: string;
+  embed_url: string | null;
+  preview_url: string | null;
+  citation_text: string | null;
+  attribution_name: string | null;
+  attribution_url: string | null;
+  published_at: string | null;
+  source_updated_at: string | null;
+  metadata: Record<string, unknown>;
+  rights_evidence: RightsEvidence;
+  search_terms: string[];
+};
+
 export type ImportResultRecord = {
   id: string;
   external_id: string | null;
@@ -49,14 +70,12 @@ export type ImportResultRecord = {
   created_at: string;
 };
 
-export type OwidImportPlan = {
+export type ImportPlan = {
   run_id: string;
   source_id: string;
   started_at: string;
   completed_at: string;
   status: "succeeded" | "failed" | "partial";
-  normalize_report: NormalizeReport;
-  fetched: OwidBatchResult;
   assets: ImportAssetRecord[];
   results: ImportResultRecord[];
   counts: {
@@ -67,6 +86,11 @@ export type OwidImportPlan = {
   };
 };
 
+export type OwidImportPlan = ImportPlan & {
+  normalize_report: NormalizeReport;
+  fetched: OwidBatchResult;
+};
+
 export type ImportRunnerOptions = {
   source_id?: string;
   now?: string;
@@ -75,7 +99,7 @@ export type ImportRunnerOptions = {
 };
 
 export type ImportRunResult = {
-  plan: OwidImportPlan;
+  plan: ImportPlan;
   database_written: boolean;
 };
 
@@ -193,6 +217,47 @@ export function buildImportAssetRecord(
     rights_json: JSON.stringify(classification.rights),
     metadata_json: buildMetadataJson(asset, rightsEvidence),
     search_document: [asset.normalized.title, description, "chart", "Our World in Data"]
+      .filter(Boolean)
+      .join(" "),
+    status: "draft",
+    created_at: checkedAt,
+    updated_at: checkedAt,
+    last_checked_at: checkedAt,
+  };
+}
+
+export function buildSourceImportAssetRecord(
+  asset: SourceAssetRecordInput,
+  checkedAt: string,
+): ImportAssetRecord {
+  const classification = classifyRights(asset.rights_evidence);
+  const licenseCode =
+    classification.chart_license === "CUSTOM_OR_UNKNOWN" ? null : classification.chart_license;
+  return {
+    id: asset.id,
+    source_id: asset.source_id,
+    external_id: asset.external_id,
+    slug: asset.slug,
+    asset_type: asset.asset_type,
+    title: asset.title,
+    description: asset.description,
+    canonical_url: asset.canonical_url,
+    canonical_url_normalized: asset.canonical_url,
+    embed_url: asset.embed_url,
+    preview_url: asset.preview_url,
+    citation_text: asset.citation_text,
+    attribution_name: asset.attribution_name,
+    attribution_url: asset.attribution_url,
+    published_at: asset.published_at,
+    source_updated_at: asset.source_updated_at,
+    license_code: licenseCode,
+    rights_status: classification.rights_status,
+    rights_json: JSON.stringify(classification.rights),
+    metadata_json: JSON.stringify({
+      ...asset.metadata,
+      rights_evidence: asset.rights_evidence,
+    }),
+    search_document: [asset.title, asset.description, ...asset.search_terms]
       .filter(Boolean)
       .join(" "),
     status: "draft",
@@ -403,9 +468,9 @@ function chunk<T>(values: T[], size: number): T[][] {
   return chunks;
 }
 
-export async function writeOwidImport(
+export async function writeImport(
   db: D1Database,
-  plan: OwidImportPlan,
+  plan: ImportPlan,
   batchSize = DEFAULT_BATCH_SIZE,
 ): Promise<ImportRunResult> {
   await db.prepare(insertRunSql).bind(plan.run_id, plan.source_id, plan.started_at).run();
@@ -464,6 +529,14 @@ export async function writeOwidImport(
   }
 }
 
+export async function writeOwidImport(
+  db: D1Database,
+  plan: OwidImportPlan,
+  batchSize = DEFAULT_BATCH_SIZE,
+): Promise<ImportRunResult> {
+  return writeImport(db, plan, batchSize);
+}
+
 function sqlLiteral(value: unknown): string {
   if (value === null || value === undefined) {
     return "NULL";
@@ -496,7 +569,7 @@ function sqlAssetUpdateStatement(asset: ImportAssetRecord): string {
   return `UPDATE assets SET source_id = ${values[0]}, external_id = ${values[1]}, asset_type = ${values[2]}, title = ${values[3]}, description = ${values[4]}, canonical_url = ${values[5]}, canonical_url_normalized = ${values[6]}, embed_url = ${values[7]}, preview_url = ${values[8]}, citation_text = ${values[9]}, attribution_name = ${values[10]}, attribution_url = ${values[11]}, published_at = ${values[12]}, source_updated_at = ${values[13]}, search_document = ${values[14]}, updated_at = ${values[15]}, last_checked_at = ${values[16]} WHERE slug = ${values[17]};`;
 }
 
-export function buildOwidImportSql(plan: OwidImportPlan): string {
+export function buildImportSql(plan: ImportPlan): string {
   const statements = [
     `INSERT INTO ingest_runs (id, source_id, status, accepted_count, duplicate_count, invalid_count, error_count, started_at, completed_at) VALUES (${sqlLiteral(plan.run_id)}, ${sqlLiteral(plan.source_id)}, 'running', 0, 0, 0, 0, ${sqlLiteral(plan.started_at)}, NULL);`,
     ...plan.assets.flatMap((asset) => [
@@ -512,4 +585,8 @@ export function buildOwidImportSql(plan: OwidImportPlan): string {
     `UPDATE ingest_runs SET status = ${sqlLiteral(plan.status)}, accepted_count = ${plan.counts.accepted}, duplicate_count = ${plan.counts.duplicates}, invalid_count = ${plan.counts.invalid}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
   ];
   return `${statements.join("\n\n")}\n`;
+}
+
+export function buildOwidImportSql(plan: OwidImportPlan): string {
+  return buildImportSql(plan);
 }

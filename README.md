@@ -116,7 +116,9 @@ Opportunity cards can open a topic-tagged submission draft; see
 
 The F3 source connector contract and World Bank candidate policy are documented
 in [docs/source-connectors.md](docs/source-connectors.md). The source remains a
-candidate until the F4 parser and rights fixtures pass.
+candidate for production data until item-level rights review passes. The F4
+parser is available through `npm run ingest:worldbank -- <indicator>` and
+defaults to a dry run.
 
 The final launch search/rights gate is recorded in
 [docs/launch-search-rights-review-r3.md](docs/launch-search-rights-review-r3.md).
