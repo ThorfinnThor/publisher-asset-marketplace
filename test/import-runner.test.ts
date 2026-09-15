@@ -214,4 +214,58 @@ describe("import runner", () => {
     expect(calls.filter((call) => call.startsWith("batch:")).length).toBe(3);
     expect(calls.some((call) => call.startsWith("UPDATE ingest_runs"))).toBe(true);
   });
+
+  it("can preserve an unavailable source as a conservative draft fallback", async () => {
+    const sourceClient = {
+      fetchAssets: async () => ({
+        successful: [],
+        failed: [
+          {
+            slug: "unavailable-chart",
+            error: {
+              slug: "unavailable-chart",
+              endpoint: "metadata" as const,
+              code: "http_503",
+              message: "OWID metadata request returned HTTP 503",
+              status: 503,
+              attempts: 3,
+            },
+          },
+        ],
+      }),
+    };
+    const plan = await prepareOwidImport(
+      JSON.stringify([
+        {
+          asset_url: "https://ourworldindata.org/grapher/unavailable-chart",
+          title: "Unavailable chart title",
+        },
+      ]),
+      "json",
+      {
+        now: "2026-09-15T00:00:00.000Z",
+        run_id: "ingest_fallback",
+        source_client: sourceClient,
+        allow_source_fallback: true,
+      },
+    );
+
+    expect(plan.counts).toEqual({ accepted: 1, duplicates: 0, invalid: 0, errors: 0 });
+    expect(plan.status).toBe("succeeded");
+    expect(plan.assets[0]).toMatchObject({
+      slug: "unavailable-chart",
+      title: "Unavailable chart title",
+      external_id: "unavailable-chart",
+      rights_status: "unknown",
+      status: "draft",
+    });
+    expect(JSON.parse(plan.assets[0]!.metadata_json)).toMatchObject({
+      source_fetch_error: { code: "http_503", attempts: 3 },
+      rights_evidence: { embed_available: null, indicator_evidence: [] },
+    });
+    expect(plan.results[0]).toMatchObject({
+      status: "upserted",
+      reason_code: "source_fetch_fallback",
+    });
+  });
 });

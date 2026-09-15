@@ -264,7 +264,9 @@ async function main(): Promise<void> {
     const batchInput = JSON.stringify(
       batch.map((asset) => ({ asset_url: asset.canonicalUrl, title: asset.title })),
     );
-    const plan = await prepareOwidImport(batchInput, "json");
+    const plan = await prepareOwidImport(batchInput, "json", {
+      allow_source_fallback: args.includes("--allow-source-fallback"),
+    });
     if (target === "remote") {
       await applyRemoteQueries(
         buildOwidImportQueries(plan, { rebuildSearchIndex: false }),

@@ -15,6 +15,11 @@ on:
         description: Assets fetched and written per D1 batch
         required: true
         default: "25"
+      allow_source_fallback:
+        description: Import unavailable source metadata as conservative draft placeholders
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -44,6 +49,7 @@ jobs:
           --start ${{ inputs.start }}
           --limit ${{ inputs.limit }}
           --batch-size ${{ inputs.batch_size }}
+          ${{ inputs.allow_source_fallback && '--allow-source-fallback' || '' }}
           --apply --remote
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

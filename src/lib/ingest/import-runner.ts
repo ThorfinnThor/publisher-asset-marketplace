@@ -1,5 +1,11 @@
-import { normalizeOwidInput, type NormalizeReport } from "./normalize-input";
-import { OwidSourceClient, type OwidAssetFetch, type OwidBatchResult } from "./owid-source-client";
+import { normalizeOwidInput, type AcceptedInput, type NormalizeReport } from "./normalize-input";
+import {
+  buildOwidSourceUrls,
+  OwidSourceClient,
+  type OwidAssetFetch,
+  type OwidBatchFailure,
+  type OwidBatchResult,
+} from "./owid-source-client";
 import { rebuildAssetSearchTrigrams, rebuildAssetSearchTrigramsSql } from "../search/search-index";
 import {
   classifyRights,
@@ -96,6 +102,7 @@ export type ImportRunnerOptions = {
   now?: string;
   run_id?: string;
   source_client?: Pick<OwidSourceClient, "fetchAssets">;
+  allow_source_fallback?: boolean;
 };
 
 export type ImportRunResult = {
@@ -290,6 +297,63 @@ export function buildImportAssetRecord(
   };
 }
 
+function buildOwidFallbackAssetRecord(
+  input: AcceptedInput,
+  failure: OwidBatchFailure,
+  checkedAt: string,
+  sourceId: string,
+): ImportAssetRecord {
+  const urls = buildOwidSourceUrls(input.slug);
+  const rightsEvidence: RightsEvidence = {
+    chart_owner: null,
+    chart_license_code: null,
+    chart_license_raw: null,
+    chart_license_url: null,
+    chart_license_explicit: false,
+    manual_review_completed: false,
+    embed_available: null,
+    chart_reuse_prohibited: null,
+    evidence_conflict: false,
+    citation_available: false,
+    indicator_evidence: [],
+    evidence_url: urls.canonicalUrl,
+    evidence_checked_at: checkedAt,
+  };
+  const classification = classifyRights(rightsEvidence);
+  const title = input.title?.trim() || input.slug;
+  return {
+    id: createAssetId(input.slug),
+    source_id: sourceId,
+    external_id: input.slug,
+    slug: input.slug,
+    asset_type: "chart",
+    title,
+    description: "",
+    canonical_url: urls.canonicalUrl,
+    canonical_url_normalized: urls.canonicalUrl,
+    embed_url: urls.embedUrl,
+    preview_url: urls.previewUrl,
+    citation_text: null,
+    attribution_name: null,
+    attribution_url: null,
+    published_at: null,
+    source_updated_at: null,
+    license_code: null,
+    rights_status: classification.rights_status,
+    rights_json: JSON.stringify(classification.rights),
+    metadata_json: JSON.stringify({
+      source: "owid",
+      source_fetch_error: failure.error,
+      rights_evidence: rightsEvidence,
+    }),
+    search_document: [title, "chart", "Our World in Data"].join(" "),
+    status: "draft",
+    created_at: checkedAt,
+    updated_at: checkedAt,
+    last_checked_at: checkedAt,
+  };
+}
+
 export function buildSourceImportAssetRecord(
   asset: SourceAssetRecordInput,
   checkedAt: string,
@@ -383,23 +447,44 @@ export async function prepareOwidImport(
   const fetched = await sourceClient.fetchAssets(
     normalizeReport.accepted.map((accepted) => accepted.slug),
   );
-  const assets = fetched.successful.map((asset) =>
+  const fetchedAssets = fetched.successful.map((asset) =>
     buildImportAssetRecord(asset, completedAt, sourceId),
+  );
+  const acceptedBySlug = new Map(
+    normalizeReport.accepted.map((accepted) => [accepted.slug, accepted]),
+  );
+  const fallbackBySlug = options.allow_source_fallback
+    ? new Map(fetched.failed.map((failure) => [failure.slug, failure]))
+    : new Map<string, OwidBatchFailure>();
+  const fallbackAssets = [...fallbackBySlug.values()].map((failure) => {
+    const accepted = acceptedBySlug.get(failure.slug);
+    if (!accepted) {
+      throw new Error(`Missing normalized input for fallback asset ${failure.slug}`);
+    }
+    return buildOwidFallbackAssetRecord(accepted, failure, completedAt, sourceId);
+  });
+  const assets = [...fetchedAssets, ...fallbackAssets].sort((left, right) =>
+    left.slug.localeCompare(right.slug),
   );
   const results = buildNormalizeResults(normalizeReport, runId, completedAt);
   let resultIndex = results.length;
 
   for (const asset of assets) {
+    const fallback = fallbackBySlug.get(asset.slug);
     results.push({
       id: resultId(runId, resultIndex++),
       external_id: asset.external_id,
       status: "upserted",
-      reason_code: null,
-      detail_json: detailJson({ slug: asset.slug, rights_status: asset.rights_status }),
+      reason_code: fallback ? "source_fetch_fallback" : null,
+      detail_json: detailJson({
+        slug: asset.slug,
+        rights_status: asset.rights_status,
+        source_error: fallback?.error,
+      }),
       created_at: completedAt,
     });
   }
-  for (const failure of fetched.failed) {
+  for (const failure of options.allow_source_fallback ? [] : fetched.failed) {
     results.push({
       id: resultId(runId, resultIndex++),
       external_id: failure.slug,
@@ -410,7 +495,7 @@ export async function prepareOwidImport(
     });
   }
 
-  const errors = fetched.failed.length;
+  const errors = options.allow_source_fallback ? 0 : fetched.failed.length;
   const partial = errors > 0 || normalizeReport.invalid.length > 0;
   const status = partial ? (assets.length > 0 ? "partial" : "failed") : "succeeded";
   return {
