@@ -3,6 +3,7 @@ import handler from "vinext/server/fetch-handler";
 import { runDemandAggregation } from "../src/lib/analytics/demand-aggregation";
 import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
+import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner";
 import { withSecurityHeaders } from "../src/lib/security-headers";
 
 type WorkerEnv = { DB: D1Database };
@@ -21,16 +22,43 @@ const worker = {
       runAssetRefresh(env.DB, {
         now: scheduledAt,
         max_assets: 25,
-      }).then((result) => {
-        console.log(
-          JSON.stringify({
-            event: "asset_refresh_completed",
-            run_id: result.plan.run_id,
-            status: result.plan.status,
-            ...result.plan.counts,
-          }),
-        );
-      }),
+      })
+        .then((result) => {
+          console.log(
+            JSON.stringify({
+              event: "asset_refresh_completed",
+              source_id: result.plan.source_id,
+              run_id: result.plan.run_id,
+              status: result.plan.status,
+              ...result.plan.counts,
+            }),
+          );
+          return runWorldBankRefresh(env.DB, {
+            now: scheduledAt,
+            max_assets: 10,
+          });
+        })
+        .then((result) => {
+          console.log(
+            JSON.stringify({
+              event: "asset_refresh_completed",
+              source_id: result.plan.source_id,
+              run_id: result.plan.run_id,
+              status: result.plan.status,
+              database_written: result.database_written,
+              ...result.plan.counts,
+            }),
+          );
+        })
+        .catch((error: unknown) => {
+          console.error(
+            JSON.stringify({
+              event: "asset_refresh_failed",
+              message: error instanceof Error ? error.message : "unknown_error",
+            }),
+          );
+          throw error;
+        }),
     );
     context.waitUntil(
       runDemandAggregation(env.DB, {

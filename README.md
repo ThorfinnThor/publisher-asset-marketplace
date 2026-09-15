@@ -53,10 +53,10 @@ The reviewed ten-asset OWID evidence set is documented in
 `--apply --local|--remote`; publication additionally requires `--publish` and is limited to
 classifier-approved `safe` or `restricted` assets.
 
-The B7 refresh job runs daily at 03:00 UTC from the Worker cron trigger. It refreshes only stale
-assets, hides explicit 404 sources, and records each outcome in `refresh_runs` and
-`refresh_results`. Run `npm run refresh:assets -- --local` for a dry run; use `--apply --remote`
-only for an intentional production write.
+The B7 refresh job runs daily at 03:00 UTC from the Worker cron trigger. It refreshes stale OWID
+assets first and then stale World Bank assets, hides only explicit 404 sources, and records each
+executed outcome in `refresh_runs` and `refresh_results`. Run `npm run refresh:assets -- --local`
+for an OWID dry run; use `--apply --remote` only for an intentional production write.
 
 ## Product boundaries
 

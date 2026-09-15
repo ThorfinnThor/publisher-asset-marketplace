@@ -148,6 +148,8 @@ The parser is implemented in:
   evidence preservation;
 - `src/lib/ingest/worldbank-import-runner.ts` — mapping into the common
   idempotent D1 import pipeline;
+- `src/lib/ingest/worldbank-refresh-runner.ts` — annual staleness selection,
+  rights-preserving refresh, 404 hiding, and policy-drift review fallback;
 - `scripts/import-worldbank.ts` — explicit dry-run/SQL/apply entry point;
 - `migrations/0013_worldbank_source.sql` — source registry row only.
 
