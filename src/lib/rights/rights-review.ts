@@ -80,6 +80,11 @@ export type RightsReviewPlan = {
   };
 };
 
+export type RightsReviewQuery = {
+  sql: string;
+  params: unknown[];
+};
+
 const supportedLicenses = new Set<SupportedLicense>([
   "CC0_1_0",
   "PUBLIC_DOMAIN",
@@ -376,4 +381,38 @@ export function buildRightsReviewSql(plan: RightsReviewPlan): string {
     `INSERT OR IGNORE INTO rights_reviews (id, asset_id, decision, reason_code, notes, evidence_url, reviewed_by, created_at) VALUES (${sqlLiteral(update.review.id)}, ${sqlLiteral(update.asset_id)}, ${sqlLiteral(update.rights_status)}, ${sqlLiteral(update.reason_code)}, ${sqlLiteral(update.review.notes)}, ${sqlLiteral(update.review.evidence_url)}, NULL, ${sqlLiteral(update.review.created_at)});`,
   ]);
   return `${statements.join("\n\n")}\n`;
+}
+
+export function buildRightsReviewQueries(plan: RightsReviewPlan): RightsReviewQuery[] {
+  return plan.updates.flatMap((update) => [
+    {
+      sql: `UPDATE assets SET license_code = ?, rights_status = ?, rights_json = ?, metadata_json = ?, citation_text = ?, attribution_name = ?, attribution_url = ?, status = ?, updated_at = ? WHERE id = ? AND slug = ? AND canonical_url = ?`,
+      params: [
+        update.license_code,
+        update.rights_status,
+        update.rights_json,
+        update.metadata_json,
+        update.citation_text,
+        update.attribution_name,
+        update.attribution_url,
+        update.status,
+        update.updated_at,
+        update.asset_id,
+        update.slug,
+        update.canonical_url,
+      ],
+    },
+    {
+      sql: `INSERT OR IGNORE INTO rights_reviews (id, asset_id, decision, reason_code, notes, evidence_url, reviewed_by, created_at) VALUES (?, ?, ?, ?, ?, ?, NULL, ?)`,
+      params: [
+        update.review.id,
+        update.asset_id,
+        update.rights_status,
+        update.reason_code,
+        update.review.notes,
+        update.review.evidence_url,
+        update.review.created_at,
+      ],
+    },
+  ]);
 }

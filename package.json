@@ -23,6 +23,7 @@
     "audit:import": "tsx scripts/audit-import.ts",
     "refresh:assets": "tsx scripts/refresh-assets.ts",
     "rights:review": "tsx scripts/review-rights.ts",
+    "rights:owid-corpus": "tsx scripts/review-owid-corpus-rights.ts",
     "search:review": "tsx scripts/review-search-quality.ts --output docs/search-quality-review-c8.md",
     "release:smoke": "tsx scripts/release-smoke.ts",
     "lint": "eslint src scripts test",

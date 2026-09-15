@@ -1,0 +1,97 @@
+name: Review OWID corpus rights in Cloudflare
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: Zero-based normalized asset offset
+        required: true
+        default: "0"
+      limit:
+        description: Maximum assets to review
+        required: true
+        default: "3000"
+      batch_size:
+        description: Assets per D1 batch
+        required: true
+        default: "25"
+      concurrency:
+        description: Concurrent OWID evidence requests
+        required: true
+        default: "8"
+      publish:
+        description: Publish only assets that pass the deterministic rights classifier
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-production-rights-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Verify and apply asset-specific rights evidence
+        run: >-
+          npm run rights:owid-corpus -- data/seed/owid-all-3000.csv
+          --remote
+          --start ${{ inputs.start }}
+          --limit ${{ inputs.limit }}
+          --batch-size ${{ inputs.batch_size }}
+          --concurrency ${{ inputs.concurrency }}
+          --apply
+          ${{ inputs.publish && '--publish' || '' }}
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: 93b3f1b1-a71e-4387-bbfc-64d237e9551d
+      - name: Audit the complete production corpus
+        run: >-
+          npm run audit:import -- --remote --sample-size 5
+          --output "$RUNNER_TEMP/import-audit-b6-production.md"
+          --enforce-gate
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: 93b3f1b1-a71e-4387-bbfc-64d237e9551d
+      - name: Add audit sample to job summary
+        if: always()
+        run: |
+          if test -f "$RUNNER_TEMP/import-audit-b6-production.md"; then
+            sed -n '1,180p' "$RUNNER_TEMP/import-audit-b6-production.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload complete audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: import-audit-b6-production
+          path: ${{ runner.temp }}/import-audit-b6-production.md
+          if-no-files-found: ignore
+      - name: Report production publication counts
+        if: always()
+        run: >-
+          npx wrangler d1 execute DB --remote --config wrangler.jsonc --json
+          --command "SELECT COUNT(*) AS asset_count,
+          SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END) AS published_count,
+          SUM(CASE WHEN status IN ('draft', 'review') THEN 1 ELSE 0 END) AS pending_review_count,
+          SUM(CASE WHEN rights_status = 'safe' THEN 1 ELSE 0 END) AS safe_count,
+          SUM(CASE WHEN rights_status = 'restricted' THEN 1 ELSE 0 END) AS restricted_count,
+          SUM(CASE WHEN rights_status = 'unknown' THEN 1 ELSE 0 END) AS unknown_count,
+          SUM(CASE WHEN rights_status = 'blocked' THEN 1 ELSE 0 END) AS blocked_count
+          FROM assets WHERE source_id = 'source_owid'"
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

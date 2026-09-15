@@ -41,6 +41,9 @@ function rowsFromWrangler(value: unknown): AuditAssetRow[] {
 }
 
 async function readAssets(target: "local" | "remote"): Promise<AuditAssetRow[]> {
+  if (target === "remote") {
+    return readRemoteAssets();
+  }
   const npx = process.platform === "win32" ? "npx.cmd" : "npx";
   const query = `SELECT
     id, slug, title, rights_status, status, source_updated_at, last_checked_at,
@@ -67,6 +70,54 @@ async function readAssets(target: "local" | "remote"): Promise<AuditAssetRow[]> 
     process.stderr.write(stderr);
   }
   return rowsFromWrangler(JSON.parse(stdout));
+}
+
+async function readRemoteAssets(): Promise<AuditAssetRow[]> {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+  const databaseId = process.env.CLOUDFLARE_D1_DATABASE_ID;
+  if (!accountId || !apiToken || !databaseId) {
+    throw new Error(
+      "Remote paginated audit requires CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, and CLOUDFLARE_D1_DATABASE_ID",
+    );
+  }
+  const endpoint = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/d1/database/${encodeURIComponent(databaseId)}/query`;
+  const pageSize = 50;
+  const rows: AuditAssetRow[] = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sql: `SELECT
+          id, slug, title, rights_status, status, source_updated_at, last_checked_at,
+          metadata_json, rights_json, canonical_url, embed_url, citation_text
+        FROM assets
+        ORDER BY slug
+        LIMIT ? OFFSET ?`,
+        params: [pageSize, offset],
+      }),
+    });
+    const payload = (await response.json()) as {
+      success?: boolean;
+      errors?: Array<{ message?: string }>;
+      result?: Array<{ success?: boolean; results?: AuditAssetRow[] }>;
+    };
+    const result = payload.result?.[0];
+    if (!response.ok || payload.success !== true || result?.success === false) {
+      throw new Error(
+        `Remote D1 audit query failed: ${(payload.errors ?? []).map((error) => error.message).join("; ") || response.statusText}`,
+      );
+    }
+    const page = result?.results ?? [];
+    rows.push(...page);
+    if (page.length < pageSize) {
+      return rows;
+    }
+  }
 }
 
 async function main(): Promise<void> {

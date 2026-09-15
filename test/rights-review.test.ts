@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import manifestJson from "../data/rights/owid-seed-rights-review-v1.json";
 import {
+  buildRightsReviewQueries,
   buildRightsReviewSql,
   parseRightsReviewManifest,
   prepareRightsReview,
@@ -105,6 +106,12 @@ describe("rights evidence review", () => {
     expect(sql).toContain("rights_review_owid-seed-v1_active-mobile-money-accounts");
     expect(sql).toContain("status = 'published'");
     expect(sql).not.toContain("COMMIT;");
+
+    const queries = buildRightsReviewQueries(plan);
+    expect(queries).toHaveLength(20);
+    expect(queries[0]?.sql).toContain("UPDATE assets SET license_code = ?");
+    expect(queries[0]?.params).toContain("asset_owid_active-mobile-money-accounts");
+    expect(queries[1]?.sql).toContain("INSERT OR IGNORE INTO rights_reviews");
   });
 
   it("fails closed when a reviewed URL drifts or a decision no longer matches evidence", () => {
