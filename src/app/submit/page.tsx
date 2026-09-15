@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 
-import { SubmissionForm } from "@/components/submission-form";
+import { SubmissionForm, SubmissionRequirements } from "@/components/submission-form";
 import { csrfTokenForRequest, getAuthenticatedProfile } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
 import { normalizeDemandQuery } from "@/lib/search/normalize-demand-query";
@@ -32,6 +32,10 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
           before it can appear in publisher search.
         </p>
       </header>
+
+      <div className="submission-requirements--standalone">
+        <SubmissionRequirements />
+      </div>
 
       {!auth.profile ? (
         <section className="creator-auth-card" aria-labelledby="submit-sign-in-heading">

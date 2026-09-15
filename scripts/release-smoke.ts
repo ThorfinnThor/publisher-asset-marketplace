@@ -52,7 +52,7 @@ const checks: SmokeCheck[] = [
   {
     path: "/submit?topic=saas%20churn",
     expectedStatus: 200,
-    includes: ["Publish an asset"],
+    includes: ["Publish an asset", "Submission requirements", "Maximum 10 submissions"],
   },
   {
     path: "/api/analytics/search",

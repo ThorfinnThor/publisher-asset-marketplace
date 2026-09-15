@@ -11,8 +11,11 @@ E3 opens the creator submission flow behind GitHub authentication. The page is
    is exposed to the browser.
 3. The client form sends structured JSON with an exact same-origin `Origin` header and the CSRF token.
 4. The Worker streams at most 32 KiB before parsing JSON, validates every field again, and rejects
-   unknown fields, unsafe URLs, control characters, missing rights booleans, and missing attestation.
-5. D1 stores a `pending` submission only. The normalized canonical URL is unique across existing
+   unknown fields, unsafe URLs, missing previews, raw HTML, control characters, missing rights
+   booleans, and missing attestation.
+5. Accepted payloads receive a deterministic automated pre-screen checklist for host relationships,
+   preview format, attribution language, and declared reuse rights.
+6. D1 stores a `pending` submission only. The normalized canonical URL is unique across existing
    assets and submissions, and an atomic `INSERT ... SELECT` enforces the 10-submissions-per-creator
    rolling 24-hour limit.
 

@@ -41,7 +41,7 @@ export type CreatorAssetRecord = {
   canonical_url_normalized: string;
   embed_url: string;
   embed_origin: string;
-  preview_url: string | null;
+  preview_url: string;
   citation_text: string;
   attribution_name: string;
   attribution_url: string;
@@ -80,9 +80,8 @@ export function buildCreatorAssetRecord(
 ): PublishValidationResult {
   const canonical = normalizePublicHttpsUrl(submission.canonical_url);
   const embed = normalizePublicHttpsUrl(submission.embed_url);
-  const preview = submission.preview_url
-    ? normalizePublicHttpsUrl(submission.preview_url)
-    : ({ ok: true, value: null } as const);
+  if (!submission.preview_url) return { ok: false, code: "promotion_preview_required" };
+  const preview = normalizePublicHttpsUrl(submission.preview_url);
   const attribution = normalizePublicHttpsUrl(submission.attribution_url);
   const evidence = normalizePublicHttpsUrl(review.rights_evidence_url);
   if (!canonical.ok || !embed.ok || !preview.ok || !attribution.ok || !evidence.ok) {

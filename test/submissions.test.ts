@@ -11,7 +11,7 @@ const validSubmission = {
   title: "A useful chart",
   description: "A chart that helps publishers understand a trend.",
   embed_url: "https://Example.com/embed/chart",
-  preview_url: null,
+  preview_url: "https://Example.com/preview/chart.png",
   attribution_name: "Example Source",
   attribution_url: "https://example.com/rights",
   attribution_terms: "Credit Example Source",
@@ -44,13 +44,30 @@ describe("submission security validation", () => {
     expect(normalizePublicHttpsUrl(value).ok).toBe(false);
   });
 
-  it("keeps markup-like metadata as plain text data", () => {
+  it("rejects raw HTML in metadata", () => {
     const result = validateSubmissionPayload({
       ...validSubmission,
       title: "<script>alert(1)</script>",
     });
-    expect(result.ok).toBe(true);
-    if (result.ok) expect(result.value.title).toBe("<script>alert(1)</script>");
+    expect(result).toMatchObject({
+      ok: false,
+      code: "raw_html_not_allowed",
+      field: "title",
+    });
+  });
+
+  it("requires a public HTTPS preview image URL", () => {
+    expect(validateSubmissionPayload({ ...validSubmission, preview_url: null })).toMatchObject({
+      ok: false,
+      code: "preview_required",
+      field: "preview_url",
+    });
+    expect(
+      validateSubmissionPayload({
+        ...validSubmission,
+        preview_url: "http://example.com/chart.png",
+      }),
+    ).toMatchObject({ ok: false, code: "scheme_not_https", field: "preview_url" });
   });
 
   it("rejects unknown fields and missing authorization", () => {

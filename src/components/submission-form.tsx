@@ -4,6 +4,48 @@ import { useState, type FormEvent } from "react";
 
 type SubmissionFormProps = { csrfToken: string; opportunityTopic?: string | null };
 
+type SubmissionResponse = {
+  error?: string;
+  pre_screen?: { status: "pass" | "review" };
+};
+
+export function SubmissionRequirements() {
+  return (
+    <section
+      className="form-section submission-requirements"
+      aria-labelledby="requirements-heading"
+    >
+      <div className="form-section__heading">
+        <span>00</span>
+        <div>
+          <h2 id="requirements-heading">Submission requirements</h2>
+          <p>Prepare these details before submitting. Automated checks run before admin review.</p>
+        </div>
+      </div>
+      <ul className="requirements-list">
+        <li>Public canonical HTTPS URL.</li>
+        <li>Type: chart, calculator, table, dataset, benchmark, or widget.</li>
+        <li>Title: 3–160 characters.</li>
+        <li>Description: 20–2,000 characters.</li>
+        <li>Public HTTPS embed URL—the URL inside an iframe, not raw iframe HTML.</li>
+        <li>Direct HTTPS preview image URL, preferably PNG or JPG, so real data is visible.</li>
+        <li>Real source or brand name—not SEO keywords.</li>
+        <li>
+          Public HTTPS attribution URL and clear terms, such as Credit Example Source — CC BY 4.0.
+        </li>
+        <li>Accurate declarations for commercial use, embedding, modification, and citation.</li>
+        <li>Confirmation that you are authorized to submit the asset.</li>
+        <li>Maximum 10 submissions per GitHub account within 24 hours.</li>
+        <li>The canonical URL must not already exist in the marketplace or another submission.</li>
+      </ul>
+      <p className="requirements-exclusion">
+        Not accepted: raw HTML, uploaded JavaScript, arbitrary scripts, private/internal URLs, or
+        URLs containing credentials.
+      </p>
+    </section>
+  );
+}
+
 export function SubmissionForm({ csrfToken, opportunityTopic = null }: SubmissionFormProps) {
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,7 +80,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
           opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
         }),
       });
-      const result = (await response.json().catch(() => null)) as { error?: string } | null;
+      const result = (await response.json().catch(() => null)) as SubmissionResponse | null;
       if (!response.ok) {
         setStatus({ tone: "error", text: result?.error ?? "The submission could not be saved." });
         return;
@@ -46,7 +88,10 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
       form.reset();
       setStatus({
         tone: "success",
-        text: "Submitted for review. We will check the source and declared usage rights before publication.",
+        text:
+          result?.pre_screen?.status === "pass"
+            ? "Automated pre-screen passed. Submitted for final admin rights review."
+            : "Submitted for review. Automated checks identified items for the admin to verify.",
       });
     } catch {
       setStatus({ tone: "error", text: "The submission could not be reached. Please try again." });
@@ -98,6 +143,8 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               name="title"
               placeholder="A clear, specific title"
               defaultValue={opportunityTopic ?? undefined}
+              minLength={3}
+              maxLength={160}
               required
               type="text"
             />
@@ -108,6 +155,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               id="asset-description"
               name="description"
               minLength={20}
+              maxLength={2000}
               placeholder="What does this asset show or calculate?"
               defaultValue={
                 opportunityTopic
@@ -120,12 +168,18 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
           <div className="form-field">
             <label htmlFor="embed-url">Embed URL</label>
             <input id="embed-url" name="embed_url" placeholder="https://…" required type="url" />
+            <p className="form-hint">Paste only the iframe source URL, never iframe HTML.</p>
           </div>
           <div className="form-field">
-            <label htmlFor="preview-url">
-              Preview URL <span>(optional)</span>
-            </label>
-            <input id="preview-url" name="preview_url" placeholder="https://…" type="url" />
+            <label htmlFor="preview-url">Preview image URL</label>
+            <input
+              id="preview-url"
+              name="preview_url"
+              placeholder="https://…/preview.png"
+              required
+              type="url"
+            />
+            <p className="form-hint">Direct public HTTPS image shown on the asset page.</p>
           </div>
         </div>
       </section>
@@ -148,7 +202,14 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
         <div className="form-grid">
           <div className="form-field">
             <label htmlFor="source-name">Source or brand name</label>
-            <input id="source-name" name="attribution_name" required type="text" />
+            <input
+              id="source-name"
+              maxLength={120}
+              minLength={2}
+              name="attribution_name"
+              required
+              type="text"
+            />
             <p className="form-hint">
               Used as visible link text. Enter a real source or brand, not SEO keywords.
             </p>
@@ -168,7 +229,9 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
             <input
               id="attribution-terms"
               name="attribution_terms"
-              placeholder="Credit Example Source"
+              placeholder="Credit Example Source — CC BY 4.0"
+              minLength={2}
+              maxLength={1000}
               required
               type="text"
             />

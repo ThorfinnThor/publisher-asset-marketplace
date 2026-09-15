@@ -71,4 +71,22 @@ describe("E5 creator asset publishing", () => {
     });
     expect(result).toEqual({ ok: false, code: "promotion_url_invalid" });
   });
+
+  it("fails closed when a legacy submission has no preview image", () => {
+    const result = buildCreatorAssetRecord(
+      { ...submission, preview_url: null },
+      {
+        reviewed_by: "github:admin",
+        rights_status: "safe",
+        rights_reason_code: "manual_review",
+        rights_evidence_url: "https://creator.example/terms",
+        title: null,
+        description: null,
+        attribution_name: null,
+        attribution_terms: null,
+        reviewed_at: "2026-09-14T13:00:00.000Z",
+      },
+    );
+    expect(result).toEqual({ ok: false, code: "promotion_preview_required" });
+  });
 });

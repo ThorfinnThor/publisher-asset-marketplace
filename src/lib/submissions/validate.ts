@@ -23,7 +23,7 @@ const assetTypes = new Set(["chart", "calculator", "table", "dataset", "benchmar
 export type ValidatedSubmission = {
   canonicalUrl: string;
   embedUrl: string;
-  previewUrl: string | null;
+  previewUrl: string;
   assetType: "chart" | "calculator" | "table" | "dataset" | "benchmark" | "widget";
   title: string;
   description: string;
@@ -56,10 +56,10 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
   if (!canonicalUrl.ok) return { ...canonicalUrl, field: "canonical_url" };
   const embedUrl = normalizePublicHttpsUrl(input.embed_url);
   if (!embedUrl.ok) return { ...embedUrl, field: "embed_url" };
-  const previewUrl =
-    input.preview_url === null || input.preview_url === undefined
-      ? ({ ok: true, value: null } as const)
-      : normalizePublicHttpsUrl(input.preview_url);
+  if (input.preview_url === null || input.preview_url === undefined || input.preview_url === "") {
+    return { ok: false, code: "preview_required", field: "preview_url" };
+  }
+  const previewUrl = normalizePublicHttpsUrl(input.preview_url);
   if (!previewUrl.ok) return { ...previewUrl, field: "preview_url" };
 
   if (typeof input.asset_type !== "string" || !assetTypes.has(input.asset_type)) {
@@ -74,6 +74,15 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
   if (!attributionName.ok) return { ...attributionName, field: "attribution_name" };
   const attributionTerms = normalizeText(input.attribution_terms, 2, 1_000);
   if (!attributionTerms.ok) return { ...attributionTerms, field: "attribution_terms" };
+
+  const textFields = [
+    ["title", title.value],
+    ["description", description.value],
+    ["attribution_name", attributionName.value],
+    ["attribution_terms", attributionTerms.value],
+  ] as const;
+  const markupField = textFields.find(([, value]) => containsHtmlMarkup(value));
+  if (markupField) return { ok: false, code: "raw_html_not_allowed", field: markupField[0] };
 
   const attributionUrl = normalizePublicHttpsUrl(input.attribution_url);
   if (!attributionUrl.ok) return { ...attributionUrl, field: "attribution_url" };
@@ -173,6 +182,10 @@ function normalizeText(
   if (value.length < minimum) return { ok: false, code: "text_too_short" };
   if (value.length > maximum) return { ok: false, code: "text_too_long" };
   return { ok: true, value };
+}
+
+function containsHtmlMarkup(value: string): boolean {
+  return /<\s*\/?\s*[a-z][^>]*>/iu.test(value);
 }
 
 function isBlockedHost(hostname: string): boolean {

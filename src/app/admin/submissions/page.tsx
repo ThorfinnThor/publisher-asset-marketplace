@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { AdminReviewActions } from "@/components/admin-review-actions";
 import { csrfTokenForRequest, getAuthenticatedProfile } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
+import { parseStoredSubmissionPreScreen } from "@/lib/submissions/pre-screen";
 
 export const metadata: Metadata = {
   title: "Submission moderation",
@@ -27,6 +28,8 @@ type SubmissionRow = {
   attribution_terms: string;
   opportunity_topic: string | null;
   declared_rights_json: string;
+  pre_screen_status: "pass" | "review";
+  pre_screen_json: string;
   review_status: "pending" | "approved" | "rejected" | "needs_changes";
   review_notes: string | null;
   rights_status: "safe" | "restricted" | "unknown" | "blocked";
@@ -113,6 +116,7 @@ function SubmissionReviewCard({
   submission: SubmissionRow;
 }) {
   const declaredRights = parseRights(submission.declared_rights_json);
+  const preScreen = parseStoredSubmissionPreScreen(submission.pre_screen_json);
   return (
     <article className="moderation-card">
       <header className="moderation-card__header">
@@ -128,6 +132,29 @@ function SubmissionReviewCard({
 
       <div className="moderation-card__body">
         <p className="moderation-card__description">{submission.description}</p>
+        <section
+          className={`submission-prescreen submission-prescreen--${submission.pre_screen_status}`}
+          aria-label="Automated pre-screen"
+        >
+          <strong>
+            Automated pre-screen:{" "}
+            {submission.pre_screen_status === "pass" ? "passed" : "review needed"}
+          </strong>
+          {preScreen.checks.length > 0 ? (
+            <ul>
+              {preScreen.checks.map((check) => (
+                <li key={check.code}>
+                  <span className={`pre-screen-state pre-screen-state--${check.status}`}>
+                    {check.status === "pass" ? "Pass" : "Review"}
+                  </span>
+                  {check.message}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Legacy submission: complete every check manually.</p>
+          )}
+        </section>
         {submission.opportunity_topic ? (
           <p className="detail-supporting-text">
             Demand topic: <strong>{submission.opportunity_topic}</strong>
@@ -225,7 +252,8 @@ async function loadAdminQueue(): Promise<AdminQueue> {
             s.id, s.creator_id, p.display_name AS creator_name,
             s.canonical_url, s.embed_url, s.preview_url, s.asset_type,
             s.title, s.description, s.attribution_name, s.attribution_url,
-            s.attribution_terms, s.opportunity_topic, s.declared_rights_json, s.review_status,
+            s.attribution_terms, s.opportunity_topic, s.declared_rights_json,
+            s.pre_screen_status, s.pre_screen_json, s.review_status,
             s.review_notes, s.rights_status, s.rights_reason_code,
             s.rights_evidence_url, s.created_at
           FROM submissions s

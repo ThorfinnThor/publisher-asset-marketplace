@@ -91,7 +91,7 @@ with raw creator input are prohibited.
 | ------------------------- | ----------------------------------------------------------------------- |
 | `canonical_url`           | Required normalized public HTTPS URL, maximum 2,048 characters          |
 | `embed_url`               | Required normalized public HTTPS URL, maximum 2,048 characters          |
-| `preview_url`             | Optional normalized public HTTPS URL, maximum 2,048 characters          |
+| `preview_url`             | Required normalized public HTTPS image URL, maximum 2,048 characters    |
 | `attribution_url`         | Required normalized public HTTPS URL, maximum 2,048 characters          |
 | `asset_type`              | One of `chart`, `calculator`, `table`, `dataset`, `benchmark`, `widget` |
 | `title`                   | Plain text, 3-160 characters                                            |

@@ -119,18 +119,18 @@
   ],
   "text_cases": [
     {
-      "id": "html-stays-text",
+      "id": "html-rejected",
       "field": "description",
       "input": "Useful chart <img src=x onerror=alert(1)>",
-      "accepted": true,
-      "rendered_as": "text"
+      "accepted": false,
+      "reason": "raw_html_not_allowed"
     },
     {
-      "id": "script-stays-text",
+      "id": "script-rejected",
       "field": "title",
       "input": "<script>alert(1)</script>",
-      "accepted": true,
-      "rendered_as": "text"
+      "accepted": false,
+      "reason": "raw_html_not_allowed"
     },
     {
       "id": "control-character-rejected",

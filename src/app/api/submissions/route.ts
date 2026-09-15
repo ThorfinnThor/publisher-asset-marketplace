@@ -1,5 +1,7 @@
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
+import { buildSubmissionInsertBindings, submissionInsertSql } from "@/lib/submissions/create";
+import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
 import { validateSubmissionPayload } from "@/lib/submissions/validate";
 
 const maxBodyBytes = 32 * 1024;
@@ -35,6 +37,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!validation.ok) {
     return errorResponse(400, validation.code, "Please correct the highlighted submission fields.");
   }
+  const preScreen = runSubmissionPreScreen(validation.value);
 
   const db = getDatabase();
   const now = new Date().toISOString();
@@ -55,43 +58,18 @@ export async function POST(request: Request): Promise<Response> {
       return errorResponse(409, "canonical_url_exists", "This asset is already submitted.");
 
     const submissionId = crypto.randomUUID();
+    const insertBindings = buildSubmissionInsertBindings({
+      id: submissionId,
+      creatorId: profile.id,
+      submission: validation.value,
+      preScreen,
+      now,
+      since,
+      submissionLimit,
+    });
     const result = await db
-      .prepare(
-        `
-          INSERT INTO submissions (
-            id, creator_id, canonical_url, canonical_url_normalized, embed_url, preview_url,
-            asset_type, title, description, attribution_name, attribution_url, attribution_terms,
-            opportunity_topic, declared_rights_json, authorization_attested_at, authorization_version,
-            review_status, created_at, updated_at
-          )
-          SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'pending', ?, ?
-          WHERE (
-            SELECT COUNT(*) FROM submissions
-            WHERE creator_id = ? AND created_at >= ?
-          ) < ?
-        `,
-      )
-      .bind(
-        submissionId,
-        profile.id,
-        validation.value.canonicalUrl,
-        validation.value.canonicalUrl,
-        validation.value.embedUrl,
-        validation.value.previewUrl,
-        validation.value.assetType,
-        validation.value.title,
-        validation.value.description,
-        validation.value.attributionName,
-        validation.value.attributionUrl,
-        validation.value.attributionTerms,
-        validation.value.opportunityTopic,
-        JSON.stringify({ ...validation.value.rights, attested_at: now }),
-        now,
-        now,
-        profile.id,
-        since,
-        submissionLimit,
-      )
+      .prepare(submissionInsertSql)
+      .bind(...insertBindings)
       .run();
 
     if (result.meta.changes === 0) {
@@ -99,7 +77,12 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     return Response.json(
-      { ok: true, submission_id: submissionId, review_status: "pending" },
+      {
+        ok: true,
+        submission_id: submissionId,
+        review_status: "pending",
+        pre_screen: preScreen,
+      },
       { status: 201, headers: { "cache-control": "no-store" } },
     );
   } catch (error) {
