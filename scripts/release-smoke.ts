@@ -74,8 +74,11 @@ const checks: SmokeCheck[] = [
 async function run(): Promise<void> {
   const failures: string[] = [];
   for (const check of checks) {
-    const response = await fetch(`${baseUrl}${check.path}`, {
+    const url = new URL(check.path, `${baseUrl}/`);
+    url.searchParams.set("__release_smoke", process.env.GITHUB_SHA ?? Date.now().toString());
+    const response = await fetch(url, {
       redirect: "manual",
+      headers: { "cache-control": "no-cache", ...check.headers },
       ...check.init,
     });
     const body = await response.text();
