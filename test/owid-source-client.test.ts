@@ -68,7 +68,7 @@ describe("OwidSourceClient", () => {
     const result = await client.fetchAsset("sample-chart");
 
     expect(result.normalized).toMatchObject({
-      externalId: "123",
+      externalId: "sample-chart",
       title: "Sample chart title",
       description: "A sample chart subtitle",
       citationText: "Sample source citation",
@@ -192,7 +192,7 @@ describe("OwidSourceClient", () => {
 
     expect(asset.config).toEqual({});
     expect(asset.indicators).toEqual([]);
-    expect(asset.normalized).toMatchObject({ title: "Legacy chart", externalId: null });
+    expect(asset.normalized).toMatchObject({ title: "Legacy chart", externalId: "legacy-chart" });
   });
 
   it("keeps batch concurrency bounded and separates failures", async () => {

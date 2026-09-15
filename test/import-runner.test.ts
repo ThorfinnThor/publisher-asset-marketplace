@@ -45,7 +45,7 @@ const sampleAsset: OwidAssetFetch = {
     },
   ],
   normalized: {
-    externalId: "123",
+    externalId: "sample-chart",
     title: "Sample chart",
     description: "A chart about samples",
     citationText: "Sample provider (2025)",
@@ -98,7 +98,7 @@ describe("import runner", () => {
     expect(record).toMatchObject({
       id: "asset_owid_sample-chart",
       source_id: "source_owid",
-      external_id: "123",
+      external_id: "sample-chart",
       rights_status: "unknown",
       license_code: null,
       status: "draft",

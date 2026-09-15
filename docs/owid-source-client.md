@@ -16,6 +16,7 @@ importer. Indicator metadata provides the origin and license evidence required b
 Safety and reliability are explicit in the client:
 
 - only normalized OWID grapher slugs are accepted;
+- the normalized Grapher slug is the stable `external_id`; OWID's numeric config id remains in raw metadata because chart variants can share it;
 - request concurrency is bounded (four by default, including endpoint requests);
 - each request has a timeout and at most three attempts;
 - retries are limited to transient network/HTTP failures with capped exponential backoff;

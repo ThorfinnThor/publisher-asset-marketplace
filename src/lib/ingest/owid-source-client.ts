@@ -163,13 +163,6 @@ function readString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
 }
 
-function readIdentifier(value: unknown): string | undefined {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return String(value);
-  }
-  return readString(value);
-}
-
 function normalizeSlug(value: string): string {
   const slug = value.trim().toLocaleLowerCase("en");
   if (!SLUG_PATTERN.test(slug)) {
@@ -217,7 +210,11 @@ function normalizeMetadata(
   );
 
   return {
-    externalId: readIdentifier(config.id) ?? null,
+    // The public Grapher slug is OWID's stable unique chart identifier. A
+    // numeric config id can be shared by multiple chart variants, so it is
+    // preserved in raw config metadata but must not back the source-level
+    // uniqueness constraint.
+    externalId: slug,
     title: readString(chart.title) ?? readString(config.title) ?? slug,
     description: readString(chart.subtitle) ?? "",
     citationText,
