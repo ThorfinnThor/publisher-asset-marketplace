@@ -31,6 +31,11 @@ Run all checks with:
 npm run check
 ```
 
+Run the isolated creator submission E2E flow against a local Worker with
+`npm run e2e:submission`; setup and cleanup instructions are in
+[docs/e2e-submission.md](docs/e2e-submission.md). The test is local-only by default and covers
+submission, pre-screening, admin approval, publication and the creator dashboard.
+
 ## Deployment
 
 The GitHub deployment workflow expects repository secrets named `CLOUDFLARE_API_TOKEN` and
