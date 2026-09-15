@@ -1376,19 +1376,13 @@ summary {
   border-radius: 8px;
 }
 
-.asset-detail__source-embed,
 .asset-detail__source-image {
   display: block;
   width: 100%;
-  min-height: 410px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
-}
-
-.asset-detail__source-image {
   height: auto;
-  min-height: 0;
   object-fit: contain;
 }
 
@@ -2350,10 +2344,6 @@ summary {
     max-width: 700px;
   }
 
-  .asset-detail__source-embed {
-    min-height: 440px;
-  }
-
   .related-assets__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2582,10 +2572,6 @@ summary {
 
   .asset-detail__columns {
     margin-top: 52px;
-  }
-
-  .asset-detail__source-embed {
-    min-height: 360px;
   }
 
   .asset-detail__actions {

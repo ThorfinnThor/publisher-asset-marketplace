@@ -125,31 +125,20 @@ export default async function AssetPage({ params }: AssetPageProps) {
         </div>
 
         <div className="asset-detail__preview">
-          {embedAllowed && asset.embed_url ? (
-            <iframe
-              className="asset-detail__source-embed"
-              src={asset.embed_url}
-              title={`${asset.title} — interactive source chart`}
-              loading="lazy"
-              referrerPolicy="strict-origin-when-cross-origin"
-              sandbox="allow-scripts allow-same-origin"
-            />
-          ) : previewUrl ? (
+          {previewUrl ? (
             <img
               className="asset-detail__source-image"
               src={previewUrl}
-              alt={`Source preview of ${asset.title}`}
+              alt={`Data visualization: ${asset.title}`}
               loading="eager"
             />
           ) : (
             <ChartPreview variant={previewVariant(asset.asset_type)} />
           )}
           <p>
-            {embedAllowed && asset.embed_url
-              ? "Interactive chart loaded directly from the source."
-              : previewUrl
-                ? "Data preview loaded directly from the source."
-                : "A source preview is not available for this asset."}
+            {previewUrl
+              ? `Data visualization loaded directly from ${asset.source_name || "the source"}.`
+              : "A source data visualization is not available for this asset."}
           </p>
         </div>
       </section>
