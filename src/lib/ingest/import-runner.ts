@@ -569,7 +569,10 @@ function sqlAssetUpdateStatement(asset: ImportAssetRecord): string {
   return `UPDATE assets SET source_id = ${values[0]}, external_id = ${values[1]}, asset_type = ${values[2]}, title = ${values[3]}, description = ${values[4]}, canonical_url = ${values[5]}, canonical_url_normalized = ${values[6]}, embed_url = ${values[7]}, preview_url = ${values[8]}, citation_text = ${values[9]}, attribution_name = ${values[10]}, attribution_url = ${values[11]}, published_at = ${values[12]}, source_updated_at = ${values[13]}, search_document = ${values[14]}, updated_at = ${values[15]}, last_checked_at = ${values[16]} WHERE slug = ${values[17]};`;
 }
 
-export function buildImportSql(plan: ImportPlan): string {
+export function buildImportSql(
+  plan: ImportPlan,
+  options: { rebuildSearchIndex?: boolean } = {},
+): string {
   const statements = [
     `INSERT INTO ingest_runs (id, source_id, status, accepted_count, duplicate_count, invalid_count, error_count, started_at, completed_at) VALUES (${sqlLiteral(plan.run_id)}, ${sqlLiteral(plan.source_id)}, 'running', 0, 0, 0, 0, ${sqlLiteral(plan.started_at)}, NULL);`,
     ...plan.assets.flatMap((asset) => [
@@ -580,13 +583,17 @@ export function buildImportSql(plan: ImportPlan): string {
       (result) =>
         `INSERT INTO ingest_results (id, ingest_run_id, external_id, status, reason_code, detail_json, created_at) VALUES (${[result.id, plan.run_id, result.external_id, result.status, result.reason_code, result.detail_json, result.created_at].map(sqlLiteral).join(", ")});`,
     ),
-    "DELETE FROM asset_search_trigrams;",
-    `${rebuildAssetSearchTrigramsSql.trim()};`,
+    ...(options.rebuildSearchIndex === false
+      ? []
+      : ["DELETE FROM asset_search_trigrams;", `${rebuildAssetSearchTrigramsSql.trim()};`]),
     `UPDATE ingest_runs SET status = ${sqlLiteral(plan.status)}, accepted_count = ${plan.counts.accepted}, duplicate_count = ${plan.counts.duplicates}, invalid_count = ${plan.counts.invalid}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
   ];
   return `${statements.join("\n\n")}\n`;
 }
 
-export function buildOwidImportSql(plan: OwidImportPlan): string {
-  return buildImportSql(plan);
+export function buildOwidImportSql(
+  plan: OwidImportPlan,
+  options: { rebuildSearchIndex?: boolean } = {},
+): string {
+  return buildImportSql(plan, options);
 }

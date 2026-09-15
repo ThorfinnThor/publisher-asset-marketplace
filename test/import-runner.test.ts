@@ -139,6 +139,9 @@ describe("import runner", () => {
       "WHERE length(substr(value, position, 3)) = 3;\n\nUPDATE ingest_runs",
     );
     expect(buildOwidImportSql(plan)).toContain("asset_owid_sample-chart");
+    expect(buildOwidImportSql(plan, { rebuildSearchIndex: false })).not.toContain(
+      "DELETE FROM asset_search_trigrams",
+    );
   });
 
   it("writes a plan in bounded D1 batches and finalizes the run", async () => {

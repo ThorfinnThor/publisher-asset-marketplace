@@ -85,4 +85,16 @@ describe("normalizeOwidInput", () => {
 
     expect(report.accepted.map((item) => item.slug)).toEqual(["population", "life-expectancy"]);
   });
+
+  it("accepts an OWID slug ending in a hyphen", () => {
+    const report = normalizeOwidInput(
+      "https://ourworldindata.org/grapher/mean-income-or-consumption-per-day-2017-vs-2021-international-",
+      "txt",
+    );
+
+    expect(report.invalid).toHaveLength(0);
+    expect(report.accepted[0]?.slug).toBe(
+      "mean-income-or-consumption-per-day-2017-vs-2021-international-",
+    );
+  });
 });

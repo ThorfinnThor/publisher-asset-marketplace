@@ -47,6 +47,7 @@ async function main(): Promise<void> {
   const remote = args.includes("--remote");
   const local = args.includes("--local");
   const jsonOutput = args.includes("--json");
+  const rebuildSearchIndex = !args.includes("--skip-search-rebuild");
   const sqlOutput = optionValue(args, "--sql-out");
 
   if (!inputPath) {
@@ -85,12 +86,12 @@ async function main(): Promise<void> {
   try {
     if (sqlOutput) {
       sqlPath = resolve(sqlOutput);
-      await writeFile(sqlPath, buildOwidImportSql(plan), "utf8");
+      await writeFile(sqlPath, buildOwidImportSql(plan, { rebuildSearchIndex }), "utf8");
     }
     if (apply) {
       tempDirectory = await mkdtemp(join(tmpdir(), "publisher-asset-import-"));
       sqlPath ??= join(tempDirectory, "import.sql");
-      await writeFile(sqlPath, buildOwidImportSql(plan), "utf8");
+      await writeFile(sqlPath, buildOwidImportSql(plan, { rebuildSearchIndex }), "utf8");
       await applyWithWrangler(sqlPath, remote ? "remote" : "local");
       summary.databaseWritten = true;
     } else {

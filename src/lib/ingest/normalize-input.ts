@@ -29,7 +29,10 @@ type Candidate = {
 };
 
 const allowedHosts = new Set(["ourworldindata.org", "www.ourworldindata.org"]);
-const slugPattern = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+// OWID has published Grapher slugs that end in a hyphen, for example charts
+// whose title ends in "international-$". Keep the first character strict but
+// otherwise accept OWID's lowercase alphanumeric/hyphen path segment.
+const slugPattern = /^[a-z0-9][a-z0-9-]*$/;
 
 function parseCsvRows(input: string): string[][] {
   const rows: string[][] = [];
