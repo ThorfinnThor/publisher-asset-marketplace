@@ -11,6 +11,8 @@ import { rebuildAssetSearchTrigramsSql } from "../src/lib/search/search-index";
 
 const execFileAsync = promisify(execFile);
 const supportedFormats = new Set(["csv", "json", "txt"] as const);
+const remoteBatchPauseMs = 2_000;
+const maxD1Attempts = 5;
 
 function optionValue(args: string[], name: string): string | undefined {
   const index = args.indexOf(name);
@@ -26,33 +28,70 @@ function integerOption(args: string[], name: string, fallback: number, minimum: 
   return value;
 }
 
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
+}
+
+function commandOutput(error: unknown): string {
+  if (typeof error !== "object" || error === null) {
+    return String(error);
+  }
+  const candidate = error as { message?: unknown; stdout?: unknown; stderr?: unknown };
+  return [candidate.message, candidate.stdout, candidate.stderr]
+    .filter((value): value is string => typeof value === "string")
+    .join("\n");
+}
+
+function retryableD1Import(error: unknown): boolean {
+  const output = commandOutput(error);
+  return (
+    output.includes("D1_RESET_DO") ||
+    output.includes("429") ||
+    /temporar(?:y|ily) unavailable/i.test(output)
+  );
+}
+
 async function applySql(sql: string, target: "remote" | "local", label: string): Promise<void> {
   const directory = await mkdtemp(join(tmpdir(), "publisher-corpus-import-"));
   const sqlPath = join(directory, `${label}.sql`);
   try {
     await writeFile(sqlPath, sql, "utf8");
     const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-    const { stdout, stderr } = await execFileAsync(
-      npx,
-      [
-        "wrangler",
-        "d1",
-        "execute",
-        "DB",
-        `--${target}`,
-        "--file",
-        sqlPath,
-        "--config",
-        "wrangler.jsonc",
-        "--yes",
-      ],
-      { maxBuffer: 30 * 1024 * 1024 },
-    );
-    if (stdout.trim() !== "") {
-      process.stdout.write(stdout);
-    }
-    if (stderr.trim() !== "") {
-      process.stderr.write(stderr);
+    for (let attempt = 1; attempt <= maxD1Attempts; attempt += 1) {
+      try {
+        const { stdout, stderr } = await execFileAsync(
+          npx,
+          [
+            "wrangler",
+            "d1",
+            "execute",
+            "DB",
+            `--${target}`,
+            "--file",
+            sqlPath,
+            "--config",
+            "wrangler.jsonc",
+            "--yes",
+          ],
+          { maxBuffer: 30 * 1024 * 1024 },
+        );
+        if (stdout.trim() !== "") {
+          process.stdout.write(stdout);
+        }
+        if (stderr.trim() !== "") {
+          process.stderr.write(stderr);
+        }
+        return;
+      } catch (error) {
+        if (!retryableD1Import(error) || attempt === maxD1Attempts) {
+          throw error;
+        }
+        const delayMs = remoteBatchPauseMs * attempt;
+        process.stderr.write(
+          `${JSON.stringify({ event: "d1_import_retry", label, attempt, delayMs })}\n`,
+        );
+        await sleep(delayMs);
+      }
     }
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -158,6 +197,9 @@ async function main(): Promise<void> {
         errors: plan.counts.errors,
       })}\n`,
     );
+    if (target === "remote" && index + 1 < batchPlan.batches.length) {
+      await sleep(remoteBatchPauseMs);
+    }
   }
 
   await applySql(
