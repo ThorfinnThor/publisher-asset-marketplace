@@ -57,7 +57,8 @@ The normalized 3,000-asset corpus is stored in `data/seed/owid-all-3000.csv`, de
 tracked master workbook. Validate its exact count without fetching or writing with
 `npm run ingest:corpus -- data/seed/owid-all-3000.csv --expected-count 3000`. The manually
 dispatched `Import OWID corpus to Cloudflare` GitHub workflow fetches and upserts restartable,
-bounded ranges, then rebuilds the search index once. Imported corpus rows remain fail-closed in
+bounded ranges, stores only the source fields needed for audit/refresh, then rebuilds the search
+index once. Imported corpus rows remain fail-closed in
 `draft`/`unknown` until an asset-level rights review explicitly publishes them; the workbook's
 general legal-status column is source context and is not treated as authorization.
 

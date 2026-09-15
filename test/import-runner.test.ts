@@ -110,6 +110,32 @@ describe("import runner", () => {
     expect(JSON.parse(record.metadata_json)).toHaveProperty("rights_evidence.chart_owner", null);
   });
 
+  it("stores only bounded source fields needed for audit and refresh", () => {
+    const asset: OwidAssetFetch = {
+      ...sampleAsset,
+      raw: {
+        ...sampleAsset.raw,
+        metadata: {
+          ...sampleAsset.raw.metadata,
+          unusedLargePayload: "x".repeat(200_000),
+        },
+        config: {
+          ...sampleAsset.raw.config,
+          dimensions: { unused: "x".repeat(200_000) },
+        },
+      },
+    };
+
+    const metadata = JSON.parse(
+      buildImportAssetRecord(asset, "2026-09-14T00:00:00.000Z").metadata_json,
+    );
+
+    expect(metadata.metadata).not.toHaveProperty("unusedLargePayload");
+    expect(metadata.config).not.toHaveProperty("dimensions");
+    expect(metadata).toHaveProperty("indicators.0.metadata.origins.0.license.name", "CC BY 4.0");
+    expect(metadata).toHaveProperty("rights_evidence.indicator_evidence.0.origins.0.license_code");
+  });
+
   it("prepares an idempotent plan with duplicate, invalid, and upsert results", async () => {
     const plan = await prepareOwidImport(
       [

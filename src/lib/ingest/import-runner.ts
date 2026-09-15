@@ -174,11 +174,68 @@ function buildRightsEvidence(asset: OwidAssetFetch, checkedAt: string): RightsEv
 }
 
 function buildMetadataJson(asset: OwidAssetFetch, rightsEvidence: RightsEvidence): string {
+  const chart = asset.raw.metadata.chart;
+  const columns = Object.fromEntries(
+    Object.entries(asset.raw.metadata.columns ?? {}).map(([key, column]) => [
+      key,
+      {
+        title: column.title,
+        shortUnit: column.shortUnit,
+        unit: column.unit,
+        citationShort: column.citationShort,
+        citationLong: column.citationLong,
+        lastUpdated: column.lastUpdated,
+        nextUpdate: column.nextUpdate,
+        fullMetadata: column.fullMetadata,
+        owidVariableId: column.owidVariableId,
+      },
+    ]),
+  );
+  const indicators = asset.raw.indicators.map((indicator) => ({
+    url: indicator.url,
+    metadata: {
+      id: indicator.metadata.id,
+      name: indicator.metadata.name,
+      processingLevel: indicator.metadata.processingLevel,
+      nonRedistributable: indicator.metadata.nonRedistributable,
+      origins: (indicator.metadata.origins ?? []).map((origin) => ({
+        id: origin.id,
+        title: origin.title,
+        producer: origin.producer,
+        citationFull: origin.citationFull,
+        attributionShort: origin.attributionShort,
+        urlMain: origin.urlMain,
+        urlDownload: origin.urlDownload,
+        dateAccessed: origin.dateAccessed,
+        datePublished: origin.datePublished,
+        license: origin.license
+          ? { name: origin.license.name, url: origin.license.url }
+          : undefined,
+      })),
+    },
+  }));
+
   return JSON.stringify({
     source: "owid",
-    metadata: asset.raw.metadata,
-    config: asset.raw.config,
-    indicators: asset.raw.indicators,
+    metadata: {
+      chart: chart
+        ? {
+            title: chart.title,
+            subtitle: chart.subtitle,
+            citation: chart.citation,
+            originalChartUrl: chart.originalChartUrl,
+          }
+        : undefined,
+      columns,
+      dateDownloaded: asset.raw.metadata.dateDownloaded,
+    },
+    config: {
+      id: asset.raw.config.id,
+      slug: asset.raw.config.slug,
+      title: asset.raw.config.title,
+      originUrl: asset.raw.config.originUrl,
+    },
+    indicators,
     rights_evidence: rightsEvidence,
   });
 }
