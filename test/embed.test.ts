@@ -42,7 +42,7 @@ describe("C5 source-hosted embed", () => {
 
   it("builds escaped iframe markup for clipboard copy", () => {
     expect(buildEmbedMarkup(safeAsset)).toBe(
-      '<iframe src="https://ourworldindata.org/grapher/solar-pv-prices?embed=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts"></iframe>',
+      '<iframe src="https://ourworldindata.org/grapher/solar-pv-prices?embed=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin"></iframe>',
     );
     expect(parseEmbedRights(null)).toEqual({});
   });
@@ -63,7 +63,7 @@ describe("C5 source-hosted embed", () => {
     ).toBe(false);
     const markup = buildEmbedMarkup(creatorAsset);
     expect(markup).toBe(
-      '<figure><iframe src="https://tools.example/embed/chart?id=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts"></iframe><figcaption>Source: <a href="https://tools.example/">Example Tools</a></figcaption></figure>',
+      '<figure><iframe src="https://tools.example/embed/chart?id=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin"></iframe><figcaption>Source: <a href="https://tools.example/">Example Tools</a></figcaption></figure>',
     );
     expect(markup).not.toContain(">Solar prices");
     expect(markup).not.toContain("target=");

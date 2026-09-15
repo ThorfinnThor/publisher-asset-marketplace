@@ -58,7 +58,7 @@ export function canCopyEmbed(asset: EmbedAsset): boolean {
 
 export function buildEmbedMarkup(asset: EmbedAsset): string {
   if (!canCopyEmbed(asset) || !asset.embed_url) return "";
-  const iframe = `<iframe src="${escapeAttribute(asset.embed_url)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts"></iframe>`;
+  const iframe = `<iframe src="${escapeAttribute(asset.embed_url)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin"></iframe>`;
   if (asset.source_id !== null) return iframe;
 
   return `<figure>${iframe}<figcaption>Source: <a href="${escapeAttribute(asset.attribution_url ?? "")}">${escapeText(asset.attribution_name ?? "")}</a></figcaption></figure>`;
