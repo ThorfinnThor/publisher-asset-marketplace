@@ -1,0 +1,28 @@
+{
+  "review_version": "worldbank-population-total-v1",
+  "reviewed_at": "2026-09-15T10:17:50.000Z",
+  "review_scope": "Citation and source-link use for the World Bank Open Data indicator SP.POP.TOTL; no embed and no raw-data redistribution.",
+  "assets": [
+    {
+      "slug": "worldbank-sp.pop.totl",
+      "canonical_url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
+      "chart_owner": "third_party",
+      "chart_license_code": "CC_BY",
+      "chart_license_raw": "CC BY-4.0",
+      "chart_license_url": "https://data.worldbank.org/summary-terms-of-use",
+      "chart_license_explicit": true,
+      "manual_review_completed": true,
+      "embed_available": false,
+      "citation_only_allowed": true,
+      "chart_reuse_prohibited": false,
+      "evidence_conflict": false,
+      "evidence_url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
+      "expected_rights_status": "safe",
+      "expected_raw_data_redistribution": null,
+      "citation_text": "World Bank Open Data: Population, total (SP.POP.TOTL). Original sources: UN Population Division, National Statistical Offices, Eurostat, and UN Statistics Division.",
+      "attribution_name": "World Bank Open Data",
+      "attribution_url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
+      "review_note": "The indicator page explicitly labels this World Development Indicators record CC BY-4.0 and identifies multiple original providers. This review enables citation and source-link actions only; no official embed was verified and raw-data redistribution remains unverified. The marketplace must not imply World Bank or provider endorsement."
+    }
+  ]
+}

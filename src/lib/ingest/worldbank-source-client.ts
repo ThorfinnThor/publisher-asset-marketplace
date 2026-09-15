@@ -56,7 +56,7 @@ export type WorldBankNormalizedAsset = {
   sourceUpdatedAt: string | null;
   canonicalUrl: string;
   embedUrl: null;
-  previewUrl: string;
+  previewUrl: null;
   assetType: "dataset";
   licenseCode: SupportedLicense | null;
   attributionName: string;
@@ -228,7 +228,8 @@ function buildRightsEvidence(
     chart_license_url: license.url ?? WORLD_BANK_POLICY_URL,
     chart_license_explicit: license.name !== null,
     manual_review_completed: false,
-    embed_available: null,
+    embed_available: false,
+    citation_only_allowed: false,
     chart_reuse_prohibited: null,
     evidence_conflict: false,
     citation_available: true,
@@ -263,7 +264,7 @@ function normalizeAsset(
     sourceUpdatedAt: latest,
     canonicalUrl: urls.canonicalUrl,
     embedUrl: null,
-    previewUrl: urls.previewUrl,
+    previewUrl: null,
     assetType: "dataset",
     licenseCode: normalizeSupportedLicense(license.name),
     attributionName: provider,

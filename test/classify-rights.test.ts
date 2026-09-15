@@ -141,6 +141,33 @@ describe("classifyRights", () => {
     });
   });
 
+  it("allows an explicitly reviewed citation-only third-party dataset", () => {
+    const result = classify({
+      chart_owner: "third_party",
+      manual_review_completed: true,
+      embed_available: false,
+      citation_only_allowed: true,
+    });
+
+    expect(result).toMatchObject({
+      rights_status: "safe",
+      reason_code: "manually_verified_third_party",
+    });
+    expect(result.rights.embed_allowed).toBe(false);
+    expect(result.actions).toMatchObject({
+      embed_copy: false,
+      citation_copy: true,
+    });
+  });
+
+  it("blocks a missing embed unless citation-only use was explicitly reviewed", () => {
+    const result = classify({ embed_available: false });
+    expect(result).toMatchObject({
+      rights_status: "blocked",
+      reason_code: "official_embed_unavailable",
+    });
+  });
+
   it("blocks conflicting chart evidence", () => {
     const result = classify({ evidence_conflict: true });
     expect(result).toMatchObject({

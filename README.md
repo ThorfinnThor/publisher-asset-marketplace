@@ -120,5 +120,8 @@ candidate for production data until item-level rights review passes. The F4
 parser is available through `npm run ingest:worldbank -- <indicator>` and
 defaults to a dry run.
 
+The first World Bank citation-only decision is recorded in
+[docs/worldbank-population-total-rights-review.md](docs/worldbank-population-total-rights-review.md).
+
 The final launch search/rights gate is recorded in
 [docs/launch-search-rights-review-r3.md](docs/launch-search-rights-review-r3.md).

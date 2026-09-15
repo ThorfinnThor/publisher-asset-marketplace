@@ -11,12 +11,16 @@ export type RightsReviewManifestAsset = {
   chart_license_explicit: true;
   manual_review_completed: boolean;
   embed_available: boolean;
+  citation_only_allowed: boolean;
   chart_reuse_prohibited: boolean;
   evidence_conflict: boolean;
   evidence_url: string;
   expected_rights_status: RightsStatus;
   expected_raw_data_redistribution: TriState;
   review_note: string;
+  citation_text?: string;
+  attribution_name?: string;
+  attribution_url?: string;
 };
 
 export type RightsReviewManifest = {
@@ -31,6 +35,8 @@ export type RightsReviewAssetRow = {
   slug: string;
   canonical_url: string;
   citation_text: string | null;
+  attribution_name?: string | null;
+  attribution_url?: string | null;
   rights_status: RightsStatus;
   status: "draft" | "review" | "published" | "hidden";
   metadata_json: string | null;
@@ -45,6 +51,9 @@ export type RightsReviewUpdate = {
   reason_code: RightsReasonCode;
   rights_json: string;
   metadata_json: string;
+  citation_text: string | null;
+  attribution_name: string | null;
+  attribution_url: string | null;
   status: RightsReviewAssetRow["status"];
   updated_at: string;
   review: {
@@ -106,6 +115,17 @@ function requiredBoolean(record: Record<string, unknown>, key: string): boolean 
   return value;
 }
 
+function optionalString(record: Record<string, unknown>, key: string): string | undefined {
+  const value = record[key];
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  if (typeof value !== "string" || value.trim() === "") {
+    throw new Error(`Rights review field ${key} must be a non-empty string when provided`);
+  }
+  return value.trim();
+}
+
 function triState(record: Record<string, unknown>, key: string): TriState {
   const value = record[key];
   if (value !== true && value !== false && value !== null) {
@@ -139,6 +159,21 @@ function parseManifestAsset(value: unknown): RightsReviewManifestAsset {
   if (canonicalUrl !== evidenceUrl) {
     throw new Error(`Evidence URL must be the asset-specific canonical URL for ${slug}`);
   }
+  const embedAvailable = requiredBoolean(value, "embed_available");
+  const citationOnlyAllowed =
+    value.citation_only_allowed === undefined
+      ? false
+      : requiredBoolean(value, "citation_only_allowed");
+  if (citationOnlyAllowed && embedAvailable) {
+    throw new Error(`Citation-only review cannot declare an embed available for ${slug}`);
+  }
+  const attributionUrl = optionalString(value, "attribution_url");
+  if (attributionUrl) {
+    const parsed = new URL(attributionUrl);
+    if (parsed.protocol !== "https:") {
+      throw new Error(`Rights review attribution_url must use HTTPS for ${slug}`);
+    }
+  }
 
   return {
     slug,
@@ -149,13 +184,17 @@ function parseManifestAsset(value: unknown): RightsReviewManifestAsset {
     chart_license_url: requiredString(value, "chart_license_url"),
     chart_license_explicit: true,
     manual_review_completed: requiredBoolean(value, "manual_review_completed"),
-    embed_available: requiredBoolean(value, "embed_available"),
+    embed_available: embedAvailable,
+    citation_only_allowed: citationOnlyAllowed,
     chart_reuse_prohibited: requiredBoolean(value, "chart_reuse_prohibited"),
     evidence_conflict: requiredBoolean(value, "evidence_conflict"),
     evidence_url: evidenceUrl,
     expected_rights_status: expectedStatus as RightsStatus,
     expected_raw_data_redistribution: triState(value, "expected_raw_data_redistribution"),
     review_note: requiredString(value, "review_note"),
+    citation_text: optionalString(value, "citation_text"),
+    attribution_name: optionalString(value, "attribution_name"),
+    attribution_url: attributionUrl,
   };
 }
 
@@ -268,9 +307,10 @@ export function prepareRightsReview(
       chart_license_explicit: review.chart_license_explicit,
       manual_review_completed: review.manual_review_completed,
       embed_available: review.embed_available,
+      citation_only_allowed: review.citation_only_allowed,
       chart_reuse_prohibited: review.chart_reuse_prohibited,
       evidence_conflict: review.evidence_conflict,
-      citation_available: Boolean(row.citation_text?.trim()),
+      citation_available: Boolean((review.citation_text ?? row.citation_text)?.trim()),
       evidence_url: review.evidence_url,
       evidence_checked_at: manifest.reviewed_at,
     };
@@ -297,6 +337,9 @@ export function prepareRightsReview(
       reason_code: classification.reason_code,
       rights_json: JSON.stringify(classification.rights),
       metadata_json: JSON.stringify({ ...metadata, rights_evidence: evidence }),
+      citation_text: review.citation_text ?? row.citation_text,
+      attribution_name: review.attribution_name ?? row.attribution_name ?? null,
+      attribution_url: review.attribution_url ?? row.attribution_url ?? null,
       status: nextStatus,
       updated_at: manifest.reviewed_at,
       review: {
@@ -329,7 +372,7 @@ function sqlLiteral(value: unknown): string {
 
 export function buildRightsReviewSql(plan: RightsReviewPlan): string {
   const statements = plan.updates.flatMap((update) => [
-    `UPDATE assets SET license_code = ${sqlLiteral(update.license_code)}, rights_status = ${sqlLiteral(update.rights_status)}, rights_json = ${sqlLiteral(update.rights_json)}, metadata_json = ${sqlLiteral(update.metadata_json)}, status = ${sqlLiteral(update.status)}, updated_at = ${sqlLiteral(update.updated_at)} WHERE id = ${sqlLiteral(update.asset_id)} AND slug = ${sqlLiteral(update.slug)} AND canonical_url = ${sqlLiteral(update.canonical_url)};`,
+    `UPDATE assets SET license_code = ${sqlLiteral(update.license_code)}, rights_status = ${sqlLiteral(update.rights_status)}, rights_json = ${sqlLiteral(update.rights_json)}, metadata_json = ${sqlLiteral(update.metadata_json)}, citation_text = ${sqlLiteral(update.citation_text)}, attribution_name = ${sqlLiteral(update.attribution_name)}, attribution_url = ${sqlLiteral(update.attribution_url)}, status = ${sqlLiteral(update.status)}, updated_at = ${sqlLiteral(update.updated_at)} WHERE id = ${sqlLiteral(update.asset_id)} AND slug = ${sqlLiteral(update.slug)} AND canonical_url = ${sqlLiteral(update.canonical_url)};`,
     `INSERT OR IGNORE INTO rights_reviews (id, asset_id, decision, reason_code, notes, evidence_url, reviewed_by, created_at) VALUES (${sqlLiteral(update.review.id)}, ${sqlLiteral(update.asset_id)}, ${sqlLiteral(update.rights_status)}, ${sqlLiteral(update.reason_code)}, ${sqlLiteral(update.review.notes)}, ${sqlLiteral(update.review.evidence_url)}, NULL, ${sqlLiteral(update.review.created_at)});`,
   ]);
   return `${statements.join("\n\n")}\n`;

@@ -26,6 +26,7 @@ export type RightsEvidence = {
   chart_license_explicit: boolean;
   manual_review_completed: boolean;
   embed_available: TriState;
+  citation_only_allowed?: boolean;
   chart_reuse_prohibited: TriState;
   evidence_conflict: boolean;
   citation_available: boolean;
@@ -301,7 +302,7 @@ export function classifyRights(evidence: RightsEvidence): RightsClassification {
   } else if (evidence.chart_reuse_prohibited === true) {
     status = "blocked";
     reasonCode = "explicit_reuse_prohibition";
-  } else if (evidence.embed_available === false) {
+  } else if (evidence.embed_available === false && evidence.citation_only_allowed !== true) {
     status = "blocked";
     reasonCode = "official_embed_unavailable";
   } else if (license === "ALL_RIGHTS_RESERVED") {

@@ -36,10 +36,16 @@ async function runWrangler(args: string[]): Promise<{ stdout: string; stderr: st
   return execFileAsync(npx, ["wrangler", ...args], { maxBuffer: 20 * 1024 * 1024 });
 }
 
-async function readAssets(target: "local" | "remote"): Promise<RightsReviewAssetRow[]> {
-  const query = `SELECT id, slug, canonical_url, citation_text, rights_status, status, metadata_json
+async function readAssets(
+  target: "local" | "remote",
+  sourceId: string,
+): Promise<RightsReviewAssetRow[]> {
+  if (!/^source_[a-z0-9_]+$/.test(sourceId)) {
+    throw new Error("Source id contains unsupported characters");
+  }
+  const query = `SELECT id, slug, canonical_url, citation_text, attribution_name, attribution_url, rights_status, status, metadata_json
     FROM assets
-    WHERE source_id = 'source_owid'
+    WHERE source_id = '${sourceId}'
     ORDER BY slug`;
   const { stdout, stderr } = await runWrangler([
     "d1",
@@ -91,10 +97,11 @@ async function main(): Promise<void> {
     throw new Error("--apply requires exactly one target: --local or --remote");
   }
   const target = remote ? "remote" : "local";
+  const sourceId = optionValue(args, "--source") ?? "source_owid";
   const manifestPath = resolve(optionValue(args, "--manifest") ?? defaultManifest);
   const sqlOutput = optionValue(args, "--sql-out");
   const manifest = parseRightsReviewManifest(JSON.parse(await readFile(manifestPath, "utf8")));
-  const plan = prepareRightsReview(await readAssets(target), manifest, { publish });
+  const plan = prepareRightsReview(await readAssets(target, sourceId), manifest, { publish });
   const sql = buildRightsReviewSql(plan);
 
   let tempDirectory: string | undefined;
@@ -120,6 +127,7 @@ async function main(): Promise<void> {
     `${JSON.stringify(
       {
         target,
+        sourceId,
         reviewVersion: plan.review_version,
         reviewedAt: plan.reviewed_at,
         publishRequested: publish,

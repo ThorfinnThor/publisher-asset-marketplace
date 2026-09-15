@@ -24,7 +24,7 @@ const sampleAsset: WorldBankAssetFetch = {
     sourceUpdatedAt: "2024",
     canonicalUrl: "https://data.worldbank.org/indicator/SP.SAMPLE",
     embedUrl: null,
-    previewUrl: "https://data.worldbank.org/indicator/SP.SAMPLE",
+    previewUrl: null,
     assetType: "dataset",
     licenseCode: "CC_BY",
     attributionName: "World Bank Open Data",
@@ -37,7 +37,8 @@ const sampleAsset: WorldBankAssetFetch = {
     chart_license_url: "https://creativecommons.org/licenses/by/4.0/",
     chart_license_explicit: true,
     manual_review_completed: false,
-    embed_available: null,
+    embed_available: false,
+    citation_only_allowed: false,
     chart_reuse_prohibited: null,
     evidence_conflict: false,
     citation_available: true,
@@ -77,11 +78,11 @@ describe("World Bank import runner", () => {
       asset_type: "dataset",
       embed_url: null,
       status: "draft",
-      rights_status: "unknown",
+      rights_status: "blocked",
       license_code: "CC_BY",
     });
     expect(JSON.parse(record.rights_json)).toMatchObject({
-      embed_allowed: null,
+      embed_allowed: false,
       commercial_use: true,
     });
   });

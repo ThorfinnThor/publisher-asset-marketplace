@@ -49,14 +49,14 @@ rights review has completed.
 
 ## Preview, embed, and reuse boundaries
 
-| Capability              | World Bank F4 default                            | Reason                                                                |
-| ----------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
-| Search/index metadata   | Yes, after validation                            | Metadata and indicator pages are source-hosted and attributable       |
-| Preview                 | Yes, link to the source indicator page           | Do not copy or re-host source visuals by default                      |
-| Embed                   | No by default (`embed_url = null`)               | An iframe/export URL must be explicitly documented and tested first   |
-| Commercial reuse        | Only when the item’s metadata permits it         | CC BY 4.0 is not a substitute for item-level evidence                 |
-| Raw-data redistribution | No by default                                    | Third-party indicators and microdata may have additional restrictions |
-| Citation copy           | Yes when the source/provider citation is present | Preserve the exact attribution text and policy URL                    |
+| Capability              | World Bank F4 default                             | Reason                                                                |
+| ----------------------- | ------------------------------------------------- | --------------------------------------------------------------------- |
+| Search/index metadata   | Yes, after validation                             | Metadata and indicator pages are source-hosted and attributable       |
+| Preview                 | Interface placeholder only (`preview_url = null`) | Do not copy or re-host source visuals by default                      |
+| Embed                   | No by default (`embed_url = null`)                | An iframe/export URL must be explicitly documented and tested first   |
+| Commercial reuse        | Only when the item’s metadata permits it          | CC BY 4.0 is not a substitute for item-level evidence                 |
+| Raw-data redistribution | No by default                                     | Third-party indicators and microdata may have additional restrictions |
+| Citation copy           | Yes when the source/provider citation is present  | Preserve the exact attribution text and policy URL                    |
 
 The marketplace must not show “Commercial use” or “Safe to reuse” from a
 source-level default. The existing per-field rights badge rules continue to
@@ -108,7 +108,7 @@ explicitly widened nullable `embed_url` shape in F4):
 | `title` / `description`                | Indicator metadata, bounded and plain text               |
 | `canonical_url`                        | Source-hosted indicator page                             |
 | `embed_url`                            | `null` until an official, tested embed contract exists   |
-| `preview_url`                          | Source-hosted indicator page or documented preview URL   |
+| `preview_url`                          | `null` until a documented source-hosted image exists     |
 | `citation_text`                        | Provider/source citation from metadata                   |
 | `attribution_name` / `attribution_url` | Original provider and source metadata                    |
 | `source_updated_at`                    | Latest source update/observation timestamp when valid    |
@@ -168,3 +168,7 @@ The parser currently imports records as `draft`, uses `embed_url = null`, and
 keeps rights `unknown` until the evidence is manually reviewed. The F4 fixture
 suite covers the acceptance gates above; no production World Bank records have
 been imported by this change.
+
+The first item-level citation-only review is documented in
+[`docs/worldbank-population-total-rights-review.md`](worldbank-population-total-rights-review.md).
+It does not authorize an embed or raw-data redistribution.

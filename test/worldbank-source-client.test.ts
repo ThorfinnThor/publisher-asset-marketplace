@@ -50,6 +50,10 @@ describe("World Bank source client", () => {
       licenseCode: "CC_BY",
     });
     expect(result.rightsEvidence.chart_license_explicit).toBe(true);
+    expect(result.rightsEvidence).toMatchObject({
+      embed_available: false,
+      citation_only_allowed: false,
+    });
     expect(result.raw.response[1]).toHaveLength(1);
     expect(requests[0]).toContain("test-agent/1.0");
   });
