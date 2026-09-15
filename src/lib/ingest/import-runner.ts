@@ -103,6 +103,13 @@ export type ImportRunResult = {
   database_written: boolean;
 };
 
+export type D1QueryParameter = string | number | null;
+
+export type D1ParameterizedQuery = {
+  sql: string;
+  params: D1QueryParameter[];
+};
+
 function nowIso(): string {
   return new Date().toISOString();
 }
@@ -624,6 +631,74 @@ function sqlAssetInsertStatement(asset: ImportAssetRecord): string {
 function sqlAssetUpdateStatement(asset: ImportAssetRecord): string {
   const values = importedAssetUpdateBindings(asset).map(sqlLiteral);
   return `UPDATE assets SET source_id = ${values[0]}, external_id = ${values[1]}, asset_type = ${values[2]}, title = ${values[3]}, description = ${values[4]}, canonical_url = ${values[5]}, canonical_url_normalized = ${values[6]}, embed_url = ${values[7]}, preview_url = ${values[8]}, citation_text = ${values[9]}, attribution_name = ${values[10]}, attribution_url = ${values[11]}, published_at = ${values[12]}, source_updated_at = ${values[13]}, search_document = ${values[14]}, updated_at = ${values[15]}, last_checked_at = ${values[16]} WHERE slug = ${values[17]};`;
+}
+
+function d1QueryParameters(values: unknown[]): D1QueryParameter[] {
+  return values.map((value) => {
+    if (value === null || value === undefined) {
+      return null;
+    }
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+    return String(value);
+  });
+}
+
+export function buildImportQueries(
+  plan: ImportPlan,
+  options: { rebuildSearchIndex?: boolean } = {},
+): D1ParameterizedQuery[] {
+  return [
+    {
+      sql: insertRunSql,
+      params: d1QueryParameters([plan.run_id, plan.source_id, plan.started_at]),
+    },
+    ...plan.assets.flatMap((asset) => [
+      { sql: insertAssetSql, params: d1QueryParameters(assetBindings(asset)) },
+      {
+        sql: updateImportedAssetSql,
+        params: d1QueryParameters(importedAssetUpdateBindings(asset)),
+      },
+    ]),
+    ...plan.results.map((result) => ({
+      sql: insertResultSql,
+      params: d1QueryParameters([
+        result.id,
+        plan.run_id,
+        result.external_id,
+        result.status,
+        result.reason_code,
+        result.detail_json,
+        result.created_at,
+      ]),
+    })),
+    ...(options.rebuildSearchIndex === false
+      ? []
+      : [
+          { sql: "DELETE FROM asset_search_trigrams", params: [] },
+          { sql: rebuildAssetSearchTrigramsSql, params: [] },
+        ]),
+    {
+      sql: updateRunSql,
+      params: d1QueryParameters([
+        plan.status,
+        plan.counts.accepted,
+        plan.counts.duplicates,
+        plan.counts.invalid,
+        plan.counts.errors,
+        plan.completed_at,
+        plan.run_id,
+      ]),
+    },
+  ];
+}
+
+export function buildOwidImportQueries(
+  plan: OwidImportPlan,
+  options: { rebuildSearchIndex?: boolean } = {},
+): D1ParameterizedQuery[] {
+  return buildImportQueries(plan, options);
 }
 
 export function buildImportSql(

@@ -31,6 +31,12 @@ describe("buildOwidSourceUrls", () => {
   it("rejects malformed slugs before making a request", () => {
     expect(() => buildOwidSourceUrls("sample/chart")).toThrow("invalid OWID slug");
   });
+
+  it("accepts an official OWID slug ending in a hyphen", () => {
+    expect(buildOwidSourceUrls("sample-chart-").canonicalUrl).toBe(
+      "https://ourworldindata.org/grapher/sample-chart-",
+    );
+  });
 });
 
 describe("OwidSourceClient", () => {

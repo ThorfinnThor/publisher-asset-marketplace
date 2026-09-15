@@ -3,7 +3,7 @@ const OWID_API_HOST = "api.ourworldindata.org";
 const DEFAULT_USER_AGENT =
   "publisher-asset-marketplace/0.1 (OWID source ingestion; contact: maintainers)";
 const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
-const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*$/;
 
 export type OwidSourceUrls = {
   canonicalUrl: string;

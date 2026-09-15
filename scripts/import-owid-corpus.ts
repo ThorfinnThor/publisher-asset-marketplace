@@ -5,7 +5,12 @@ import { tmpdir } from "node:os";
 import { promisify } from "node:util";
 
 import { planCorpusBatches } from "../src/lib/ingest/corpus-plan";
-import { buildOwidImportSql, prepareOwidImport } from "../src/lib/ingest/import-runner";
+import {
+  buildOwidImportQueries,
+  buildOwidImportSql,
+  type D1ParameterizedQuery,
+  prepareOwidImport,
+} from "../src/lib/ingest/import-runner";
 import { normalizeOwidInput } from "../src/lib/ingest/normalize-input";
 import { rebuildAssetSearchTrigramsSql } from "../src/lib/search/search-index";
 
@@ -13,6 +18,16 @@ const execFileAsync = promisify(execFile);
 const supportedFormats = new Set(["csv", "json", "txt"] as const);
 const remoteBatchPauseMs = 2_000;
 const maxD1Attempts = 5;
+
+class D1HttpError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "D1HttpError";
+    this.status = status;
+  }
+}
 
 function optionValue(args: string[], name: string): string | undefined {
   const index = args.indexOf(name);
@@ -45,10 +60,81 @@ function commandOutput(error: unknown): string {
 function retryableD1Import(error: unknown): boolean {
   const output = commandOutput(error);
   return (
+    (error instanceof D1HttpError && (error.status === 429 || error.status >= 500)) ||
     output.includes("D1_RESET_DO") ||
     output.includes("429") ||
     /temporar(?:y|ily) unavailable/i.test(output)
   );
+}
+
+async function applyRemoteQueries(queries: D1ParameterizedQuery[], label: string): Promise<void> {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+  const databaseId = process.env.CLOUDFLARE_D1_DATABASE_ID;
+  if (!accountId || !apiToken || !databaseId) {
+    throw new Error(
+      "Remote parameterized import requires CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, and CLOUDFLARE_D1_DATABASE_ID",
+    );
+  }
+
+  const endpoint = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/d1/database/${encodeURIComponent(databaseId)}/query`;
+  for (let attempt = 1; attempt <= maxD1Attempts; attempt += 1) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ batch: queries }),
+      });
+      const responseText = await response.text();
+      let payload: {
+        success?: boolean;
+        errors?: Array<{ code?: number; message?: string }>;
+        result?: Array<{ success?: boolean; meta?: { rows_written?: number } }>;
+      };
+      try {
+        payload = JSON.parse(responseText) as typeof payload;
+      } catch {
+        throw new D1HttpError(
+          `D1 returned a non-JSON response for ${label}: ${responseText.slice(0, 300)}`,
+          response.status,
+        );
+      }
+      const failedResult = payload.result?.find((result) => result.success === false);
+      if (!response.ok || payload.success !== true || failedResult) {
+        const detail = (payload.errors ?? [])
+          .map((error) => `${error.code ?? "unknown"}: ${error.message ?? "unknown error"}`)
+          .join("; ");
+        throw new D1HttpError(
+          `D1 parameterized import failed for ${label}: ${detail || response.statusText}`,
+          response.status,
+        );
+      }
+      process.stdout.write(
+        `${JSON.stringify({
+          event: "d1_parameterized_batch_complete",
+          label,
+          statements: queries.length,
+          rowsWritten: (payload.result ?? []).reduce(
+            (total, result) => total + (result.meta?.rows_written ?? 0),
+            0,
+          ),
+        })}\n`,
+      );
+      return;
+    } catch (error) {
+      if (!retryableD1Import(error) || attempt === maxD1Attempts) {
+        throw error;
+      }
+      const delayMs = remoteBatchPauseMs * attempt;
+      process.stderr.write(
+        `${JSON.stringify({ event: "d1_import_retry", label, attempt, delayMs })}\n`,
+      );
+      await sleep(delayMs);
+    }
+  }
 }
 
 async function applySql(sql: string, target: "remote" | "local", label: string): Promise<void> {
@@ -179,11 +265,18 @@ async function main(): Promise<void> {
       batch.map((asset) => ({ asset_url: asset.canonicalUrl, title: asset.title })),
     );
     const plan = await prepareOwidImport(batchInput, "json");
-    await applySql(
-      buildOwidImportSql(plan, { rebuildSearchIndex: false }),
-      target,
-      `batch-${index + 1}`,
-    );
+    if (target === "remote") {
+      await applyRemoteQueries(
+        buildOwidImportQueries(plan, { rebuildSearchIndex: false }),
+        `batch-${index + 1}`,
+      );
+    } else {
+      await applySql(
+        buildOwidImportSql(plan, { rebuildSearchIndex: false }),
+        target,
+        `batch-${index + 1}`,
+      );
+    }
     accepted += plan.counts.accepted;
     errors += plan.counts.errors;
     importedBatches += 1;
@@ -202,11 +295,21 @@ async function main(): Promise<void> {
     }
   }
 
-  await applySql(
-    `DELETE FROM asset_search_trigrams;\n${rebuildAssetSearchTrigramsSql.trim()};\n`,
-    target,
-    "rebuild-search-index",
-  );
+  if (target === "remote") {
+    await applyRemoteQueries(
+      [
+        { sql: "DELETE FROM asset_search_trigrams", params: [] },
+        { sql: rebuildAssetSearchTrigramsSql, params: [] },
+      ],
+      "rebuild-search-index",
+    );
+  } else {
+    await applySql(
+      `DELETE FROM asset_search_trigrams;\n${rebuildAssetSearchTrigramsSql.trim()};\n`,
+      target,
+      "rebuild-search-index",
+    );
+  }
 
   process.stdout.write(
     `${JSON.stringify(

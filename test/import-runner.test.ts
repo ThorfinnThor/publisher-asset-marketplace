@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildImportAssetRecord,
+  buildOwidImportQueries,
   buildOwidImportSql,
   prepareOwidImport,
   writeOwidImport,
@@ -168,6 +169,20 @@ describe("import runner", () => {
     expect(buildOwidImportSql(plan, { rebuildSearchIndex: false })).not.toContain(
       "DELETE FROM asset_search_trigrams",
     );
+    const queries = buildOwidImportQueries(plan, { rebuildSearchIndex: false });
+    expect(queries.some((query) => query.sql.includes("INSERT OR IGNORE INTO assets"))).toBe(true);
+    expect(queries.some((query) => query.params.includes("asset_owid_sample-chart"))).toBe(true);
+    expect(queries.some((query) => query.sql.includes("DELETE FROM asset_search_trigrams"))).toBe(
+      false,
+    );
+
+    plan.assets[0]!.metadata_json = JSON.stringify({ payload: "x".repeat(200_000) });
+    const largeMetadataQueries = buildOwidImportQueries(plan, { rebuildSearchIndex: false });
+    const assetInsert = largeMetadataQueries.find((query) =>
+      query.sql.includes("INSERT OR IGNORE INTO assets"),
+    );
+    expect(assetInsert?.sql.length).toBeLessThan(2_000);
+    expect(assetInsert?.params.some((value) => String(value).length > 200_000)).toBe(true);
   });
 
   it("writes a plan in bounded D1 batches and finalizes the run", async () => {
