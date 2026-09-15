@@ -253,7 +253,7 @@ function indicatorMetadataUrls(slug: string, metadata: OwidMetadataDocument): st
       });
     }
     const validPath = /^\/v1\/indicators\/[0-9]+\.metadata\.json$/.test(url.pathname);
-    if (url.protocol !== "https:" || url.hostname !== OWID_API_HOST || !validPath) {
+    if (url.protocol !== "https:" || url.hostname !== OWID_API_HOST) {
       throw new OwidSourceClientError({
         slug,
         endpoint: "indicator",
@@ -261,6 +261,12 @@ function indicatorMetadataUrls(slug: string, metadata: OwidMetadataDocument): st
         message: "OWID metadata contained an unsupported indicator metadata URL",
         attempts: 0,
       });
+    }
+    // Some legacy OWID charts expose a same-origin placeholder such as
+    // /v1/indicators/undefined.metadata.json. It carries no usable rights
+    // evidence, so ignore it and keep the asset in conservative draft state.
+    if (!validPath) {
+      continue;
     }
     url.search = "";
     url.hash = "";
@@ -314,7 +320,7 @@ export class OwidSourceClient {
     const urls = buildOwidSourceUrls(slug);
     const [metadata, config] = await Promise.all([
       this.fetchJson<OwidMetadataDocument>(slug, "metadata", urls.metadataUrl),
-      this.fetchJson<OwidConfigDocument>(slug, "config", urls.configUrl),
+      this.fetchJson<OwidConfigDocument>(slug, "config", urls.configUrl, {}),
     ]);
     const indicators = await Promise.all(
       indicatorMetadataUrls(slug, metadata).map(async (url) => ({
@@ -370,7 +376,12 @@ export class OwidSourceClient {
     return { successful, failed };
   }
 
-  private async fetchJson<T>(slug: string, endpoint: OwidEndpoint, url: string): Promise<T> {
+  private async fetchJson<T>(
+    slug: string,
+    endpoint: OwidEndpoint,
+    url: string,
+    notFoundValue?: T,
+  ): Promise<T> {
     let lastError: unknown;
 
     for (let attempt = 1; attempt <= this.maxAttempts; attempt += 1) {
@@ -392,6 +403,9 @@ export class OwidSourceClient {
           clearTimeout(timeout);
         }
 
+        if (response.status === 404 && notFoundValue !== undefined) {
+          return notFoundValue;
+        }
         if (!response.ok) {
           throw new OwidSourceClientError({
             slug,

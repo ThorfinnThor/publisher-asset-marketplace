@@ -162,6 +162,39 @@ describe("OwidSourceClient", () => {
     });
   });
 
+  it("imports legacy charts with a missing config and an unusable same-origin indicator", async () => {
+    const client = new OwidSourceClient({
+      logger: () => undefined,
+      fetchImpl: async (input) => {
+        const url = String(input);
+        if (url.endsWith(".config.json")) {
+          return new Response("missing", { status: 404 });
+        }
+        if (url.endsWith(".metadata.json")) {
+          return new Response(
+            JSON.stringify({
+              chart: { title: "Legacy chart" },
+              columns: {
+                one: {
+                  fullMetadata:
+                    "https://api.ourworldindata.org/v1/indicators/undefined.metadata.json",
+                },
+              },
+            }),
+            { status: 200 },
+          );
+        }
+        throw new Error(`unexpected request: ${url}`);
+      },
+    });
+
+    const asset = await client.fetchAsset("legacy-chart");
+
+    expect(asset.config).toEqual({});
+    expect(asset.indicators).toEqual([]);
+    expect(asset.normalized).toMatchObject({ title: "Legacy chart", externalId: null });
+  });
+
   it("keeps batch concurrency bounded and separates failures", async () => {
     let active = 0;
     let peak = 0;
