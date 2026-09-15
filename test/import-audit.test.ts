@@ -115,6 +115,33 @@ describe("B6 import audit", () => {
     expect(report.gate_b).toEqual({ passed: true, reasons: [] });
   });
 
+  it("accepts a reviewed safe citation-only asset without an embed", () => {
+    const citationOnly = asset("citation-only", "safe", {
+      embed_url: null,
+      citation_text: "Reviewed citation",
+      rights_json: JSON.stringify({ ...rights("safe"), embed_allowed: false }),
+      metadata_json: JSON.stringify({
+        metadata: {
+          chart: { title: "Citation only", subtitle: "Description" },
+          columns: { Value: { nextUpdate: "2027-01-01" } },
+        },
+        indicators: [{ url: "https://example.test/indicator" }],
+        rights_evidence: {
+          chart_owner: "third_party",
+          chart_license_explicit: true,
+          citation_only_allowed: true,
+          evidence_url: "https://example.test/evidence",
+          evidence_checked_at: auditedAt,
+        },
+      }),
+    });
+
+    expect(auditImportAssets([citationOnly], { audited_at: auditedAt }).gate_b).toEqual({
+      passed: true,
+      reasons: [],
+    });
+  });
+
   it("fails rights invariants and quarantines malformed metadata for review", () => {
     const report = auditImportAssets(
       [

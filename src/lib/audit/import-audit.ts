@@ -254,14 +254,19 @@ function auditAsset(
   if (
     asset.rights_status === "safe" &&
     rights &&
-    (rights.embed_allowed !== true ||
+    ((rights.embed_allowed !== true &&
+      !(
+        metadata.evidence?.citation_only_allowed === true &&
+        rights.embed_allowed === false &&
+        nonEmptyString(asset.citation_text)
+      )) ||
       rights.commercial_use !== true ||
       rights.modification_allowed !== true)
   ) {
     add(
       "incomplete_safe_permissions",
       "error",
-      "Safe assets must explicitly allow embedding, commercial use, and modification.",
+      "Safe assets must explicitly allow commercial use and modification plus either embedding or a reviewed citation-only action.",
     );
   }
 
