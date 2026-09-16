@@ -59,6 +59,8 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               <Link href="/submit">Publish</Link>
               <Link href="/creator/guide">Creator guide</Link>
               <Link href="/creator/terms">Creator terms</Link>
+              <Link href="/legal-notice">Impressum</Link>
+              <Link href="/report">Meldung</Link>
             </nav>
           </div>
         </footer>
