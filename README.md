@@ -35,6 +35,8 @@ Run the isolated creator submission E2E flow against a local Worker with
 `npm run e2e:submission`; setup and cleanup instructions are in
 [docs/e2e-submission.md](docs/e2e-submission.md). The test is local-only by default and covers
 submission, pre-screening, admin approval, publication and the creator dashboard.
+The non-mutating `npm run e2e:embed-sandbox` regression uses Chrome/Chromium to verify the exact
+cross-origin `allow-scripts` sandbox and runs automatically in CI.
 
 ## Deployment
 

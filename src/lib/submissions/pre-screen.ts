@@ -7,7 +7,8 @@ export type SubmissionPreScreenCheck = {
     | "attribution_host"
     | "preview_format"
     | "attribution_language"
-    | "declared_reuse";
+    | "declared_reuse"
+    | "sandbox_compatibility";
   status: "pass" | "review";
   message: string;
 };
@@ -27,6 +28,7 @@ const checkCodes = new Set<string>([
   "preview_format",
   "attribution_language",
   "declared_reuse",
+  "sandbox_compatibility",
 ]);
 
 export function runSubmissionPreScreen(submission: ValidatedSubmission): SubmissionPreScreenResult {
@@ -86,6 +88,12 @@ export function runSubmissionPreScreen(submission: ValidatedSubmission): Submiss
           message:
             "Embedding or commercial use is not declared allowed; verify the intended restricted use.",
         },
+    {
+      code: "sandbox_compatibility",
+      status: "pass",
+      message:
+        "Creator confirmed an interactive test with the fixed v1 sandbox (allow-scripts only).",
+    },
   ];
 
   return {

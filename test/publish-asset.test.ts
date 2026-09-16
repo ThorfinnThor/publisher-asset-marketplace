@@ -42,6 +42,7 @@ describe("E5 creator asset publishing", () => {
       attribution_name: null,
       attribution_terms: null,
       reviewed_at: "2026-09-14T13:00:00.000Z",
+      sandbox_tested: true,
     });
 
     expect(result.ok).toBe(true);
@@ -68,6 +69,7 @@ describe("E5 creator asset publishing", () => {
       attribution_name: null,
       attribution_terms: null,
       reviewed_at: "2026-09-14T13:00:00.000Z",
+      sandbox_tested: true,
     });
     expect(result).toEqual({ ok: false, code: "promotion_url_invalid" });
   });
@@ -85,8 +87,25 @@ describe("E5 creator asset publishing", () => {
         attribution_name: null,
         attribution_terms: null,
         reviewed_at: "2026-09-14T13:00:00.000Z",
+        sandbox_tested: true,
       },
     );
     expect(result).toEqual({ ok: false, code: "promotion_preview_required" });
+  });
+
+  it("fails closed when the admin did not verify the fixed sandbox", () => {
+    const result = buildCreatorAssetRecord(submission, {
+      reviewed_by: "github:admin",
+      rights_status: "safe",
+      rights_reason_code: "manual_review",
+      rights_evidence_url: "https://creator.example/terms",
+      title: null,
+      description: null,
+      attribution_name: null,
+      attribution_terms: null,
+      reviewed_at: "2026-09-14T13:00:00.000Z",
+      sandbox_tested: false as unknown as true,
+    });
+    expect(result).toEqual({ ok: false, code: "promotion_sandbox_test_required" });
   });
 });

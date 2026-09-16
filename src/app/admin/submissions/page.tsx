@@ -214,6 +214,7 @@ function SubmissionReviewCard({
       <div className="moderation-card__actions">
         <AdminReviewActions
           csrfToken={csrfToken}
+          embedUrl={submission.embed_url}
           initialEvidenceUrl={submission.rights_evidence_url}
           initialAttributionName={submission.attribution_name}
           initialAttributionTerms={submission.attribution_terms}

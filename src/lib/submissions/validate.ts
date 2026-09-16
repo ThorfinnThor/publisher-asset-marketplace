@@ -14,6 +14,7 @@ const submissionKeys = new Set([
   "embed_allowed",
   "modification_allowed",
   "citation_required",
+  "sandbox_compatible",
   "authorized_to_submit",
   "opportunity_topic",
 ]);
@@ -36,6 +37,8 @@ export type ValidatedSubmission = {
     commercial_use: boolean;
     modification_allowed: boolean;
     citation_required: boolean;
+    sandbox_compatible: true;
+    sandbox_profile: "v1:allow-scripts";
     attribution_required: true;
     attribution_terms: string;
     submitter_authorized: true;
@@ -108,6 +111,13 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
   for (const field of rightsFields) {
     if (typeof input[field] !== "boolean") return { ok: false, code: "boolean_required", field };
   }
+  if (input.sandbox_compatible !== true) {
+    return {
+      ok: false,
+      code: "sandbox_compatibility_required",
+      field: "sandbox_compatible",
+    };
+  }
   if (input.authorized_to_submit !== true) {
     return { ok: false, code: "authorization_required", field: "authorized_to_submit" };
   }
@@ -130,6 +140,8 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
         commercial_use: input.commercial_use as boolean,
         modification_allowed: input.modification_allowed as boolean,
         citation_required: input.citation_required as boolean,
+        sandbox_compatible: true,
+        sandbox_profile: "v1:allow-scripts",
         attribution_required: true,
         attribution_terms: attributionTerms.value,
         submitter_authorized: true,

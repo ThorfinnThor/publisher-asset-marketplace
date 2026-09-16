@@ -48,6 +48,7 @@ async function run(): Promise<void> {
   assert(form.response.status === 200, `submission form returned ${form.response.status}`);
   assert(form.text.includes("Submission requirements"), "submission requirements are not visible");
   assert(form.text.includes("Preview image URL"), "preview requirement is missing");
+  assert(form.text.includes("Sandbox compatibility test"), "sandbox test is missing");
 
   const submission = await request("/api/submissions", {
     method: "POST",
@@ -67,6 +68,7 @@ async function run(): Promise<void> {
       embed_allowed: true,
       modification_allowed: false,
       citation_required: true,
+      sandbox_compatible: true,
       authorized_to_submit: true,
       opportunity_topic: null,
     },
@@ -95,6 +97,7 @@ async function run(): Promise<void> {
       rights_status: "safe",
       rights_reason_code: "source_terms",
       rights_evidence_url: "https://e2e-test.example.com/rights",
+      sandbox_tested: true,
     },
   });
   assert(review.response.status === 200, `admin approval returned ${review.response.status}`);

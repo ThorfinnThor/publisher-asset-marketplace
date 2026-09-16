@@ -99,6 +99,7 @@ with raw creator input are prohibited.
 | `attribution_name`        | Plain text, 2-120 characters                                            |
 | `attribution_terms`       | Plain text, 2-1,000 characters                                          |
 | rights answers            | Explicit booleans; absence is invalid, not `false`                      |
+| `sandbox_compatible`      | Must be exactly `true` after testing the fixed `allow-scripts` profile  |
 | authorization attestation | Must be exactly `true`; record its version and timestamp                |
 
 The rights object is closed and versioned. E3 writes:
@@ -110,6 +111,8 @@ The rights object is closed and versioned. E3 writes:
   "commercial_use": true,
   "modification_allowed": false,
   "citation_required": true,
+  "sandbox_compatible": true,
+  "sandbox_profile": "v1:allow-scripts",
   "attribution_required": true,
   "attribution_terms": "Credit Example Source",
   "submitter_authorized": true,

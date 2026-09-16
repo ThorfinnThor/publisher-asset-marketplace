@@ -8,6 +8,7 @@ const approvedReview = {
   rights_status: "safe",
   rights_reason_code: "source_terms",
   rights_evidence_url: "https://example.com/terms#embedding",
+  sandbox_tested: true,
 };
 
 describe("submission moderation contract", () => {
@@ -30,6 +31,11 @@ describe("submission moderation contract", () => {
     expect(validateReviewPayload({ ...approvedReview, rights_status: "blocked" })).toMatchObject({
       ok: false,
       code: "blocked_asset_cannot_approve",
+    });
+    expect(validateReviewPayload({ ...approvedReview, sandbox_tested: false })).toMatchObject({
+      ok: false,
+      code: "sandbox_test_required",
+      field: "sandbox_tested",
     });
   });
 

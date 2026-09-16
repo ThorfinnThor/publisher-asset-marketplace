@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type MouseEvent } from "react";
 
 type SubmissionFormProps = { csrfToken: string; opportunityTopic?: string | null };
 
@@ -33,6 +33,10 @@ export function SubmissionRequirements() {
         <li>Title: 3–160 characters.</li>
         <li>Description: 20–2,000 characters.</li>
         <li>Public HTTPS embed URL—the URL inside an iframe, not raw iframe HTML.</li>
+        <li>
+          The embed must remain interactive with <code>sandbox=&quot;allow-scripts&quot;</code>{" "}
+          only, without cookies, browser storage, forms, popups, downloads, or same-origin access.
+        </li>
         <li>Direct HTTPS preview image URL, preferably PNG or JPG, so real data is visible.</li>
         <li>Real source or brand name—not SEO keywords.</li>
         <li>
@@ -54,6 +58,29 @@ export function SubmissionRequirements() {
 export function SubmissionForm({ csrfToken, opportunityTopic = null }: SubmissionFormProps) {
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [embedTest, setEmbedTest] = useState<{ url: string; loaded: boolean } | null>(null);
+
+  function testEmbed(event: MouseEvent<HTMLButtonElement>) {
+    const field = event.currentTarget.form?.elements.namedItem("embed_url");
+    const value = field instanceof HTMLInputElement ? field.value.trim() : "";
+    try {
+      const url = new URL(value);
+      if (
+        url.protocol !== "https:" ||
+        !url.hostname ||
+        url.username.length > 0 ||
+        url.password.length > 0 ||
+        url.port.length > 0
+      ) {
+        throw new Error("invalid embed URL");
+      }
+      setStatus(null);
+      setEmbedTest({ url: value, loaded: false });
+    } catch {
+      setEmbedTest(null);
+      setStatus({ tone: "error", text: "Enter a public HTTPS embed URL before testing it." });
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,6 +88,15 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
     setStatus(null);
     const form = event.currentTarget;
     const data = new FormData(form);
+    const embedUrl = String(data.get("embed_url") ?? "").trim();
+    if (!embedTest?.loaded || embedTest.url !== embedUrl) {
+      setSubmitting(false);
+      setStatus({
+        tone: "error",
+        text: "Run the sandbox test again for the current embed URL before submitting.",
+      });
+      return;
+    }
     try {
       const response = await fetch("/api/submissions", {
         method: "POST",
@@ -72,7 +108,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
           asset_type: data.get("asset_type"),
           title: data.get("title"),
           description: data.get("description"),
-          embed_url: data.get("embed_url"),
+          embed_url: embedUrl,
           preview_url: String(data.get("preview_url") ?? "").trim() || null,
           attribution_name: data.get("attribution_name"),
           attribution_url: data.get("attribution_url"),
@@ -81,6 +117,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
           embed_allowed: data.get("embed_allowed") === "on",
           modification_allowed: data.get("modification_allowed") === "on",
           citation_required: data.get("citation_required") === "on",
+          sandbox_compatible: data.get("sandbox_compatible") === "on",
           authorized_to_submit: data.get("authorized_to_submit") === "on",
           opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
         }),
@@ -172,7 +209,14 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
           </div>
           <div className="form-field">
             <label htmlFor="embed-url">Embed URL</label>
-            <input id="embed-url" name="embed_url" placeholder="https://…" required type="url" />
+            <input
+              id="embed-url"
+              name="embed_url"
+              onChange={() => setEmbedTest(null)}
+              placeholder="https://…"
+              required
+              type="url"
+            />
             <p className="form-hint">Paste only the iframe source URL, never iframe HTML.</p>
           </div>
           <div className="form-field">
@@ -186,6 +230,54 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
             />
             <p className="form-hint">Direct public HTTPS image shown on the asset page.</p>
           </div>
+        </div>
+
+        <div className="embed-test" aria-labelledby="embed-test-heading">
+          <div className="embed-test__heading">
+            <div>
+              <h3 id="embed-test-heading">Sandbox compatibility test</h3>
+              <p>
+                Load the embed with the exact marketplace restrictions, then use its primary
+                controls and confirm that calculation or interaction still works.
+              </p>
+            </div>
+            <button className="button button--secondary" onClick={testEmbed} type="button">
+              Test embed
+            </button>
+          </div>
+          {embedTest ? (
+            <div className="embed-test__frame-wrap">
+              <iframe
+                key={embedTest.url}
+                className="embed-test__frame"
+                loading="eager"
+                onLoad={() =>
+                  setEmbedTest((current) =>
+                    current?.url === embedTest.url ? { ...current, loaded: true } : current,
+                  )
+                }
+                referrerPolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts"
+                src={embedTest.url}
+                title="Submitted embed sandbox test"
+              />
+            </div>
+          ) : (
+            <p className="embed-test__empty">Enter the embed URL and select Test embed.</p>
+          )}
+          <label className="attestation embed-test__attestation">
+            <input
+              disabled={!embedTest?.loaded}
+              name="sandbox_compatible"
+              required
+              type="checkbox"
+            />
+            <span>
+              I tested the current embed above. It remains usable with scripts only and does not
+              require cookies, localStorage, sessionStorage, IndexedDB, forms, popups, downloads,
+              authentication, or same-origin access.
+            </span>
+          </label>
         </div>
       </section>
 

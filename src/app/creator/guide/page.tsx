@@ -83,7 +83,8 @@ export default function CreatorGuidePage() {
               <strong>Design for the iframe viewport.</strong>
               <span>
                 Test at 320 px, 768 px and 1280 px wide. Keep calculations in memory; do not depend
-                on cookies, localStorage, IndexedDB or credentials.
+                on cookies, localStorage, sessionStorage, IndexedDB, forms, popups, downloads,
+                same-origin access or credentials.
               </span>
             </div>
             <pre className="creator-guide__code">
@@ -148,6 +149,7 @@ export default function CreatorGuidePage() {
             <ul>
               <li>Canonical page loads over HTTPS.</li>
               <li>Embed route is stable and source-hosted.</li>
+              <li>The interactive sandbox test passes with exactly allow-scripts.</li>
               <li>Preview URL returns PNG or JPG data.</li>
               <li>Rights page names the asset and owner.</li>
               <li>Commercial and embedding permissions are explicit.</li>

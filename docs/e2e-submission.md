@@ -4,6 +4,11 @@ The `e2e:submission` script runs the complete creator workflow against a local W
 database. It creates a test submission, verifies the automated pre-screen and admin queue, approves
 the submission, then verifies the published asset and creator dashboard.
 
+`npm run e2e:embed-sandbox` is a separate non-mutating browser regression. It starts two temporary
+local origins, frames the embed with exactly `sandbox="allow-scripts"`, operates an interactive
+fixture, and confirms that an otherwise identical fixture with an unguarded `sessionStorage` access
+fails. CI runs this test with the installed Chrome/Chromium browser.
+
 The script refuses remote URLs unless `E2E_ALLOW_REMOTE=1` is explicitly set. The default test
 sessions are local-only and must never be configured in production.
 

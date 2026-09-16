@@ -22,6 +22,8 @@ const submission: ValidatedSubmission = {
     commercial_use: true,
     modification_allowed: false,
     citation_required: true,
+    sandbox_compatible: true,
+    sandbox_profile: "v1:allow-scripts",
     attribution_required: true,
     attribution_terms: "Credit Example Analytics",
     submitter_authorized: true,
@@ -33,7 +35,7 @@ describe("submission automated pre-screen", () => {
   it("passes a source-hosted submission with a direct preview image", () => {
     const result = runSubmissionPreScreen(submission);
     expect(result.status).toBe("pass");
-    expect(result.checks).toHaveLength(6);
+    expect(result.checks).toHaveLength(7);
     expect(result.checks.every((check) => check.status === "pass")).toBe(true);
   });
 
@@ -52,6 +54,7 @@ describe("submission automated pre-screen", () => {
         expect.objectContaining({ code: "preview_format", status: "review" }),
         expect.objectContaining({ code: "attribution_language", status: "review" }),
         expect.objectContaining({ code: "declared_reuse", status: "review" }),
+        expect.objectContaining({ code: "sandbox_compatibility", status: "pass" }),
       ]),
     );
   });

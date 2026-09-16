@@ -35,7 +35,7 @@ export async function POST(request: Request): Promise<Response> {
   delete payload.csrf_token;
   const validation = validateSubmissionPayload(payload);
   if (!validation.ok) {
-    return errorResponse(400, validation.code, "Please correct the highlighted submission fields.");
+    return errorResponse(400, validation.code, validationErrorMessage(validation.code));
   }
   const preScreen = runSubmissionPreScreen(validation.value);
 
@@ -91,6 +91,13 @@ export async function POST(request: Request): Promise<Response> {
     }
     return errorResponse(503, "submission_unavailable", "The submission could not be saved.");
   }
+}
+
+function validationErrorMessage(code: string): string {
+  if (code === "sandbox_compatibility_required") {
+    return "Test the embed in the marketplace sandbox and confirm that it remains interactive without storage, cookies or same-origin access.";
+  }
+  return "Please correct the highlighted submission fields.";
 }
 
 async function loadProfile(request: Request) {

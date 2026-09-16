@@ -91,6 +91,7 @@ export async function POST(
         attribution_name: validation.value.attributionName,
         attribution_terms: validation.value.attributionTerms,
         reviewed_at: now,
+        sandbox_tested: true,
       });
       if (!publishedAsset.ok)
         return errorResponse(400, publishedAsset.code, "Asset cannot be published.");
@@ -174,7 +175,9 @@ export async function POST(
                 attribution_name = COALESCE(?, attribution_name),
                 attribution_terms = COALESCE(?, attribution_terms),
                 rights_status = ?, rights_reason_code = ?, rights_evidence_url = ?,
-                rights_reviewed_at = ?, asset_id = COALESCE(?, asset_id), updated_at = ?
+                rights_reviewed_at = ?,
+                sandbox_tested_at = CASE WHEN ? THEN ? ELSE sandbox_tested_at END,
+                asset_id = COALESCE(?, asset_id), updated_at = ?
             WHERE id = ? AND review_status IN ('pending', 'needs_changes')
           `,
         )
@@ -191,6 +194,8 @@ export async function POST(
           validation.value.rightsReasonCode,
           validation.value.rightsEvidenceUrl,
           now,
+          validation.value.sandboxTested ? 1 : 0,
+          now,
           asset?.id ?? null,
           now,
           id,
@@ -203,9 +208,9 @@ export async function POST(
           `
             INSERT INTO submission_reviews (
               id, submission_id, decision, review_notes, rights_status,
-              rights_reason_code, rights_evidence_url, reviewed_by, created_at
+              rights_reason_code, rights_evidence_url, sandbox_tested, reviewed_by, created_at
             )
-            SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
+            SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             WHERE EXISTS (
               SELECT 1 FROM submissions
               WHERE id = ? AND reviewed_at = ? AND reviewed_by = ?
@@ -221,6 +226,7 @@ export async function POST(
           validation.value.rightsStatus,
           validation.value.rightsReasonCode,
           validation.value.rightsEvidenceUrl,
+          validation.value.sandboxTested ? 1 : 0,
           profile.id,
           now,
           id,

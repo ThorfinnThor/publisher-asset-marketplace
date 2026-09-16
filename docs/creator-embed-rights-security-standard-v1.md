@@ -103,6 +103,16 @@ cannot operate under this profile, it is not v1-compatible. A broader sandbox pr
 new SOL security review and an origin-specific capability record; admins cannot grant exceptions by
 editing raw iframe HTML.
 
+Before submission, the creator must load the current embed URL in the form's sandbox tester,
+exercise its primary controls, and attest that the asset remains usable. The server stores that
+attestation and the immutable `v1:allow-scripts` profile in the declared-rights record. This is
+evidence that the required test was performed, not proof of code safety; moderation still repeats
+the interaction before approval.
+
+Approval is fail-closed: the moderation API requires a separate admin `sandbox_tested` confirmation,
+and publication records the sandbox profile and verification timestamp in the asset rights and
+metadata snapshots.
+
 The HTML standard defines each sandbox keyword as a capability re-enable. It also warns that
 combining `allow-scripts` and `allow-same-origin` on same-origin content can let the embedded page
 remove the sandbox. See:

@@ -20,6 +20,8 @@ const submission: ValidatedSubmission = {
     commercial_use: true,
     modification_allowed: false,
     citation_required: true,
+    sandbox_compatible: true,
+    sandbox_profile: "v1:allow-scripts",
     attribution_required: true,
     attribution_terms: "Credit Example",
     submitter_authorized: true,

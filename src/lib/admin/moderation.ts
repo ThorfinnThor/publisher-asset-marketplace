@@ -12,6 +12,7 @@ const reviewKeys = new Set([
   "description",
   "attribution_name",
   "attribution_terms",
+  "sandbox_tested",
 ]);
 
 export type ReviewDecision = "approved" | "rejected" | "needs_changes";
@@ -27,6 +28,7 @@ export type ValidatedReview = {
   description: string | null;
   attributionName: string | null;
   attributionTerms: string | null;
+  sandboxTested: boolean;
 };
 
 export type ReviewValidationResult =
@@ -68,6 +70,12 @@ export function validateReviewPayload(input: unknown): ReviewValidationResult {
   if (input.decision === "approved" && input.rights_status === "blocked") {
     return { ok: false, code: "blocked_asset_cannot_approve", field: "rights_status" };
   }
+  if (typeof input.sandbox_tested !== "boolean") {
+    return { ok: false, code: "boolean_required", field: "sandbox_tested" };
+  }
+  if (input.decision === "approved" && input.sandbox_tested !== true) {
+    return { ok: false, code: "sandbox_test_required", field: "sandbox_tested" };
+  }
   if (
     input.decision === "approved" &&
     ((input.rights_status !== "safe" && input.rights_status !== "restricted") || !evidence.value)
@@ -87,6 +95,7 @@ export function validateReviewPayload(input: unknown): ReviewValidationResult {
       description: description.value,
       attributionName: attributionName.value,
       attributionTerms: attributionTerms.value,
+      sandboxTested: input.sandbox_tested,
     },
   };
 }

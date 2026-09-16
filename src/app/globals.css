@@ -1645,6 +1645,55 @@ summary {
   grid-column: 1 / -1;
 }
 
+.embed-test {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  background: #fbfaf8;
+}
+
+.embed-test__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.embed-test__heading h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.embed-test__heading p,
+.embed-test__empty {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.embed-test__frame-wrap {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+}
+
+.embed-test__frame {
+  width: 100%;
+  height: 480px;
+  display: block;
+  border: 0;
+}
+
+.embed-test__attestation {
+  border: 0;
+  padding: 0;
+}
+
 .rights-declaration {
   display: grid;
   grid-template-columns: 1fr 1fr;

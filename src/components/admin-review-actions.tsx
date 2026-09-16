@@ -12,6 +12,7 @@ type AdminReviewActionsProps = {
   initialAttributionTerms: string;
   initialRightsStatus: "safe" | "restricted" | "unknown" | "blocked";
   initialEvidenceUrl: string | null;
+  embedUrl: string;
 };
 
 export function AdminReviewActions({
@@ -23,10 +24,13 @@ export function AdminReviewActions({
   initialAttributionTerms,
   initialRightsStatus,
   initialEvidenceUrl,
+  embedUrl,
 }: AdminReviewActionsProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sandboxOpen, setSandboxOpen] = useState(false);
+  const [sandboxLoaded, setSandboxLoaded] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,6 +53,7 @@ export function AdminReviewActions({
           description: data.get("description"),
           attribution_name: data.get("attribution_name"),
           attribution_terms: data.get("attribution_terms"),
+          sandbox_tested: data.get("sandbox_tested") === "on",
         }),
       });
       const result = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -166,6 +171,47 @@ export function AdminReviewActions({
             placeholder="Record the evidence checked and any changes required."
             required
           />
+        </div>
+        <div className="embed-test form-field--wide" aria-label="Admin sandbox verification">
+          <div className="embed-test__heading">
+            <div>
+              <h3>Required embed verification</h3>
+              <p>
+                Open the submitted URL with exactly <code>allow-scripts</code>, then operate its
+                primary controls before approving.
+              </p>
+            </div>
+            <button
+              className="button button--secondary"
+              onClick={() => {
+                setSandboxLoaded(false);
+                setSandboxOpen(true);
+              }}
+              type="button"
+            >
+              Open sandbox test
+            </button>
+          </div>
+          {sandboxOpen ? (
+            <div className="embed-test__frame-wrap">
+              <iframe
+                className="embed-test__frame"
+                loading="eager"
+                onLoad={() => setSandboxLoaded(true)}
+                referrerPolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts"
+                src={embedUrl}
+                title="Admin embed sandbox test"
+              />
+            </div>
+          ) : null}
+          <label className="attestation embed-test__attestation">
+            <input disabled={!sandboxLoaded} name="sandbox_tested" type="checkbox" />
+            <span>
+              I interacted with this embed in the fixed marketplace sandbox and verified that it
+              remains usable. This confirmation is mandatory for approval.
+            </span>
+          </label>
         </div>
       </div>
       {error ? (

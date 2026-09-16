@@ -28,6 +28,7 @@ export type PublishReview = {
   attribution_name: string | null;
   attribution_terms: string | null;
   reviewed_at: string;
+  sandbox_tested: true;
 };
 
 export type CreatorAssetRecord = {
@@ -78,6 +79,9 @@ export function buildCreatorAssetRecord(
   submission: PublishableSubmission,
   review: PublishReview,
 ): PublishValidationResult {
+  if (review.sandbox_tested !== true) {
+    return { ok: false, code: "promotion_sandbox_test_required" };
+  }
   const canonical = normalizePublicHttpsUrl(submission.canonical_url);
   const embed = normalizePublicHttpsUrl(submission.embed_url);
   if (!submission.preview_url) return { ok: false, code: "promotion_preview_required" };
@@ -117,6 +121,9 @@ export function buildCreatorAssetRecord(
     evidence_checked_at: review.reviewed_at,
     reviewed_rights_status: review.rights_status,
     rights_reason_code: review.rights_reason_code,
+    sandbox_compatible: true,
+    sandbox_profile: "v1:allow-scripts",
+    sandbox_tested_at: review.reviewed_at,
   };
   const metadata = {
     source: "creator_submission",
@@ -127,6 +134,8 @@ export function buildCreatorAssetRecord(
     rights_evidence_url: evidence.value,
     rights_reason_code: review.rights_reason_code,
     embed_origin: embedOrigin,
+    sandbox_profile: "v1:allow-scripts",
+    sandbox_tested_at: review.reviewed_at,
     opportunity_topic: submission.opportunity_topic ?? null,
   };
 

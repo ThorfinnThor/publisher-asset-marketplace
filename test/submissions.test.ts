@@ -19,6 +19,7 @@ const validSubmission = {
   embed_allowed: true,
   modification_allowed: false,
   citation_required: true,
+  sandbox_compatible: true,
   authorized_to_submit: true,
   opportunity_topic: null,
 };
@@ -87,6 +88,23 @@ describe("submission security validation", () => {
       ok: false,
       code: "boolean_required",
       field: "embed_allowed",
+    });
+  });
+
+  it("requires confirmation of the fixed sandbox compatibility test", () => {
+    expect(
+      validateSubmissionPayload({ ...validSubmission, sandbox_compatible: false }),
+    ).toMatchObject({
+      ok: false,
+      code: "sandbox_compatibility_required",
+      field: "sandbox_compatible",
+    });
+    const missingSandboxConfirmation = { ...validSubmission };
+    Reflect.deleteProperty(missingSandboxConfirmation, "sandbox_compatible");
+    expect(validateSubmissionPayload(missingSandboxConfirmation)).toMatchObject({
+      ok: false,
+      code: "sandbox_compatibility_required",
+      field: "sandbox_compatible",
     });
   });
 

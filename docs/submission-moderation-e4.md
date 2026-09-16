@@ -18,7 +18,8 @@ Every decision requires:
 - plain-text review notes;
 - a rights status (`safe`, `restricted`, `unknown`, or `blocked`);
 - a rights reason code; and
-- HTTPS rights evidence for approval.
+- HTTPS rights evidence for approval; and
+- an admin-confirmed interactive test in the fixed `sandbox="allow-scripts"` profile for approval.
 
 The reviewer may also normalize title, description, source name and attribution terms in the same
 mutation. These remain plain text and are never interpreted as HTML.
@@ -31,12 +32,15 @@ An approved decision promotes the submission in the same batch to a published cr
 submission stores the resulting `asset_id` and the asset receives reviewed attribution terms plus
 a reviewed embed-origin snapshot.
 
-Submitted URLs are displayed as escaped text/links only. The queue never fetches a creator URL or
-renders submitted HTML/iframe markup.
+Submitted URLs are displayed as escaped text/links only. The admin can explicitly open the embed
+URL in marketplace-generated iframe markup with the fixed sandbox; creator-supplied HTML is never
+rendered. The Worker does not fetch the URL. The verification result is stored both on the
+submission and in the immutable review record.
 
 Implementation:
 
-- Migration: `migrations/0008_submission_moderation.sql`
+- Migrations: `migrations/0008_submission_moderation.sql` and
+  `migrations/0015_embed_sandbox_verification.sql`
 - Contract: `src/lib/admin/moderation.ts`
 - Queue: `src/app/admin/submissions/page.tsx`
 - Mutation and promotion: `src/app/api/admin/submissions/[id]/review/route.ts`
