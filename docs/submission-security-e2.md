@@ -148,6 +148,9 @@ identity or moderation state.
 
 ## Embed boundary
 
+Creator-side route, preview, rights-evidence, and framing requirements are specified in
+[Creator embed, preview, rights, and security standard v1](creator-embed-rights-security-standard-v1.md).
+
 - A creator submits only an `embed_url`, never iframe markup.
 - Approval snapshots an exact normalized embed origin for the asset. Public embed generation
   requires `status = published`, rights status `safe` or `restricted`, reviewed

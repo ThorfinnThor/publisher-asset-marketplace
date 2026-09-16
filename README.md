@@ -119,6 +119,9 @@ See [docs/creator-asset-publishing-e5.md](docs/creator-asset-publishing-e5.md) f
 
 Creator source links and copied embed attribution follow the accepted
 [E6 attribution/link policy](docs/creator-attribution-link-policy-e6.md).
+Creator-hosted calculators and widgets must also satisfy the
+[creator embed, preview, rights, and security standard](docs/creator-embed-rights-security-standard-v1.md)
+before moderation can publish them.
 
 Creator-owned published assets expose bounded first-party publisher signals in the dashboard.
 See [docs/creator-analytics-e7.md](docs/creator-analytics-e7.md) for the E7 metric definitions,
