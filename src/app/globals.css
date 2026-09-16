@@ -1552,6 +1552,109 @@ summary {
   margin-top: 56px;
 }
 
+.url-scan-card {
+  display: grid;
+  gap: 20px;
+  max-width: 1030px;
+  margin-top: 56px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 27px 28px 30px;
+  background: #f7f9ff;
+}
+
+.url-scan-card .form-section__heading {
+  margin-bottom: 0;
+}
+
+.url-scan-card__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.url-scan-card__form .form-field {
+  margin: 0;
+}
+
+.url-scan-card__error {
+  margin: 0;
+  color: #7e2d2d;
+  font-size: 12px;
+}
+
+.url-scan-result {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+.url-scan-result__status {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.url-scan-result__status span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.url-scan-result__grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.url-scan-result__preview {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+}
+
+.url-scan-result__facts {
+  display: grid;
+  gap: 9px;
+  margin: 0 0 16px;
+}
+
+.url-scan-result__facts div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.url-scan-result__facts dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.url-scan-result__facts dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.url-scan-result__issues {
+  margin: 0 0 16px;
+  color: #7e2d2d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.scan-prefill-notice {
+  max-width: 1030px;
+  margin-top: 20px;
+}
+
 .submission-form {
   overflow: hidden;
   border: 1px solid var(--border);
@@ -2760,6 +2863,11 @@ summary {
   }
 
   .submission-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .url-scan-card__form,
+  .url-scan-result__grid {
     grid-template-columns: 1fr;
   }
 

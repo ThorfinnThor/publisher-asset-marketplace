@@ -45,6 +45,23 @@ class ScanFailure extends Error {
 }
 
 export default {
+  async fetch(request: Request, env: ScannerEnv): Promise<Response> {
+    const url = new URL(request.url);
+    if (request.method !== "GET" || !url.pathname.startsWith("/internal/previews/")) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    const key = decodePreviewKey(url.pathname);
+    if (!key) return new Response("Not found", { status: 404 });
+    const object = await env.PREVIEWS.get(key);
+    if (!object) return new Response("Not found", { status: 404 });
+
+    const headers = new Headers();
+    object.writeHttpMetadata(headers);
+    headers.set("cache-control", "private, no-store");
+    headers.set("x-content-type-options", "nosniff");
+    return new Response(object.body, { headers });
+  },
   async queue(batch: MessageBatch<UrlScanJobMessageV1>, env: ScannerEnv): Promise<void> {
     for (const message of batch.messages) {
       const job = parseJobMessage(message.body);
@@ -104,6 +121,20 @@ export default {
     }
   },
 } satisfies ExportedHandler<ScannerEnv, UrlScanJobMessageV1>;
+
+function decodePreviewKey(pathname: string): string | null {
+  const encoded = pathname.slice("/internal/previews/".length);
+  try {
+    const key = decodeURIComponent(encoded);
+    return /^unconfirmed\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.png$/i.test(
+      key,
+    )
+      ? key
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 async function scanUrl(job: UrlScanJobMessageV1, env: ScannerEnv): Promise<UrlScanResultV1> {
   const deadline = Date.now() + urlScanContractV1.limits.jobTimeoutMs;

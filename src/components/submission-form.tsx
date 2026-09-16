@@ -3,7 +3,22 @@
 import Link from "next/link";
 import { useState, type FormEvent, type MouseEvent } from "react";
 
-type SubmissionFormProps = { csrfToken: string; opportunityTopic?: string | null };
+type SubmissionInitialValues = {
+  canonical_url?: string;
+  asset_type?: "chart" | "calculator" | "table" | "dataset" | "benchmark" | "widget";
+  title?: string;
+  description?: string;
+  embed_url?: string;
+  preview_url?: string;
+  attribution_name?: string;
+  attribution_url?: string;
+};
+
+type SubmissionFormProps = {
+  csrfToken: string;
+  opportunityTopic?: string | null;
+  initialValues?: SubmissionInitialValues;
+};
 
 type SubmissionResponse = {
   error?: string;
@@ -55,7 +70,11 @@ export function SubmissionRequirements() {
   );
 }
 
-export function SubmissionForm({ csrfToken, opportunityTopic = null }: SubmissionFormProps) {
+export function SubmissionForm({
+  csrfToken,
+  opportunityTopic = null,
+  initialValues,
+}: SubmissionFormProps) {
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [embedTest, setEmbedTest] = useState<{ url: string; loaded: boolean } | null>(null);
@@ -159,6 +178,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               id="canonical-url"
               name="canonical_url"
               placeholder="https://example.com/data-tool"
+              defaultValue={initialValues?.canonical_url}
               required
               type="url"
             />
@@ -166,7 +186,12 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
           </div>
           <div className="form-field">
             <label htmlFor="asset-type">Asset type</label>
-            <select defaultValue="" id="asset-type" name="asset_type" required>
+            <select
+              defaultValue={initialValues?.asset_type ?? ""}
+              id="asset-type"
+              name="asset_type"
+              required
+            >
               <option disabled value="">
                 Select type
               </option>
@@ -184,7 +209,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               id="asset-title"
               name="title"
               placeholder="A clear, specific title"
-              defaultValue={opportunityTopic ?? undefined}
+              defaultValue={initialValues?.title ?? opportunityTopic ?? undefined}
               minLength={3}
               maxLength={160}
               required
@@ -200,9 +225,10 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               maxLength={2000}
               placeholder="What does this asset show or calculate?"
               defaultValue={
-                opportunityTopic
+                initialValues?.description ??
+                (opportunityTopic
                   ? `A useful asset for publishers searching for “${opportunityTopic}”.`
-                  : undefined
+                  : undefined)
               }
               required
             />
@@ -214,6 +240,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               name="embed_url"
               onChange={() => setEmbedTest(null)}
               placeholder="https://…"
+              defaultValue={initialValues?.embed_url}
               required
               type="url"
             />
@@ -225,6 +252,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               id="preview-url"
               name="preview_url"
               placeholder="https://…/preview.png"
+              defaultValue={initialValues?.preview_url}
               required
               type="url"
             />
@@ -304,6 +332,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               maxLength={120}
               minLength={2}
               name="attribution_name"
+              defaultValue={initialValues?.attribution_name}
               required
               type="text"
             />
@@ -317,6 +346,7 @@ export function SubmissionForm({ csrfToken, opportunityTopic = null }: Submissio
               id="attribution-url"
               name="attribution_url"
               placeholder="https://…"
+              defaultValue={initialValues?.attribution_url}
               required
               type="url"
             />

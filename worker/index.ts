@@ -8,15 +8,13 @@ import { withSecurityHeaders } from "../src/lib/security-headers";
 import { expireUrlScanJobs } from "../src/lib/submissions/url-scan-jobs";
 import { consumeUrlScanResults } from "./url-scan-results";
 
-type WorkerEnv = { DB: D1Database; URL_SCAN_JOBS: Queue };
-
 const worker = {
-  fetch(request: Request, env: WorkerEnv, context: ExecutionContext): Promise<Response> {
+  fetch(request: Request, env: Env, context: ExecutionContext): Promise<Response> {
     return handler.fetch(request, env, context).then(withSecurityHeaders);
   },
   async scheduled(
     controller: ScheduledController,
-    env: WorkerEnv,
+    env: Env,
     context: ExecutionContext,
   ): Promise<void> {
     const scheduledAt = new Date(controller.scheduledTime).toISOString();
@@ -112,7 +110,7 @@ const worker = {
         }),
     );
   },
-  async queue(batch: MessageBatch<unknown>, env: WorkerEnv): Promise<void> {
+  async queue(batch: MessageBatch<unknown>, env: Env): Promise<void> {
     await consumeUrlScanResults(batch, env.DB);
   },
 };
