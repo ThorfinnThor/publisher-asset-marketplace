@@ -283,22 +283,23 @@ Implement and review one calculator before adapting all planners:
 | ---------------- | ------------------------------------------------------------- |
 | Asset            | Gartenhaus-Planer                                             |
 | Canonical        | `https://www.passendplanen.de/garten/gartenhaus-planer/`      |
-| Proposed embed   | `https://www.passendplanen.de/embed/gartenhaus-planer/`       |
-| Proposed preview | `https://www.passendplanen.de/previews/gartenhaus-planer.png` |
+| Embed            | `https://www.passendplanen.de/embed/gartenhaus-planer/`       |
+| Preview          | `https://www.passendplanen.de/previews/gartenhaus-planer.png` |
 | Source name      | `PassendPlanen`                                               |
-| Attribution URL  | Canonical calculator page                                     |
-| Rights evidence  | A new final, public PassendPlanen reuse-permission page       |
+| Attribution URL  | `https://www.passendplanen.de/garten/gartenhaus-planer/`      |
+| Rights evidence  | `https://www.passendplanen.de/garten/gartenhaus-planer/nutzungsrechte/` |
 | Sandbox profile  | `v1: allow-scripts`                                           |
 
-The pilot is complete only when the proposed embed and preview URLs exist, the rights page is final,
-the acceptance matrix passes, and an admin records the evidence. The current public calculator and
-methodology pages are useful product evidence but do not by themselves grant third-party commercial
+The pilot URLs and rights page were deployed on 2026-09-16 and returned `200` during the LUNA
+verification pass. The acceptance matrix still applies: an admin must record the evidence before
+publishing the asset. The public calculator page alone does not grant third-party commercial
 embedding rights.
 
-## Known implementation gap for LUNA
+## Resolved implementation gap
 
-The current marketplace-generated iframe omits explicit dimensions. LUNA must add the constant
-`style="width:100%;height:720px;border:0;display:block"` before the creator tutorial is published.
+The marketplace-generated iframe now includes the constant
+`style="width:100%;height:720px;border:0;display:block"`, and the creator tutorial explains the
+same sizing contract.
 The marketplace must not accept creator-supplied inline styles or arbitrary iframe attributes to
 solve sizing.
 
@@ -310,6 +311,6 @@ This SOL step is complete when:
 - the fixed v1 sandbox capability profile is accepted;
 - provider framing headers and preview requirements are explicit;
 - the rights-evidence wording and review classification are explicit;
-- the PassendPlanen pilot URLs are reserved as proposals, not represented as already live; and
+- the PassendPlanen pilot has live embed, preview, and rights-evidence URLs; and
 - LUNA can implement the creator tutorial and sizing changes without making new security or rights
   decisions.
