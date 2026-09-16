@@ -104,7 +104,8 @@ export function prepareAutonomousPublicationStatements(
           SET review_status = 'approved', review_notes = ?, reviewed_at = ?, reviewed_by = ?,
               rights_status = ?, rights_reason_code = ?, rights_evidence_url = ?,
               rights_reviewed_at = ?, sandbox_tested_at = ?, asset_id = ?, updated_at = ?
-          WHERE id = ? AND review_status = 'pending' AND pre_screen_status = 'pass'
+          WHERE id = ? AND review_status IN ('pending', 'needs_changes')
+            AND pre_screen_status = 'pass'
             AND EXISTS (
               SELECT 1 FROM assets WHERE id = ? AND creator_id = ? AND status = 'published'
             )
