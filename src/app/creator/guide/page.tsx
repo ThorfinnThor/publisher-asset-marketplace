@@ -138,6 +138,12 @@ export default function CreatorGuidePage() {
               reuse rights and sandbox confirmation. If every check passes, the asset is published
               immediately. Otherwise, correct the reported fields and submit again.
             </p>
+            <p>
+              The marketplace is a commercial service and may earn revenue through fees,
+              subscriptions, advertising or similar models. Your submission may be listed and
+              promoted in that commercial context, but ownership of your tool, source code and data
+              remains with you.
+            </p>
             <div className="creator-guide__callout creator-guide__callout--caution">
               <strong>Declarations are asset-level.</strong>
               <span>

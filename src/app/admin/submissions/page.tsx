@@ -330,6 +330,9 @@ function formatCreatorConfirmations(
     ["preview_display_authorized", "preview display"],
     ["submitter_authorized", "submitter authorization"],
   ];
+  if (authorizationVersion >= 3) {
+    fields.push(["commercial_marketplace_acknowledged", "commercial marketplace"]);
+  }
   const confirmed = fields.filter(([key]) => rights[key] === true).map(([, label]) => label);
   return confirmed.length === fields.length ? confirmed.join(", ") : "incomplete — do not approve";
 }

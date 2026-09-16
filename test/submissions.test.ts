@@ -24,6 +24,7 @@ const validSubmission = {
   attribution_confirmed: true,
   preview_display_authorized: true,
   authorized_to_submit: true,
+  commercial_marketplace_acknowledged: true,
   opportunity_topic: null,
 };
 
@@ -96,6 +97,19 @@ describe("submission security validation", () => {
     expect(
       validateSubmissionPayload({ ...validSubmission, preview_display_authorized: false }),
     ).toMatchObject({ ok: false, code: "preview_display_authorization_required" });
+  });
+
+  it("requires acknowledgement of the marketplace's commercial operation", () => {
+    expect(
+      validateSubmissionPayload({
+        ...validSubmission,
+        commercial_marketplace_acknowledged: false,
+      }),
+    ).toMatchObject({
+      ok: false,
+      code: "commercial_marketplace_acknowledgement_required",
+      field: "commercial_marketplace_acknowledged",
+    });
   });
 
   it("requires an explicit boolean for every rights answer", () => {

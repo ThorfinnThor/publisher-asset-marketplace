@@ -19,6 +19,7 @@ type AutonomousPublicationInput = {
   submission: ValidatedSubmission;
   declaredRightsJson: string;
   preScreen: SubmissionPreScreenResult;
+  authorizationVersion: number;
   now: string;
 };
 
@@ -59,7 +60,7 @@ export function planAutonomousPublication(
     opportunity_topic: input.submission.opportunityTopic,
     declared_rights_json: input.declaredRightsJson,
     created_at: input.now,
-    authorization_version: 2,
+    authorization_version: input.authorizationVersion,
   };
   const rightsStatus = "restricted" as const;
   const asset = buildCreatorAssetRecord(storedSubmission, {
@@ -187,6 +188,8 @@ export function validatedSubmissionFromStored(
     attribution_confirmed: rights.attribution_confirmed,
     preview_display_authorized: rights.preview_display_authorized,
     authorized_to_submit: rights.submitter_authorized,
+    commercial_marketplace_acknowledged:
+      submission.authorization_version >= 3 ? rights.commercial_marketplace_acknowledged : true,
     opportunity_topic: submission.opportunity_topic ?? null,
   });
   return validation.ok ? validation.value : null;

@@ -91,20 +91,21 @@ characters other than ordinary spaces. No field accepts Markdown or HTML in V1. 
 render stored text; `dangerouslySetInnerHTML`, `srcDoc`, DOM HTML parsing, and template concatenation
 with raw creator input are prohibited.
 
-| Field                     | Rule                                                                    |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `canonical_url`           | Required normalized public HTTPS URL, maximum 2,048 characters          |
-| `embed_url`               | Required normalized public HTTPS URL, maximum 2,048 characters          |
-| `preview_url`             | Required normalized public HTTPS image URL, maximum 2,048 characters    |
-| `attribution_url`         | Required normalized public HTTPS URL, maximum 2,048 characters          |
-| `asset_type`              | One of `chart`, `calculator`, `table`, `dataset`, `benchmark`, `widget` |
-| `title`                   | Plain text, 3-160 characters                                            |
-| `description`             | Plain text, 20-2,000 characters                                         |
-| `attribution_name`        | Plain text, 2-120 characters                                            |
-| `attribution_terms`       | Plain text, 2-1,000 characters                                          |
-| rights answers            | Explicit booleans; absence is invalid, not `false`                      |
-| `sandbox_compatible`      | Must be exactly `true` after testing the fixed `allow-scripts` profile  |
-| authorization attestation | Must be exactly `true`; record its version and timestamp                |
+| Field                                  | Rule                                                                    |
+| -------------------------------------- | ----------------------------------------------------------------------- |
+| `canonical_url`                        | Required normalized public HTTPS URL, maximum 2,048 characters          |
+| `embed_url`                            | Required normalized public HTTPS URL, maximum 2,048 characters          |
+| `preview_url`                          | Required normalized public HTTPS image URL, maximum 2,048 characters    |
+| `attribution_url`                      | Required normalized public HTTPS URL, maximum 2,048 characters          |
+| `asset_type`                           | One of `chart`, `calculator`, `table`, `dataset`, `benchmark`, `widget` |
+| `title`                                | Plain text, 3-160 characters                                            |
+| `description`                          | Plain text, 20-2,000 characters                                         |
+| `attribution_name`                     | Plain text, 2-120 characters                                            |
+| `attribution_terms`                    | Plain text, 2-1,000 characters                                          |
+| rights answers                         | Explicit booleans; absence is invalid, not `false`                      |
+| `sandbox_compatible`                   | Must be exactly `true` after testing the fixed `allow-scripts` profile  |
+| authorization attestation              | Must be exactly `true`; record its version and timestamp                |
+| commercial marketplace acknowledgement | Must be exactly `true` for authorization version 3                      |
 
 The rights object is closed and versioned. E3 writes:
 
@@ -120,6 +121,7 @@ The rights object is closed and versioned. E3 writes:
   "attribution_required": true,
   "attribution_terms": "Credit Example Source",
   "submitter_authorized": true,
+  "commercial_marketplace_acknowledged": true,
   "attested_at": "server-generated ISO-8601 timestamp"
 }
 ```

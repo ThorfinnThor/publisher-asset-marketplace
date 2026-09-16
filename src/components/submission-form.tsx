@@ -67,6 +67,10 @@ export function SubmissionRequirements() {
         </li>
         <li>Accurate declarations for commercial use, embedding, modification, and citation.</li>
         <li>Confirmation that you are authorized to submit the asset.</li>
+        <li>
+          Acknowledgement that the marketplace is commercially operated and may list and promote the
+          asset without taking ownership of the tool, source code, or data.
+        </li>
         <li>Maximum 10 submissions per GitHub account within 24 hours.</li>
         <li>The canonical URL must not already exist in the marketplace or another submission.</li>
       </ul>
@@ -192,6 +196,8 @@ export function SubmissionForm({
             attribution_confirmed: data.get("attribution_confirmed") === "on",
             preview_display_authorized: data.get("preview_display_authorized") === "on",
             authorized_to_submit: data.get("authorized_to_submit") === "on",
+            commercial_marketplace_acknowledged:
+              data.get("commercial_marketplace_acknowledged") === "on",
             opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
           }),
         },
@@ -511,6 +517,17 @@ export function SubmissionForm({
             I am authorized to submit this asset and have described its usage terms accurately. I
             understand that these declarations are used for automatic publication and that false
             declarations may result in removal and account suspension.
+          </span>
+        </label>
+        <label className="attestation">
+          <input name="commercial_marketplace_acknowledged" required type="checkbox" />
+          <span>
+            I understand that Publisher Asset Marketplace is a commercial service that may earn
+            revenue, including through fees, subscriptions, advertising, or similar business models.
+            I agree that this asset may be listed, described, and promoted within that commercial
+            marketplace. I retain ownership of my tool, source code, and data; this acknowledgement
+            grants no rights beyond those needed for the submitted listing, preview, attribution,
+            and embed availability.
           </span>
         </label>
         {status ? (

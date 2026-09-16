@@ -23,9 +23,10 @@ const submission = {
     attribution_confirmed: true,
     preview_display_authorized: true,
     submitter_authorized: true,
+    commercial_marketplace_acknowledged: true,
   }),
   created_at: "2026-09-14T12:00:00.000Z",
-  authorization_version: 2,
+  authorization_version: 3,
 };
 
 describe("E5 creator asset publishing", () => {
@@ -143,6 +144,43 @@ describe("E5 creator asset publishing", () => {
       },
     );
     expect(result.ok).toBe(true);
+  });
+
+  it("requires the commercial-marketplace acknowledgement from version 3 onward", () => {
+    const declared = JSON.parse(submission.declared_rights_json) as Record<string, unknown>;
+    delete declared.commercial_marketplace_acknowledged;
+    const review = {
+      reviewed_by: "github:admin",
+      rights_status: "safe" as const,
+      rights_reason_code: "manual_review",
+      rights_evidence_url: "https://creator.example/terms",
+      title: null,
+      description: null,
+      attribution_name: null,
+      attribution_terms: null,
+      reviewed_at: "2026-09-14T13:00:00.000Z",
+      sandbox_tested: true as const,
+    };
+
+    expect(
+      buildCreatorAssetRecord(
+        { ...submission, declared_rights_json: JSON.stringify(declared) },
+        review,
+      ),
+    ).toEqual({
+      ok: false,
+      code: "promotion_commercial_marketplace_acknowledgement_required",
+    });
+    expect(
+      buildCreatorAssetRecord(
+        {
+          ...submission,
+          authorization_version: 2,
+          declared_rights_json: JSON.stringify(declared),
+        },
+        review,
+      ).ok,
+    ).toBe(true);
   });
 
   it("fails closed when the admin did not verify the fixed sandbox", () => {

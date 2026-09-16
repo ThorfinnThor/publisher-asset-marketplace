@@ -5,7 +5,7 @@ import {
   planAutonomousPublication,
   prepareAutonomousPublicationStatements,
 } from "@/lib/submissions/auto-publish";
-import { buildDeclaredRightsJson } from "@/lib/submissions/create";
+import { buildDeclaredRightsJson, currentAuthorizationVersion } from "@/lib/submissions/create";
 import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
 import {
   buildConversionSubmissionInsertBindings,
@@ -140,6 +140,7 @@ export async function POST(
       submission: validation.value,
       declaredRightsJson,
       preScreen,
+      authorizationVersion: currentAuthorizationVersion,
       now,
     });
     if (!publication.ok) {
@@ -215,9 +216,10 @@ function validationErrorMessage(code: string): string {
     code === "source_identity_confirmation_required" ||
     code === "attribution_confirmation_required" ||
     code === "preview_display_authorization_required" ||
-    code === "authorization_required"
+    code === "authorization_required" ||
+    code === "commercial_marketplace_acknowledgement_required"
   ) {
-    return "Confirm the source, attribution, preview display and your authorization.";
+    return "Confirm the source, attribution, preview display, your authorization and the commercial marketplace acknowledgement.";
   }
   return "Please correct the highlighted submission fields.";
 }

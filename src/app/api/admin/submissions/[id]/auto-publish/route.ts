@@ -82,6 +82,7 @@ export async function POST(
       submission,
       declaredRightsJson: current.declared_rights_json,
       preScreen,
+      authorizationVersion: current.authorization_version,
       now,
     });
     if (!publication.ok) {

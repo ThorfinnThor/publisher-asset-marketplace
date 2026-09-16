@@ -8,6 +8,7 @@ import {
 import {
   buildDeclaredRightsJson,
   buildSubmissionInsertBindings,
+  currentAuthorizationVersion,
   submissionInsertSql,
 } from "@/lib/submissions/create";
 import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
@@ -96,6 +97,7 @@ export async function POST(request: Request): Promise<Response> {
       submission: validation.value,
       declaredRightsJson,
       preScreen,
+      authorizationVersion: currentAuthorizationVersion,
       now,
     });
     if (!publication.ok) {
@@ -154,6 +156,9 @@ export async function POST(request: Request): Promise<Response> {
 function validationErrorMessage(code: string): string {
   if (code === "sandbox_compatibility_required") {
     return "Test the embed in the marketplace sandbox and confirm that it remains interactive without storage, cookies or same-origin access.";
+  }
+  if (code === "commercial_marketplace_acknowledgement_required") {
+    return "Confirm that the asset may be listed and promoted within the commercially operated marketplace.";
   }
   return "Please correct the highlighted submission fields.";
 }

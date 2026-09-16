@@ -33,6 +33,7 @@ const submission: ValidatedSubmission = {
     attribution_confirmed: true,
     preview_display_authorized: true,
     submitter_authorized: true,
+    commercial_marketplace_acknowledged: true,
   },
   opportunityTopic: null,
 };

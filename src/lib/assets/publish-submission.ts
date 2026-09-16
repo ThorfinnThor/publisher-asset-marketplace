@@ -115,6 +115,9 @@ export function buildCreatorAssetRecord(
   ) {
     return { ok: false, code: "promotion_creator_confirmations_required" };
   }
+  if (submission.authorization_version >= 3 && !declared.commercial_marketplace_acknowledged) {
+    return { ok: false, code: "promotion_commercial_marketplace_acknowledgement_required" };
+  }
   const embedOrigin = new URL(embed.value).origin;
   const rights = {
     schema_version: 1,
@@ -189,6 +192,7 @@ function parseDeclaredRights(value: string): {
   attribution_confirmed: boolean;
   preview_display_authorized: boolean;
   submitter_authorized: boolean;
+  commercial_marketplace_acknowledged: boolean;
   source_scan_id: string | null;
 } {
   try {
@@ -203,6 +207,7 @@ function parseDeclaredRights(value: string): {
         attribution_confirmed: false,
         preview_display_authorized: false,
         submitter_authorized: false,
+        commercial_marketplace_acknowledged: false,
         source_scan_id: null,
       };
     }
@@ -216,6 +221,7 @@ function parseDeclaredRights(value: string): {
       attribution_confirmed: rights.attribution_confirmed === true,
       preview_display_authorized: rights.preview_display_authorized === true,
       submitter_authorized: rights.submitter_authorized === true,
+      commercial_marketplace_acknowledged: rights.commercial_marketplace_acknowledged === true,
       source_scan_id: typeof rights.source_scan_id === "string" ? rights.source_scan_id : null,
     };
   } catch {
@@ -228,6 +234,7 @@ function parseDeclaredRights(value: string): {
       attribution_confirmed: false,
       preview_display_authorized: false,
       submitter_authorized: false,
+      commercial_marketplace_acknowledged: false,
       source_scan_id: null,
     };
   }

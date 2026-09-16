@@ -1,6 +1,8 @@
 import type { SubmissionPreScreenResult } from "./pre-screen";
 import type { ValidatedSubmission } from "./validate";
 
+export const currentAuthorizationVersion = 3;
+
 export const submissionInsertSql = `
   INSERT INTO submissions (
     id, creator_id, canonical_url, canonical_url_normalized, embed_url, preview_url,
@@ -10,7 +12,7 @@ export const submissionInsertSql = `
   )
   SELECT
     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-    2, 'pending', ?, ?
+    ${currentAuthorizationVersion}, 'pending', ?, ?
   WHERE (
     SELECT COUNT(*) FROM submissions
     WHERE creator_id = ? AND created_at >= ?

@@ -19,6 +19,7 @@ const submissionKeys = new Set([
   "attribution_confirmed",
   "preview_display_authorized",
   "authorized_to_submit",
+  "commercial_marketplace_acknowledged",
   "opportunity_topic",
 ]);
 
@@ -48,6 +49,7 @@ export type ValidatedSubmission = {
     attribution_confirmed: true;
     preview_display_authorized: true;
     submitter_authorized: true;
+    commercial_marketplace_acknowledged: true;
   };
   opportunityTopic: string | null;
 };
@@ -148,6 +150,13 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
   if (input.authorized_to_submit !== true) {
     return { ok: false, code: "authorization_required", field: "authorized_to_submit" };
   }
+  if (input.commercial_marketplace_acknowledged !== true) {
+    return {
+      ok: false,
+      code: "commercial_marketplace_acknowledgement_required",
+      field: "commercial_marketplace_acknowledged",
+    };
+  }
 
   return {
     ok: true,
@@ -175,6 +184,7 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
         attribution_confirmed: true,
         preview_display_authorized: true,
         submitter_authorized: true,
+        commercial_marketplace_acknowledged: true,
       },
       opportunityTopic,
     },

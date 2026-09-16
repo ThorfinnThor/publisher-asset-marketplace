@@ -1,5 +1,5 @@
 import type { SubmissionPreScreenResult } from "./pre-screen";
-import { buildDeclaredRightsJson } from "./create";
+import { buildDeclaredRightsJson, currentAuthorizationVersion } from "./create";
 import type { ValidatedSubmission } from "./validate";
 import { normalizePublicHttpsUrl } from "./validate";
 
@@ -22,7 +22,7 @@ export const conversionSubmissionInsertSql = `
   )
   SELECT
     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-    2, 'pending', ?, ?
+    ${currentAuthorizationVersion}, 'pending', ?, ?
   WHERE (
     SELECT COUNT(*) FROM submissions
     WHERE creator_id = ? AND created_at >= ?

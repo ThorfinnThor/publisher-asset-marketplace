@@ -35,6 +35,7 @@ const submission: ValidatedSubmission = {
     attribution_confirmed: true,
     preview_display_authorized: true,
     submitter_authorized: true,
+    commercial_marketplace_acknowledged: true,
   },
   opportunityTopic: null,
 };
@@ -48,6 +49,7 @@ describe("autonomous creator publication", () => {
       submission,
       declaredRightsJson,
       preScreen: runSubmissionPreScreen(submission),
+      authorizationVersion: 3,
       now,
     });
 
@@ -77,6 +79,7 @@ describe("autonomous creator publication", () => {
         submission,
         declaredRightsJson: buildDeclaredRightsJson(submission, now),
         preScreen,
+        authorizationVersion: 3,
         now,
       }),
     ).toEqual({ ok: false, code: "auto_publish_checks_failed" });
