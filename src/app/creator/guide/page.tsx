@@ -115,6 +115,13 @@ export default function CreatorGuidePage() {
               embedding, commercial editorial use, preview display, modification, attribution and
               any exclusions separately. Only claim a standard license when it actually applies.
             </p>
+            <p className="creator-guide__hint">
+              The attribution terms field is the short credit line shown to publishers, for example
+              <code>
+                Credit Your Brand — commercial use and embedding permitted with attribution
+              </code>
+              . It describes the required credit; your public rights page remains the evidence.
+            </p>
             <pre className="creator-guide__code">
               <code>{rightsSnippet}</code>
             </pre>

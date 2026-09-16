@@ -413,15 +413,26 @@ export function SubmissionForm({
           <div className="form-field form-field--wide">
             <label htmlFor="attribution-terms">Attribution terms</label>
             <input
+              aria-describedby="attribution-terms-hint attribution-terms-meaning"
               id="attribution-terms"
               name="attribution_terms"
-              placeholder="Credit Example Source — CC BY 4.0"
+              placeholder="Credit PassendPlanen — commercial use and embedding permitted with attribution"
               minLength={2}
               maxLength={1000}
               required
               type="text"
             />
-            <p className="form-hint">Shown to publishers exactly as reviewed.</p>
+            <p className="form-hint" id="attribution-terms-hint">
+              Suggestion:{" "}
+              <code>
+                Credit Your Brand — commercial use and embedding permitted with attribution
+              </code>
+            </p>
+            <p className="form-hint" id="attribution-terms-meaning">
+              This is the exact credit line publishers will see and copy. Replace “Your Brand” and
+              only claim permissions that your public attribution page actually grants. This line
+              explains the credit requirement; it does not create a licence by itself.
+            </p>
           </div>
         </div>
       </section>
