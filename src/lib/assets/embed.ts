@@ -5,6 +5,8 @@ type EmbedRights = {
   attribution_required?: boolean | null;
 };
 
+export const MARKETPLACE_IFRAME_STYLE = "width:100%;height:720px;border:0;display:block";
+
 export type EmbedAsset = {
   embed_url: string | null;
   embed_origin?: string | null;
@@ -58,7 +60,7 @@ export function canCopyEmbed(asset: EmbedAsset): boolean {
 
 export function buildEmbedMarkup(asset: EmbedAsset): string {
   if (!canCopyEmbed(asset) || !asset.embed_url) return "";
-  const iframe = `<iframe src="${escapeAttribute(asset.embed_url)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts"></iframe>`;
+  const iframe = `<iframe src="${escapeAttribute(asset.embed_url)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts" style="${MARKETPLACE_IFRAME_STYLE}"></iframe>`;
   if (asset.source_id !== null) return iframe;
 
   return `<figure>${iframe}<figcaption>Source: <a href="${escapeAttribute(asset.attribution_url ?? "")}">${escapeText(asset.attribution_name ?? "")}</a></figcaption></figure>`;

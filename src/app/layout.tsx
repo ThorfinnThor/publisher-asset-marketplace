@@ -29,7 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               <Link href="/opportunities">Opportunities</Link>
               <Link href="/#topics">Topics</Link>
               <Link href="/#publishers">For publishers</Link>
-              <Link href="/#creators">For creators</Link>
+              <Link href="/creator/guide">Creator guide</Link>
             </nav>
             <div className="site-header__actions">
               <Link className="mobile-browse" href="/search">
@@ -57,6 +57,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             <nav aria-label="Footer">
               <Link href="/search">Browse</Link>
               <Link href="/submit">Publish</Link>
+              <Link href="/creator/guide">Creator guide</Link>
             </nav>
           </div>
         </footer>

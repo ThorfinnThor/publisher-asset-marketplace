@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
 type SubmissionFormProps = { csrfToken: string; opportunityTopic?: string | null };
@@ -19,7 +20,11 @@ export function SubmissionRequirements() {
         <span>00</span>
         <div>
           <h2 id="requirements-heading">Submission requirements</h2>
-          <p>Prepare these details before submitting. Automated checks run before admin review.</p>
+          <p>
+            Prepare these details before submitting.{" "}
+            <Link href="/creator/guide">Read the creator guide</Link> for copy-ready embed and
+            rights examples.
+          </p>
         </div>
       </div>
       <ul className="requirements-list">
