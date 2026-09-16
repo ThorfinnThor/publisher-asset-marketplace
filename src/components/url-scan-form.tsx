@@ -145,8 +145,9 @@ export function UrlScanForm({ csrfToken }: UrlScanFormProps) {
         <div>
           <h2 id="url-scan-heading">Start with one public URL</h2>
           <p>
-            We inspect the page, suggest metadata and capture a real-data preview. Nothing is
-            published automatically; rights and the sandbox test remain your responsibility.
+            We inspect the page, suggest metadata and capture a real-data preview. The scan alone
+            never publishes. After you confirm the rights, commercial marketplace acknowledgement
+            and sandbox test, submissions that pass every check publish automatically.
           </p>
         </div>
       </div>
