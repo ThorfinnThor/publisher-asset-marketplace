@@ -15,6 +15,9 @@ const submissionKeys = new Set([
   "modification_allowed",
   "citation_required",
   "sandbox_compatible",
+  "source_identity_confirmed",
+  "attribution_confirmed",
+  "preview_display_authorized",
   "authorized_to_submit",
   "opportunity_topic",
 ]);
@@ -41,6 +44,9 @@ export type ValidatedSubmission = {
     sandbox_profile: "v1:allow-scripts";
     attribution_required: true;
     attribution_terms: string;
+    source_identity_confirmed: true;
+    attribution_confirmed: true;
+    preview_display_authorized: true;
     submitter_authorized: true;
   };
   opportunityTopic: string | null;
@@ -118,6 +124,27 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
       field: "sandbox_compatible",
     };
   }
+  if (input.source_identity_confirmed !== true) {
+    return {
+      ok: false,
+      code: "source_identity_confirmation_required",
+      field: "source_identity_confirmed",
+    };
+  }
+  if (input.attribution_confirmed !== true) {
+    return {
+      ok: false,
+      code: "attribution_confirmation_required",
+      field: "attribution_confirmed",
+    };
+  }
+  if (input.preview_display_authorized !== true) {
+    return {
+      ok: false,
+      code: "preview_display_authorization_required",
+      field: "preview_display_authorized",
+    };
+  }
   if (input.authorized_to_submit !== true) {
     return { ok: false, code: "authorization_required", field: "authorized_to_submit" };
   }
@@ -144,6 +171,9 @@ export function validateSubmissionPayload(input: unknown): SubmissionValidationR
         sandbox_profile: "v1:allow-scripts",
         attribution_required: true,
         attribution_terms: attributionTerms.value,
+        source_identity_confirmed: true,
+        attribution_confirmed: true,
+        preview_display_authorized: true,
         submitter_authorized: true,
       },
       opportunityTopic,

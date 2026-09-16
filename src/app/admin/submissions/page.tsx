@@ -35,6 +35,9 @@ type SubmissionRow = {
   rights_status: "safe" | "restricted" | "unknown" | "blocked";
   rights_reason_code: string | null;
   rights_evidence_url: string | null;
+  authorization_version: number;
+  source_scan_id: string | null;
+  scan_requested_url: string | null;
   created_at: string;
 };
 
@@ -155,6 +158,20 @@ function SubmissionReviewCard({
             <p>Legacy submission: complete every check manually.</p>
           )}
         </section>
+        {submission.source_scan_id && submission.scan_requested_url ? (
+          <section
+            className="submission-prescreen submission-prescreen--review"
+            aria-label="URL scan provenance"
+          >
+            <strong>URL scan assisted — rights still require manual evidence.</strong>
+            <p>
+              Scanned source:{" "}
+              <SafeExternalLink href={submission.scan_requested_url}>
+                {submission.scan_requested_url}
+              </SafeExternalLink>
+            </p>
+          </section>
+        ) : null}
         {submission.opportunity_topic ? (
           <p className="detail-supporting-text">
             Demand topic: <strong>{submission.opportunity_topic}</strong>
@@ -192,6 +209,10 @@ function SubmissionReviewCard({
           <div>
             <dt>Declared rights</dt>
             <dd>{formatDeclaredRights(declaredRights)}</dd>
+          </div>
+          <div>
+            <dt>Creator confirmations</dt>
+            <dd>{formatCreatorConfirmations(declaredRights, submission.authorization_version)}</dd>
           </div>
           <div>
             <dt>Reviewed rights</dt>
@@ -256,9 +277,11 @@ async function loadAdminQueue(): Promise<AdminQueue> {
             s.attribution_terms, s.opportunity_topic, s.declared_rights_json,
             s.pre_screen_status, s.pre_screen_json, s.review_status,
             s.review_notes, s.rights_status, s.rights_reason_code,
-            s.rights_evidence_url, s.created_at
+            s.rights_evidence_url, s.authorization_version, scan.id AS source_scan_id,
+            scan.requested_url AS scan_requested_url, s.created_at
           FROM submissions s
           JOIN profiles p ON p.id = s.creator_id
+          LEFT JOIN url_scan_jobs scan ON scan.submission_id = s.id
           WHERE s.review_status IN ('pending', 'needs_changes')
           ORDER BY s.created_at ASC
           LIMIT 100
@@ -291,6 +314,21 @@ function formatDeclaredRights(rights: Record<string, unknown>): string {
   ];
   const declared = labels.filter(([key]) => rights[key] === true).map(([, label]) => label);
   return declared.length > 0 ? declared.join(", ") : "none declared";
+}
+
+function formatCreatorConfirmations(
+  rights: Record<string, unknown>,
+  authorizationVersion: number,
+): string {
+  if (authorizationVersion < 2) return "legacy workflow — verify manually";
+  const fields: Array<[string, string]> = [
+    ["source_identity_confirmed", "source identity"],
+    ["attribution_confirmed", "attribution"],
+    ["preview_display_authorized", "preview display"],
+    ["submitter_authorized", "submitter authorization"],
+  ];
+  const confirmed = fields.filter(([key]) => rights[key] === true).map(([, label]) => label);
+  return confirmed.length === fields.length ? confirmed.join(", ") : "incomplete — do not approve";
 }
 
 function formatDate(value: string): string {

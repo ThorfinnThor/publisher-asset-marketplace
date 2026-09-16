@@ -19,9 +19,13 @@ const submission = {
     commercial_use: true,
     modification_allowed: false,
     citation_required: true,
+    source_identity_confirmed: true,
+    attribution_confirmed: true,
+    preview_display_authorized: true,
+    submitter_authorized: true,
   }),
   created_at: "2026-09-14T12:00:00.000Z",
-  authorization_version: 1,
+  authorization_version: 2,
 };
 
 describe("E5 creator asset publishing", () => {
@@ -91,6 +95,54 @@ describe("E5 creator asset publishing", () => {
       },
     );
     expect(result).toEqual({ ok: false, code: "promotion_preview_required" });
+  });
+
+  it("fails closed when creator confirmations are incomplete", () => {
+    const declared = JSON.parse(submission.declared_rights_json) as Record<string, unknown>;
+    declared.preview_display_authorized = false;
+    const result = buildCreatorAssetRecord(
+      { ...submission, declared_rights_json: JSON.stringify(declared) },
+      {
+        reviewed_by: "github:admin",
+        rights_status: "safe",
+        rights_reason_code: "manual_review",
+        rights_evidence_url: "https://creator.example/terms",
+        title: null,
+        description: null,
+        attribution_name: null,
+        attribution_terms: null,
+        reviewed_at: "2026-09-14T13:00:00.000Z",
+        sandbox_tested: true,
+      },
+    );
+    expect(result).toEqual({ ok: false, code: "promotion_creator_confirmations_required" });
+  });
+
+  it("keeps version-1 submissions on the legacy manual-review gate", () => {
+    const declared = JSON.parse(submission.declared_rights_json) as Record<string, unknown>;
+    delete declared.source_identity_confirmed;
+    delete declared.attribution_confirmed;
+    delete declared.preview_display_authorized;
+    const result = buildCreatorAssetRecord(
+      {
+        ...submission,
+        authorization_version: 1,
+        declared_rights_json: JSON.stringify(declared),
+      },
+      {
+        reviewed_by: "github:admin",
+        rights_status: "safe",
+        rights_reason_code: "manual_review",
+        rights_evidence_url: "https://creator.example/terms",
+        title: null,
+        description: null,
+        attribution_name: null,
+        attribution_terms: null,
+        reviewed_at: "2026-09-14T13:00:00.000Z",
+        sandbox_tested: true,
+      },
+    );
+    expect(result.ok).toBe(true);
   });
 
   it("fails closed when the admin did not verify the fixed sandbox", () => {

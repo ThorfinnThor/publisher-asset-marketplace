@@ -41,6 +41,12 @@ export function normalizePublicHttpsUrl(input: unknown): UrlValidationResult {
   return { ok: true, url: url.toString(), hostname };
 }
 
+export function browserGuardrailDomains(requestedUrl: string): string[] {
+  const hostname = new URL(requestedUrl).hostname.toLowerCase();
+  if (hostname.includes(":") || /^\d+\.\d+\.\d+\.\d+$/u.test(hostname)) return [hostname];
+  return [hostname, `*.${hostname}`];
+}
+
 export function isNonPublicIp(input: string): boolean {
   const value = input.toLowerCase().replace(/^\[/, "").replace(/\]$/, "");
   const ipv4 = parseIpv4(value);

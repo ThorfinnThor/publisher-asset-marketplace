@@ -106,6 +106,15 @@ export function buildCreatorAssetRecord(
   }
 
   const declared = parseDeclaredRights(submission.declared_rights_json);
+  if (
+    submission.authorization_version >= 2 &&
+    (!declared.source_identity_confirmed ||
+      !declared.attribution_confirmed ||
+      !declared.preview_display_authorized ||
+      !declared.submitter_authorized)
+  ) {
+    return { ok: false, code: "promotion_creator_confirmations_required" };
+  }
   const embedOrigin = new URL(embed.value).origin;
   const rights = {
     schema_version: 1,
@@ -137,6 +146,7 @@ export function buildCreatorAssetRecord(
     sandbox_profile: "v1:allow-scripts",
     sandbox_tested_at: review.reviewed_at,
     opportunity_topic: submission.opportunity_topic ?? null,
+    source_scan_id: declared.source_scan_id,
   };
 
   return {
@@ -175,6 +185,11 @@ function parseDeclaredRights(value: string): {
   commercial_use: boolean;
   modification_allowed: boolean;
   citation_required: boolean;
+  source_identity_confirmed: boolean;
+  attribution_confirmed: boolean;
+  preview_display_authorized: boolean;
+  submitter_authorized: boolean;
+  source_scan_id: string | null;
 } {
   try {
     const parsed: unknown = JSON.parse(value);
@@ -184,6 +199,11 @@ function parseDeclaredRights(value: string): {
         commercial_use: false,
         modification_allowed: false,
         citation_required: false,
+        source_identity_confirmed: false,
+        attribution_confirmed: false,
+        preview_display_authorized: false,
+        submitter_authorized: false,
+        source_scan_id: null,
       };
     }
     const rights = parsed as Record<string, unknown>;
@@ -192,6 +212,11 @@ function parseDeclaredRights(value: string): {
       commercial_use: rights.commercial_use === true,
       modification_allowed: rights.modification_allowed === true,
       citation_required: rights.citation_required === true,
+      source_identity_confirmed: rights.source_identity_confirmed === true,
+      attribution_confirmed: rights.attribution_confirmed === true,
+      preview_display_authorized: rights.preview_display_authorized === true,
+      submitter_authorized: rights.submitter_authorized === true,
+      source_scan_id: typeof rights.source_scan_id === "string" ? rights.source_scan_id : null,
     };
   } catch {
     return {
@@ -199,6 +224,11 @@ function parseDeclaredRights(value: string): {
       commercial_use: false,
       modification_allowed: false,
       citation_required: false,
+      source_identity_confirmed: false,
+      attribution_confirmed: false,
+      preview_display_authorized: false,
+      submitter_authorized: false,
+      source_scan_id: null,
     };
   }
 }

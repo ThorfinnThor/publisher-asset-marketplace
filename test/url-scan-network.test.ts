@@ -1,8 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import { isNonPublicIp, normalizePublicHttpsUrl } from "../src/lib/submissions/url-scan-network";
+import {
+  browserGuardrailDomains,
+  isNonPublicIp,
+  normalizePublicHttpsUrl,
+} from "../src/lib/submissions/url-scan-network";
 
 describe("URL scan network boundary", () => {
+  it("builds exact and subdomain Browser Run guardrails without prefix wildcards", () => {
+    expect(browserGuardrailDomains("https://www.example.com/tool")).toEqual([
+      "www.example.com",
+      "*.www.example.com",
+    ]);
+    expect(browserGuardrailDomains("https://tools.example.com/tool")).toEqual([
+      "tools.example.com",
+      "*.tools.example.com",
+    ]);
+    expect(browserGuardrailDomains("https://1.1.1.1/tool")).toEqual(["1.1.1.1"]);
+  });
+
   it("normalizes public HTTPS URLs and drops fragments", () => {
     expect(normalizePublicHttpsUrl(" https://Example.com/tool?q=1#section ")).toEqual({
       ok: true,

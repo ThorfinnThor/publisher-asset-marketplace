@@ -3,6 +3,7 @@ import { getDatabase, getUrlScanQueue } from "@/lib/db/client";
 import { urlScanContractV1, type UrlScanJobMessageV1 } from "@/lib/submissions/url-scan-contract";
 import {
   insertUrlScanJobSql,
+  insertUrlRescanJobSql,
   publicUrlScanJob,
   type UrlScanJobRow,
 } from "@/lib/submissions/url-scan-jobs";
@@ -33,6 +34,15 @@ export async function POST(request: Request): Promise<Response> {
   if (!(await verifyCsrfToken(request, input.csrf_token))) {
     return errorResponse(403, "csrf_failed", "Scan security check failed.");
   }
+  for (const key of Object.keys(input)) {
+    if (key !== "csrf_token" && key !== "url" && key !== "rescan_of") {
+      return errorResponse(400, "unknown_field", "Scan request is invalid.");
+    }
+  }
+  const rescanOf = input.rescan_of;
+  if (rescanOf !== undefined && (typeof rescanOf !== "string" || !isUuid(rescanOf))) {
+    return errorResponse(404, "scan_not_found", "Scan not found.");
+  }
 
   const normalized = normalizePublicHttpsUrl(input.url);
   if (!normalized.ok) {
@@ -60,24 +70,74 @@ export async function POST(request: Request): Promise<Response> {
     if (duplicate) return errorResponse(409, "canonical_url_exists", "This asset already exists.");
 
     const jobId = crypto.randomUUID();
-    const insert = await db
-      .prepare(insertUrlScanJobSql)
-      .bind(
-        jobId,
-        profile.id,
-        normalized.url,
-        normalized.url,
-        normalized.hostname,
-        now,
-        expiresAt,
-        now,
-        profile.id,
-        now,
-        profile.id,
-        since,
-        urlScanContractV1.limits.scansPerCreatorPer24Hours,
-      )
-      .run();
+    const insertBindings = [
+      jobId,
+      profile.id,
+      normalized.url,
+      normalized.url,
+      normalized.hostname,
+      now,
+      expiresAt,
+      now,
+      profile.id,
+      now,
+      profile.id,
+      since,
+      urlScanContractV1.limits.scansPerCreatorPer24Hours,
+    ];
+    const insertStatement = db.prepare(insertUrlScanJobSql).bind(...insertBindings);
+    let insert: D1Result;
+    if (typeof rescanOf === "string") {
+      const results = await db.batch([
+        db
+          .prepare(
+            `
+              UPDATE url_scan_jobs
+              SET status = 'expired', expires_at = ?, completed_at = ?, updated_at = ?
+              WHERE id = ? AND creator_id = ? AND status = 'needs_changes'
+                AND (
+                  SELECT COUNT(*) FROM url_scan_jobs
+                  WHERE creator_id = ? AND created_at >= ?
+                ) < ?
+            `,
+          )
+          .bind(
+            now,
+            now,
+            now,
+            rescanOf,
+            profile.id,
+            profile.id,
+            since,
+            urlScanContractV1.limits.scansPerCreatorPer24Hours,
+          ),
+        db.prepare(insertUrlRescanJobSql).bind(...insertBindings, rescanOf, profile.id, now),
+      ]);
+      if (results[0].meta.changes === 0) {
+        const previous = await db
+          .prepare("SELECT status FROM url_scan_jobs WHERE id = ? AND creator_id = ? LIMIT 1")
+          .bind(rescanOf, profile.id)
+          .first<{ status: string }>();
+        if (!previous) return errorResponse(404, "scan_not_found", "Scan not found.");
+        const recent = await db
+          .prepare(
+            "SELECT COUNT(*) AS count FROM url_scan_jobs WHERE creator_id = ? AND created_at >= ?",
+          )
+          .bind(profile.id, since)
+          .first<{ count: number }>();
+        if ((recent?.count ?? 0) >= urlScanContractV1.limits.scansPerCreatorPer24Hours) {
+          return errorResponse(
+            429,
+            "scan_rate_limited",
+            "You can start up to 10 scans in 24 hours.",
+          );
+        }
+        return errorResponse(409, "scan_not_rescannable", "This scan cannot be rescanned.");
+      }
+      insert = results[1];
+    } else {
+      insert = await insertStatement.run();
+    }
 
     if (insert.meta.changes === 0) {
       const active = await db
@@ -189,4 +249,8 @@ function errorResponse(status: number, code: string, message: string): Response 
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }

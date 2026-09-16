@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseUrlScanResultMessage } from "../src/lib/submissions/url-scan-jobs";
+import {
+  insertUrlRescanJobSql,
+  parseUrlScanResultMessage,
+} from "../src/lib/submissions/url-scan-jobs";
 
 describe("URL scan result messages", () => {
   const jobId = "123e4567-e89b-42d3-a456-426614174000";
@@ -44,5 +47,11 @@ describe("URL scan result messages", () => {
     { schema_version: 1, job_id: jobId, attempt: 1, status: "converted" },
   ])("rejects malformed or unauthorized transitions", (message) => {
     expect(parseUrlScanResultMessage(message)).toBeNull();
+  });
+
+  it("only inserts a rescan after its owned needs-changes row was expired", () => {
+    expect(insertUrlRescanJobSql).toContain("status = 'expired'");
+    expect(insertUrlRescanJobSql).toContain("updated_at = ?");
+    expect(insertUrlRescanJobSql.match(/\?/gu)).toHaveLength(16);
   });
 });

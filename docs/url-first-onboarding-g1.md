@@ -287,7 +287,7 @@ resulting submission ID and cannot convert again.
 
 1. **G2 — SOL — complete:** isolated Queue/Browser Run/R2 scanner, network controls, D1 job
    migration, result consumer, private preview lifecycle and production queue verification.
-2. **G3 — LUNA — next:** URL-only form, progress/result UI, deterministic autofill, remediation copy and
-   optional manifest documentation against the approved contract.
-3. **G4 — SOL:** rights/confirmation conversion gate, adversarial E2E suite and final security
-   review before enabling URL-only onboarding as the primary submission path.
+2. **G3 — LUNA — complete:** URL-only form, progress/result UI, deterministic autofill,
+   remediation copy and optional manifest documentation against the approved contract.
+3. **G4 — SOL — complete:** rights/confirmation conversion gate, adversarial E2E suite and final
+   security review. URL-only onboarding is now the primary submission path.

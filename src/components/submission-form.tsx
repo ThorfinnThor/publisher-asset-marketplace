@@ -18,6 +18,7 @@ type SubmissionFormProps = {
   csrfToken: string;
   opportunityTopic?: string | null;
   initialValues?: SubmissionInitialValues;
+  scanId?: string;
 };
 
 type SubmissionResponse = {
@@ -74,6 +75,7 @@ export function SubmissionForm({
   csrfToken,
   opportunityTopic = null,
   initialValues,
+  scanId,
 }: SubmissionFormProps) {
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -117,30 +119,36 @@ export function SubmissionForm({
       return;
     }
     try {
-      const response = await fetch("/api/submissions", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({
-          csrf_token: csrfToken,
-          canonical_url: data.get("canonical_url"),
-          asset_type: data.get("asset_type"),
-          title: data.get("title"),
-          description: data.get("description"),
-          embed_url: embedUrl,
-          preview_url: String(data.get("preview_url") ?? "").trim() || null,
-          attribution_name: data.get("attribution_name"),
-          attribution_url: data.get("attribution_url"),
-          attribution_terms: data.get("attribution_terms"),
-          commercial_use: data.get("commercial_use") === "on",
-          embed_allowed: data.get("embed_allowed") === "on",
-          modification_allowed: data.get("modification_allowed") === "on",
-          citation_required: data.get("citation_required") === "on",
-          sandbox_compatible: data.get("sandbox_compatible") === "on",
-          authorized_to_submit: data.get("authorized_to_submit") === "on",
-          opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
-        }),
-      });
+      const response = await fetch(
+        scanId ? `/api/url-scans/${encodeURIComponent(scanId)}/convert` : "/api/submissions",
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            csrf_token: csrfToken,
+            canonical_url: data.get("canonical_url"),
+            asset_type: data.get("asset_type"),
+            title: data.get("title"),
+            description: data.get("description"),
+            embed_url: embedUrl,
+            preview_url: String(data.get("preview_url") ?? "").trim() || null,
+            attribution_name: data.get("attribution_name"),
+            attribution_url: data.get("attribution_url"),
+            attribution_terms: data.get("attribution_terms"),
+            commercial_use: data.get("commercial_use") === "on",
+            embed_allowed: data.get("embed_allowed") === "on",
+            modification_allowed: data.get("modification_allowed") === "on",
+            citation_required: data.get("citation_required") === "on",
+            sandbox_compatible: data.get("sandbox_compatible") === "on",
+            source_identity_confirmed: data.get("source_identity_confirmed") === "on",
+            attribution_confirmed: data.get("attribution_confirmed") === "on",
+            preview_display_authorized: data.get("preview_display_authorized") === "on",
+            authorized_to_submit: data.get("authorized_to_submit") === "on",
+            opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
+          }),
+        },
+      );
       const result = (await response.json().catch(() => null)) as SubmissionResponse | null;
       if (!response.ok) {
         setStatus({ tone: "error", text: result?.error ?? "The submission could not be saved." });
@@ -149,8 +157,9 @@ export function SubmissionForm({
       form.reset();
       setStatus({
         tone: "success",
-        text:
-          result?.pre_screen?.status === "pass"
+        text: scanId
+          ? "Scan confirmed and converted into a pending submission for admin review."
+          : result?.pre_screen?.status === "pass"
             ? "Automated pre-screen passed. Submitted for final admin rights review."
             : "Submitted for review. Automated checks identified items for the admin to verify.",
       });
@@ -399,6 +408,18 @@ export function SubmissionForm({
       <input name="opportunity_topic" type="hidden" value={opportunityTopic ?? ""} />
 
       <div className="submission-form__footer">
+        <label className="attestation">
+          <input name="source_identity_confirmed" required type="checkbox" />
+          <span>I confirm that the source or brand identity above is accurate.</span>
+        </label>
+        <label className="attestation">
+          <input name="attribution_confirmed" required type="checkbox" />
+          <span>I confirm that the attribution URL and terms apply to this exact asset.</span>
+        </label>
+        <label className="attestation">
+          <input name="preview_display_authorized" required type="checkbox" />
+          <span>I authorize the marketplace to display the submitted preview image.</span>
+        </label>
         <label className="attestation">
           <input name="authorized_to_submit" required type="checkbox" />
           <span>

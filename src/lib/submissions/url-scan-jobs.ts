@@ -66,6 +66,13 @@ export const insertUrlScanJobSql = `
   ) < ?
 `;
 
+export const insertUrlRescanJobSql = `${insertUrlScanJobSql}
+  AND EXISTS (
+    SELECT 1 FROM url_scan_jobs
+    WHERE id = ? AND creator_id = ? AND status = 'expired' AND updated_at = ?
+  )
+`;
+
 export function parseUrlScanResultMessage(value: unknown): UrlScanResultMessageV1 | null {
   if (!isRecord(value) || value.schema_version !== 1 || !isUuid(value.job_id)) return null;
   if (!Number.isInteger(value.attempt) || Number(value.attempt) < 1 || Number(value.attempt) > 3) {

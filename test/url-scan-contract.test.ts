@@ -32,6 +32,12 @@ describe("G1 URL-first onboarding contract", () => {
         "unclear-rights-remain-unverified",
         "manifest-does-not-auto-publish",
         "prompt-injection-is-data",
+        "cross-owner-conversion-hidden",
+        "needs-changes-cannot-convert",
+        "canonical-swap-rejected",
+        "candidate-rights-never-confirmed",
+        "double-conversion-blocked",
+        "private-scan-preview-not-published",
       ]),
     );
   });

@@ -29,6 +29,7 @@
     "search:review": "tsx scripts/review-search-quality.ts --output docs/search-quality-review-c8.md",
     "release:smoke": "tsx scripts/release-smoke.ts",
     "e2e:submission": "tsx scripts/e2e-submission.ts",
+    "e2e:url-scan-conversion": "tsx scripts/e2e-url-scan-conversion.ts",
     "e2e:embed-sandbox": "tsx scripts/e2e-embed-sandbox.ts",
     "lint": "eslint src scripts test worker scanner",
     "format": "prettier --write .",

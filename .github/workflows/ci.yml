@@ -23,4 +23,21 @@ jobs:
       - run: npm run cf:typegen:scanner
       - run: npm run db:migrate:local
       - run: npm run check
+      - name: URL scan conversion E2E
+        run: |
+          printf 'AUTH_SECRET=e2e-local-secret\n' > .dev.vars
+          npm run dev -- --port 8788 > /tmp/url-scan-e2e.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:8788/ > /dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 60 ]; then
+              cat /tmp/url-scan-e2e.log
+              exit 1
+            fi
+            sleep 1
+          done
+          npm run e2e:url-scan-conversion
       - run: npm run e2e:embed-sandbox

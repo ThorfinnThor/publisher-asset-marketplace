@@ -108,6 +108,48 @@
       "expectedStatus": "needs_confirmation",
       "expectedIssue": "prompt_injection_ignored",
       "autoPublish": false
+    },
+    {
+      "id": "cross-owner-conversion-hidden",
+      "condition": "A signed-in creator attempts to convert another creator's scan",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": "ownership_unconfirmed",
+      "autoPublish": false
+    },
+    {
+      "id": "needs-changes-cannot-convert",
+      "condition": "A creator attempts to convert a scan with unresolved technical remediation",
+      "expectedStatus": "needs_changes",
+      "expectedIssue": "frame_blocked",
+      "autoPublish": false
+    },
+    {
+      "id": "canonical-swap-rejected",
+      "condition": "A creator scans one URL but submits a different canonical URL",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": "ownership_unconfirmed",
+      "autoPublish": false
+    },
+    {
+      "id": "candidate-rights-never-confirmed",
+      "condition": "Scanner or manifest rights candidates are present without creator attestations",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": "rights_evidence_missing",
+      "autoPublish": false
+    },
+    {
+      "id": "double-conversion-blocked",
+      "condition": "Two conversion requests race or a converted scan is submitted again",
+      "expectedStatus": "converted",
+      "expectedIssue": null,
+      "autoPublish": false
+    },
+    {
+      "id": "private-scan-preview-not-published",
+      "condition": "A creator confirms a scan without providing a direct public preview image URL",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": "preview_failed",
+      "autoPublish": false
     }
   ]
 }

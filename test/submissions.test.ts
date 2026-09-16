@@ -20,6 +20,9 @@ const validSubmission = {
   modification_allowed: false,
   citation_required: true,
   sandbox_compatible: true,
+  source_identity_confirmed: true,
+  attribution_confirmed: true,
+  preview_display_authorized: true,
   authorized_to_submit: true,
   opportunity_topic: null,
 };
@@ -81,6 +84,18 @@ describe("submission security validation", () => {
       ok: false,
       code: "authorization_required",
     });
+  });
+
+  it("requires explicit source, attribution, and preview-display confirmations", () => {
+    expect(
+      validateSubmissionPayload({ ...validSubmission, source_identity_confirmed: false }),
+    ).toMatchObject({ ok: false, code: "source_identity_confirmation_required" });
+    expect(
+      validateSubmissionPayload({ ...validSubmission, attribution_confirmed: false }),
+    ).toMatchObject({ ok: false, code: "attribution_confirmation_required" });
+    expect(
+      validateSubmissionPayload({ ...validSubmission, preview_display_authorized: false }),
+    ).toMatchObject({ ok: false, code: "preview_display_authorization_required" });
   });
 
   it("requires an explicit boolean for every rights answer", () => {

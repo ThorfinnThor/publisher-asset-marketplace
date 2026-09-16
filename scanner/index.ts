@@ -12,7 +12,11 @@ import {
   type UrlScanResultMessageV1,
   type UrlScanResultV1,
 } from "../src/lib/submissions/url-scan-contract";
-import { isNonPublicIp, normalizePublicHttpsUrl } from "../src/lib/submissions/url-scan-network";
+import {
+  browserGuardrailDomains,
+  isNonPublicIp,
+  normalizePublicHttpsUrl,
+} from "../src/lib/submissions/url-scan-network";
 
 type ScannerEnv = Omit<ScannerEnvBindings, "SCAN_RESULTS"> & {
   SCAN_RESULTS: Queue<UrlScanResultMessageV1>;
@@ -149,7 +153,12 @@ async function scanUrl(job: UrlScanJobMessageV1, env: ScannerEnv): Promise<UrlSc
   try {
     await validateNetworkTarget(job.requested_url, dnsCache);
     ensureBeforeDeadline(deadline);
-    browser = await puppeteer.launch(env.BROWSER);
+    browser = await puppeteer.launch(env.BROWSER, {
+      guardrails: {
+        allowedDomains: browserGuardrailDomains(job.requested_url),
+        allowedDomainSets: ["common-cdns"],
+      },
+    });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
     await attachNetworkGuards(page, dnsCache, networkBudget);
@@ -227,6 +236,12 @@ async function attachNetworkGuards(
   budget: NetworkBudget,
 ): Promise<void> {
   await page.setRequestInterception(true);
+  page.on("popup", (popup) => {
+    if (popup) void popup.close().catch(() => undefined);
+  });
+  page.on("dialog", (dialog) => {
+    void dialog.dismiss().catch(() => undefined);
+  });
   page.on("request", async (request) => {
     budget.requestCount += 1;
     if (budget.requestCount > urlScanContractV1.limits.requests) {

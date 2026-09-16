@@ -18,6 +18,11 @@ route or public `workers.dev` endpoint.
 
 ## Network controls
 
+Each Browser Run session also starts with provider-enforced guardrails for the submitted host, its
+subdomains and Cloudflare's maintained `common-cdns` set. The fixed session allowlist complements
+the application-level URL, DNS, redirect and request-interception checks. Popups and dialogs are
+closed immediately.
+
 Every creator URL, redirect and Browser Run subresource must be HTTPS, contain no credentials, use
 the default HTTPS port and resolve only to public A/AAAA addresses. The scanner rejects reserved,
 loopback, link-local, private, multicast and documentation ranges. DNS validation is cached only

@@ -58,6 +58,7 @@ export function UrlScanForm({ csrfToken }: UrlScanFormProps) {
 
   async function startScan(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const rescanOf = job?.status === "needs_changes" ? job.id : null;
     setError(null);
     setJob(null);
     setWorking(true);
@@ -66,7 +67,11 @@ export function UrlScanForm({ csrfToken }: UrlScanFormProps) {
         method: "POST",
         headers: { "content-type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ csrf_token: csrfToken, url: url.trim() }),
+        body: JSON.stringify({
+          csrf_token: csrfToken,
+          url: url.trim(),
+          ...(rescanOf ? { rescan_of: rescanOf } : {}),
+        }),
       });
       const payload = (await response.json().catch(() => null)) as {
         job_id?: string;
@@ -158,7 +163,7 @@ export function UrlScanForm({ csrfToken }: UrlScanFormProps) {
           />
         </label>
         <button className="button button--primary" disabled={working || !url.trim()} type="submit">
-          {working ? "Scanning…" : "Scan URL"}
+          {working ? "Scanning…" : job?.status === "needs_changes" ? "Rescan URL" : "Scan URL"}
         </button>
       </form>
       {error ? (
@@ -215,12 +220,19 @@ export function UrlScanForm({ csrfToken }: UrlScanFormProps) {
                     <strong>Before submitting:</strong> {issues.join(" · ")}
                   </p>
                 ) : null}
-                <Link
-                  className="button button--secondary"
-                  href={`/submit?scan=${encodeURIComponent(job.id)}`}
-                >
-                  Suggestions in submission form
-                </Link>
+                {job.status === "needs_confirmation" ? (
+                  <Link
+                    className="button button--secondary"
+                    href={`/submit?scan=${encodeURIComponent(job.id)}`}
+                  >
+                    Confirm suggestions in submission form
+                  </Link>
+                ) : (
+                  <p className="form-hint">
+                    Correct the URL or source page above, then select Rescan URL. A blocked scan
+                    cannot be converted into a submission.
+                  </p>
+                )}
               </div>
             </div>
           ) : null}

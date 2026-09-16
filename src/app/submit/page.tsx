@@ -67,6 +67,7 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
               csrfToken={auth.csrfToken}
               opportunityTopic={opportunityTopic}
               initialValues={scanPrefill ?? undefined}
+              scanId={scanPrefill?.scan_id}
             />
             <aside className="submission-aside">
               <div className="notice">
@@ -100,8 +101,9 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
 }
 
 type ScanPrefill = {
+  scan_id: string;
   canonical_url: string;
-  asset_type: "chart" | "calculator" | "table" | "dataset" | "benchmark" | "widget";
+  asset_type?: "chart" | "calculator" | "table" | "dataset" | "benchmark" | "widget";
   title: string;
   description: string;
   embed_url: string;
@@ -124,7 +126,7 @@ async function loadScanPrefill(id: string, creatorId: string): Promise<ScanPrefi
       )
       .bind(id, creatorId)
       .first<UrlScanJobRow>();
-    if (!row || (row.status !== "needs_confirmation" && row.status !== "needs_changes")) {
+    if (!row || row.status !== "needs_confirmation") {
       return null;
     }
     const job = publicUrlScanJob(row);
@@ -133,31 +135,22 @@ async function loadScanPrefill(id: string, creatorId: string): Promise<ScanPrefi
     const embed = isRecord(result.embed) ? result.embed : null;
     const preview = isRecord(result.preview) ? result.preview : null;
     const type = result.asset_type_candidate;
-    if (
-      typeof result.canonical_url_candidate !== "string" ||
-      !isAssetType(type) ||
-      typeof result.title_candidate !== "string" ||
-      typeof result.description_candidate !== "string" ||
-      !embed ||
-      typeof embed.candidate_url !== "string" ||
-      !preview ||
-      typeof preview.r2_key !== "string" ||
-      typeof result.attribution_name_candidate !== "string" ||
-      typeof result.attribution_url_candidate !== "string"
-    ) {
+    if (!embed || !preview) {
       return null;
     }
+    const canonicalUrl = stringCandidate(result.canonical_url_candidate) ?? row.requested_url;
     return {
-      canonical_url: result.canonical_url_candidate,
-      asset_type: type,
-      title: result.title_candidate,
-      description: result.description_candidate,
-      embed_url: embed.candidate_url,
+      scan_id: id,
+      canonical_url: canonicalUrl,
+      asset_type: isAssetType(type) ? type : undefined,
+      title: stringCandidate(result.title_candidate) ?? "",
+      description: stringCandidate(result.description_candidate) ?? "",
+      embed_url: stringCandidate(embed.candidate_url) ?? canonicalUrl,
       // The scanner preview is temporary and private; submissions must use the creator's direct
       // public HTTPS image URL instead.
       preview_url: "",
-      attribution_name: result.attribution_name_candidate,
-      attribution_url: result.attribution_url_candidate,
+      attribution_name: stringCandidate(result.attribution_name_candidate) ?? "",
+      attribution_url: stringCandidate(result.attribution_url_candidate) ?? canonicalUrl,
     };
   } catch {
     return null;
@@ -184,6 +177,10 @@ function isUuid(value: string | undefined): value is string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function stringCandidate(value: unknown): string | null {
+  return typeof value === "string" && value.trim().length > 0 ? value : null;
 }
 
 function parseOpportunityTopic(value: string | undefined): string | null {

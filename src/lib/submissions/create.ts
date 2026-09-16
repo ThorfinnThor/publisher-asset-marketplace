@@ -10,7 +10,7 @@ export const submissionInsertSql = `
   )
   SELECT
     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-    1, 'pending', ?, ?
+    2, 'pending', ?, ?
   WHERE (
     SELECT COUNT(*) FROM submissions
     WHERE creator_id = ? AND created_at >= ?
