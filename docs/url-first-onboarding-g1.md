@@ -1,5 +1,9 @@
 # G1 URL-first creator onboarding contract
 
+> Updated 2026-09-16: the scanner still never publishes by itself. After creator confirmation, the
+> converted submission follows [Autonomous creator publishing](autonomous-publishing.md) and is
+> published immediately only when every deterministic gate passes.
+
 Status: accepted for implementation  
 Design and security owner: **SOL**  
 Routine UI, migrations and deterministic tests after this contract: **LUNA**  

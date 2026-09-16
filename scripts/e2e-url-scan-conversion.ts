@@ -209,10 +209,12 @@ async function run(): Promise<void> {
   );
   const convertedPayload = JSON.parse(converted.text) as {
     submission_id?: unknown;
+    asset_slug?: unknown;
     auto_publish?: unknown;
   };
   assert(typeof convertedPayload.submission_id === "string", "submission id is missing");
-  assert(convertedPayload.auto_publish === false, "conversion auto-published an asset");
+  assert(convertedPayload.auto_publish === true, "passing conversion was not auto-published");
+  assert(typeof convertedPayload.asset_slug === "string", "published asset slug is missing");
 
   const repeated = await request(`/api/url-scans/${scanId}/convert`, {
     method: "POST",
@@ -223,8 +225,11 @@ async function run(): Promise<void> {
 
   const queue = await request("/admin/submissions", { session: adminSession });
   assert(queue.response.status === 200, `admin queue returned ${queue.response.status}`);
-  assert(queue.text.includes(title), "converted submission is missing from admin review");
-  assert(queue.text.includes("URL scan assisted"), "scan provenance is missing from admin review");
+  assert(!queue.text.includes(title), "auto-published submission remained in the admin queue");
+
+  const published = await request(`/asset/${convertedPayload.asset_slug}`);
+  assert(published.response.status === 200, "auto-published scanned asset is not public");
+  assert(published.text.includes(title), "auto-published scanned asset title is missing");
 
   const adminScanUrl = `https://e2e-admin-scan.example.com/tools/${stamp}`;
   const crossOwnerRescan = await request("/api/url-scans", {

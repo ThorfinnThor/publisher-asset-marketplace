@@ -34,8 +34,8 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
         <p className="eyebrow">For creators</p>
         <h1 className="page-title">Publish an asset.</h1>
         <p className="page-intro">
-          Submit a useful chart, calculator, benchmark or dataset for review. Every asset is checked
-          before it can appear in publisher search.
+          Submit a useful chart, calculator, benchmark or dataset. Assets that pass every automated
+          check are published immediately.
         </p>
       </header>
 
@@ -58,8 +58,8 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
           {scanPrefill ? (
             <div className="notice scan-prefill-notice" role="status">
               <strong>Scan suggestions loaded.</strong> Check every field, add a direct public
-              preview URL and rights evidence, then run the sandbox test before submitting for admin
-              review.
+              preview URL and rights evidence, then run the sandbox test. Passing submissions are
+              published automatically.
             </div>
           ) : null}
           <div className="submission-layout">
@@ -71,15 +71,15 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
             />
             <aside className="submission-aside">
               <div className="notice">
-                <strong>Manual review.</strong> Submissions stay pending until the source, embed and
-                declared rights are checked.
+                <strong>Autonomous publishing.</strong> Publication happens immediately only when
+                every deterministic check and creator declaration passes.
               </div>
               <div className="submission-aside__section">
                 <h2>What happens next</h2>
                 <ol>
-                  <li>Your source and metadata are reviewed.</li>
-                  <li>Reuse claims are checked against evidence.</li>
-                  <li>Approved assets join the publisher search index.</li>
+                  <li>URLs, hosts, preview format and attribution are validated.</li>
+                  <li>Your reuse declarations and sandbox confirmation are checked.</li>
+                  <li>Passing assets join publisher search immediately.</li>
                 </ol>
               </div>
               <div className="submission-aside__section">

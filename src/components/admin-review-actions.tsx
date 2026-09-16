@@ -28,6 +28,7 @@ export function AdminReviewActions({
 }: AdminReviewActionsProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [autoPublishing, setAutoPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sandboxOpen, setSandboxOpen] = useState(false);
   const [sandboxLoaded, setSandboxLoaded] = useState(false);
@@ -69,8 +70,53 @@ export function AdminReviewActions({
     }
   }
 
+  async function autoPublish() {
+    setAutoPublishing(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/admin/submissions/${submissionId}/auto-publish`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ csrf_token: csrfToken }),
+      });
+      const result = (await response.json().catch(() => null)) as {
+        error?: string;
+        pre_screen?: { checks?: Array<{ status: "pass" | "review"; message: string }> };
+      } | null;
+      if (!response.ok) {
+        const failures = result?.pre_screen?.checks
+          ?.filter((check) => check.status === "review")
+          .map((check) => check.message);
+        setError(
+          failures && failures.length > 0
+            ? `Automatic publication blocked: ${failures.join(" ")}`
+            : (result?.error ?? "Automatic publication failed."),
+        );
+        return;
+      }
+      router.refresh();
+    } catch {
+      setError("Automatic publication could not be reached. Please try again.");
+    } finally {
+      setAutoPublishing(false);
+    }
+  }
+
   return (
     <form className="moderation-action-form" onSubmit={submit}>
+      <div className="notice">
+        <strong>Autonomous path.</strong> Re-run the current deterministic checks and publish
+        immediately if every check passes.
+      </div>
+      <button
+        className="button button--primary"
+        disabled={autoPublishing || submitting}
+        onClick={autoPublish}
+        type="button"
+      >
+        {autoPublishing ? "Running checks…" : "Run automated checks"}
+      </button>
       <div className="form-grid">
         <div className="form-field">
           <label htmlFor={`decision-${submissionId}`}>Decision</label>

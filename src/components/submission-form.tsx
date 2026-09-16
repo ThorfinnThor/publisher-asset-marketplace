@@ -23,7 +23,12 @@ type SubmissionFormProps = {
 
 type SubmissionResponse = {
   error?: string;
-  pre_screen?: { status: "pass" | "review" };
+  auto_publish?: boolean;
+  asset_slug?: string;
+  pre_screen?: {
+    status: "pass" | "review";
+    checks?: Array<{ status: "pass" | "review"; message: string }>;
+  };
 };
 
 export function SubmissionRequirements() {
@@ -68,6 +73,10 @@ export function SubmissionRequirements() {
       <p className="requirements-exclusion">
         Not accepted: raw HTML, uploaded JavaScript, arbitrary scripts, private/internal URLs, or
         URLs containing credentials.
+      </p>
+      <p className="requirements-exclusion">
+        Submissions that pass every automated check are published immediately. Failed checks must be
+        corrected before the asset can be submitted.
       </p>
     </section>
   );
@@ -189,17 +198,26 @@ export function SubmissionForm({
       );
       const result = (await response.json().catch(() => null)) as SubmissionResponse | null;
       if (!response.ok) {
-        setStatus({ tone: "error", text: result?.error ?? "The submission could not be saved." });
+        const failedChecks = result?.pre_screen?.checks
+          ?.filter((check) => check.status === "review")
+          .map((check) => check.message);
+        setStatus({
+          tone: "error",
+          text:
+            failedChecks && failedChecks.length > 0
+              ? `Automatic publication blocked: ${failedChecks.join(" ")}`
+              : (result?.error ?? "The submission could not be saved."),
+        });
         return;
       }
       form.reset();
+      setPreviewUrl("");
+      setEmbedTest(null);
       setStatus({
         tone: "success",
-        text: scanId
-          ? "Scan confirmed and converted into a pending submission for admin review."
-          : result?.pre_screen?.status === "pass"
-            ? "Automated pre-screen passed. Submitted for final admin rights review."
-            : "Submitted for review. Automated checks identified items for the admin to verify.",
+        text: result?.auto_publish
+          ? `All automated checks passed. Your asset is now published${result.asset_slug ? ` at /asset/${result.asset_slug}` : ""}.`
+          : "The submission was saved but could not be published automatically.",
       });
     } catch {
       setStatus({ tone: "error", text: "The submission could not be reached. Please try again." });
@@ -400,7 +418,7 @@ export function SubmissionForm({
             </p>
           </div>
           <div className="form-field">
-            <label htmlFor="attribution-url">Attribution URL</label>
+            <label htmlFor="attribution-url">Attribution and rights URL</label>
             <input
               id="attribution-url"
               name="attribution_url"
@@ -409,6 +427,9 @@ export function SubmissionForm({
               required
               type="url"
             />
+            <p className="form-hint">
+              Public page identifying the source and supporting the declared reuse terms.
+            </p>
           </div>
           <div className="form-field form-field--wide">
             <label htmlFor="attribution-terms">Attribution terms</label>
@@ -442,7 +463,10 @@ export function SubmissionForm({
           <span>03</span>
           <div>
             <h2 id="rights-declaration-heading">Usage rights</h2>
-            <p>Declare each condition separately. Evidence will be reviewed.</p>
+            <p>
+              Declare each condition separately. These declarations are used for automatic
+              publication.
+            </p>
           </div>
         </div>
         <fieldset className="rights-declaration">
@@ -484,7 +508,9 @@ export function SubmissionForm({
         <label className="attestation">
           <input name="authorized_to_submit" required type="checkbox" />
           <span>
-            I am authorized to submit this asset and have described its usage terms accurately.
+            I am authorized to submit this asset and have described its usage terms accurately. I
+            understand that these declarations are used for automatic publication and that false
+            declarations may result in removal and account suspension.
           </span>
         </label>
         {status ? (
@@ -504,7 +530,7 @@ export function SubmissionForm({
             ? "Submitting…"
             : uploadingPreview
               ? "Uploading preview…"
-              : "Submit for review"}
+              : "Run checks and publish"}
         </button>
       </div>
     </form>

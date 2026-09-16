@@ -2,7 +2,6 @@ import { createHmac } from "node:crypto";
 
 const baseUrl = (process.env.E2E_BASE_URL ?? "http://localhost:8788").replace(/\/$/u, "");
 const creatorSession = process.env.E2E_CREATOR_SESSION ?? "creator-token-for-e2e";
-const adminSession = process.env.E2E_ADMIN_SESSION ?? "admin-token-for-e2e";
 const authSecret = process.env.E2E_AUTH_SECRET ?? "e2e-local-secret";
 
 if (!baseUrl.startsWith("http://localhost:") && process.env.E2E_ALLOW_REMOTE !== "1") {
@@ -47,7 +46,7 @@ async function run(): Promise<void> {
   const form = await request("/submit", { session: creatorSession });
   assert(form.response.status === 200, `submission form returned ${form.response.status}`);
   assert(form.text.includes("Submission requirements"), "submission requirements are not visible");
-  assert(form.text.includes("Preview image URL"), "preview requirement is missing");
+  assert(form.text.includes("Preview image"), "preview requirement is missing");
   assert(form.text.includes("Sandbox compatibility test"), "sandbox test is missing");
 
   const submission = await request("/api/submissions", {
@@ -79,36 +78,19 @@ async function run(): Promise<void> {
   assert(submission.response.status === 201, `submission returned ${submission.response.status}`);
   const submissionPayload = JSON.parse(submission.text) as {
     submission_id?: unknown;
+    asset_slug?: unknown;
+    auto_publish?: unknown;
     pre_screen?: { status?: unknown };
   };
   assert(typeof submissionPayload.submission_id === "string", "submission id is missing");
   assert(submissionPayload.pre_screen?.status === "pass", "pre-screen did not pass");
+  assert(
+    submissionPayload.auto_publish === true,
+    `passing submission was not auto-published (${submission.text.slice(0, 300)})`,
+  );
+  assert(typeof submissionPayload.asset_slug === "string", "published asset slug is missing");
 
-  const queue = await request("/admin/submissions", { session: adminSession });
-  assert(queue.response.status === 200, `admin queue returned ${queue.response.status}`);
-  assert(queue.text.includes(title), "admin queue does not show the submission");
-  assert(queue.text.includes("Automated pre-screen"), "admin queue has no pre-screen section");
-  assert(queue.text.includes("passed"), "admin queue has no passing pre-screen result");
-
-  const review = await request(`/api/admin/submissions/${submissionPayload.submission_id}/review`, {
-    method: "POST",
-    session: adminSession,
-    body: {
-      csrf_token: csrfToken(adminSession),
-      decision: "approved",
-      review_notes: "E2E test rights evidence reviewed and approved.",
-      rights_status: "safe",
-      rights_reason_code: "source_terms",
-      rights_evidence_url: "https://e2e-test.example.com/rights",
-      sandbox_tested: true,
-    },
-  });
-  assert(review.response.status === 200, `admin approval returned ${review.response.status}`);
-  const reviewPayload = JSON.parse(review.text) as { asset_slug?: unknown; asset_id?: unknown };
-  assert(typeof reviewPayload.asset_slug === "string", "published asset slug is missing");
-  assert(typeof reviewPayload.asset_id === "string", "published asset id is missing");
-
-  const asset = await request(`/asset/${reviewPayload.asset_slug}`);
+  const asset = await request(`/asset/${submissionPayload.asset_slug}`);
   assert(asset.response.status === 200, `published asset returned ${asset.response.status}`);
   assert(asset.text.includes(title), "published asset title is missing");
   assert(asset.text.includes("Data visualization loaded directly"), "real preview is not rendered");

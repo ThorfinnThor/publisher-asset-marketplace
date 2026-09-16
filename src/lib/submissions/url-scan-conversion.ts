@@ -1,4 +1,5 @@
 import type { SubmissionPreScreenResult } from "./pre-screen";
+import { buildDeclaredRightsJson } from "./create";
 import type { ValidatedSubmission } from "./validate";
 import { normalizePublicHttpsUrl } from "./validate";
 
@@ -70,7 +71,7 @@ export function buildConversionSubmissionInsertBindings(input: ConversionInsertI
     submission.attributionUrl,
     submission.attributionTerms,
     submission.opportunityTopic,
-    JSON.stringify({ ...submission.rights, attested_at: input.now, source_scan_id: input.scanId }),
+    buildDeclaredRightsJson(submission, input.now, input.scanId),
     preScreen.status,
     JSON.stringify(preScreen),
     input.now,

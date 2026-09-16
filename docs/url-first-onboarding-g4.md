@@ -1,5 +1,9 @@
 # G4 — confirmation conversion gate and final security review
 
+> Updated 2026-09-16: `auto_publish: false` remains part of the isolated scanner result because a
+> scan alone cannot publish. The confirmed conversion endpoint now applies
+> [Autonomous creator publishing](autonomous-publishing.md).
+
 Status: complete  
 Critical review owner: **SOL**  
 Contract version: **1**

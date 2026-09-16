@@ -3,6 +3,10 @@
 Status: accepted for production implementation  
 Model allocation: SOL security design, LUNA implementation
 
+> Updated 2026-09-16: the manual-approval boundary below is superseded by
+> [Autonomous creator publishing](autonomous-publishing.md). Passing checks now publish in the same
+> D1 transaction; failed checks are returned to the creator for correction.
+
 ## Boundary
 
 Pre-screening is deterministic and performs no outbound server-side fetches. Submitted URLs remain
@@ -28,7 +32,7 @@ link-manipulation attribution language; and highlights restricted embed or comme
 declarations. A submission is marked `pass` only when every deterministic check passes. Otherwise it
 is marked `review` with the specific checks that need attention.
 
-## Manual approval remains authoritative
+## Historical manual-approval boundary
 
 Pre-screening never proves ownership, availability, licensing, content type or factual accuracy. An
 admin must still inspect the source and record rights evidence before approval. The checklist reduces

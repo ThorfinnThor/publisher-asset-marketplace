@@ -1,5 +1,9 @@
 # E2 submission security contract
 
+> Updated 2026-09-16: manual-only publication rules in this historical contract are superseded by
+> [Autonomous creator publishing](autonomous-publishing.md). Authentication, CSRF, URL, rate-limit,
+> plain-text and sandbox boundaries remain in force.
+
 Status: accepted for E3 implementation  
 Owner model: SOL  
 Applies to: creator submissions, moderation, publishing, and generated embed markup

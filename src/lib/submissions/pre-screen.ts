@@ -19,6 +19,10 @@ export type SubmissionPreScreenResult = {
   checks: SubmissionPreScreenCheck[];
 };
 
+type SubmissionPreScreenOptions = {
+  marketplaceOrigin?: string;
+};
+
 const promotionalLanguage =
   /\b(?:click here|buy now|dofollow|backlinks?|link[ -]?building|keyword[ -]?rich|seo keywords?|guaranteed rankings?|rank higher|hide attribution)\b/iu;
 const checkCodes = new Set<string>([
@@ -31,7 +35,11 @@ const checkCodes = new Set<string>([
   "sandbox_compatibility",
 ]);
 
-export function runSubmissionPreScreen(submission: ValidatedSubmission): SubmissionPreScreenResult {
+export function runSubmissionPreScreen(
+  submission: ValidatedSubmission,
+  options: SubmissionPreScreenOptions = {},
+): SubmissionPreScreenResult {
+  const marketplacePreview = isMarketplacePreview(submission.previewUrl, options.marketplaceOrigin);
   const checks: SubmissionPreScreenCheck[] = [
     hostCheck(
       "embed_host",
@@ -40,13 +48,19 @@ export function runSubmissionPreScreen(submission: ValidatedSubmission): Submiss
       "Embed host matches the canonical or attribution site.",
       "Embed host differs from the canonical and attribution sites; verify the provider and ownership.",
     ),
-    hostCheck(
-      "preview_host",
-      submission.previewUrl,
-      [submission.canonicalUrl, submission.embedUrl, submission.attributionUrl],
-      "Preview host matches a submitted source host.",
-      "Preview host differs from the submitted source hosts; verify that the image belongs to this asset.",
-    ),
+    marketplacePreview
+      ? {
+          code: "preview_host",
+          status: "pass",
+          message: "Preview was uploaded to the marketplace by the authenticated creator.",
+        }
+      : hostCheck(
+          "preview_host",
+          submission.previewUrl,
+          [submission.canonicalUrl, submission.embedUrl, submission.attributionUrl],
+          "Preview host matches a submitted source host.",
+          "Preview host differs from the submitted source hosts.",
+        ),
     hostCheck(
       "attribution_host",
       submission.attributionUrl,
@@ -54,11 +68,13 @@ export function runSubmissionPreScreen(submission: ValidatedSubmission): Submiss
       "Attribution host matches the canonical site.",
       "Attribution host differs from the canonical site; verify the source identity.",
     ),
-    looksLikeDirectImage(submission.previewUrl)
+    marketplacePreview || looksLikeDirectImage(submission.previewUrl)
       ? {
           code: "preview_format",
           status: "pass",
-          message: "Preview URL looks like a direct image resource.",
+          message: marketplacePreview
+            ? "Marketplace upload passed image type, size and file-signature validation."
+            : "Preview URL looks like a direct image resource.",
         }
       : {
           code: "preview_format",
@@ -101,6 +117,22 @@ export function runSubmissionPreScreen(submission: ValidatedSubmission): Submiss
     status: checks.some((check) => check.status === "review") ? "review" : "pass",
     checks,
   };
+}
+
+function isMarketplacePreview(value: string, marketplaceOrigin: string | undefined): boolean {
+  if (!marketplaceOrigin) return false;
+  try {
+    const preview = new URL(value);
+    const origin = new URL(marketplaceOrigin).origin;
+    return (
+      preview.origin === origin &&
+      /^\/api\/submission-previews\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
+        preview.pathname,
+      )
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function parseStoredSubmissionPreScreen(value: string): SubmissionPreScreenResult {

@@ -34,7 +34,7 @@ npm run check
 Run the isolated creator submission E2E flow against a local Worker with
 `npm run e2e:submission`; setup and cleanup instructions are in
 [docs/e2e-submission.md](docs/e2e-submission.md). The test is local-only by default and covers
-submission, pre-screening, admin approval, publication and the creator dashboard.
+submission, pre-screening, autonomous publication and the creator dashboard.
 The non-mutating `npm run e2e:embed-sandbox` regression uses Chrome/Chromium to verify the exact
 cross-origin `allow-scripts` sandbox and runs automatically in CI.
 
@@ -112,8 +112,12 @@ URL fetching. Deterministic triage rules and the manual-review boundary are docu
 The E3 submission flow and endpoint contract are documented in
 [docs/creator-submissions-e3.md](docs/creator-submissions-e3.md).
 
-The E4 moderation queue and review/audit contract are documented in
+The legacy E4 moderation queue and review/audit contract are documented in
 [docs/submission-moderation-e4.md](docs/submission-moderation-e4.md).
+
+The current creator publication decision is documented in
+[docs/autonomous-publishing.md](docs/autonomous-publishing.md). Passing submissions publish in one
+audited D1 transaction; failed checks are returned to the creator for correction.
 
 Approved creator submissions are promoted into the shared public asset index with the reviewed
 rights evidence and embed origin captured in the same D1 batch.

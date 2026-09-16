@@ -12,13 +12,16 @@ the scanner has no public `workers.dev` endpoint.
    plus the real captured preview.
 3. Select **Suggestions in submission form**.
 4. Review and edit every field, add attribution terms and rights evidence, run the sandbox test,
-   and submit for the existing admin review workflow.
+   and submit. Passing submissions publish immediately; failed gates return corrections in the
+   form.
 
 The captured scanner PNG is a temporary review aid. The form intentionally leaves **Preview image
 URL** empty because a submission must point to the creator's own direct public HTTPS image URL.
 
-Scans never publish automatically. Rights, ownership and authorization remain unverified until the
-creator provides evidence and an admin approves the submission.
+The scan alone never publishes. After the authenticated creator supplies the required declarations
+and attestations, conversion publishes automatically only when every deterministic gate passes.
+The marketplace records those declarations as creator claims; it does not claim to have
+independently proven ownership or legal permission.
 
 ## Service boundary
 

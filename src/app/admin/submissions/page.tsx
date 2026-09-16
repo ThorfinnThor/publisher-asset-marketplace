@@ -54,8 +54,8 @@ export default async function AdminSubmissionsPage() {
         <header className="dashboard-header">
           <div>
             <p className="eyebrow">Admin</p>
-            <h1 className="page-title">Submission review</h1>
-            <p className="page-intro">Review source identity, reuse evidence and embed safety.</p>
+            <h1 className="page-title">Submission exceptions</h1>
+            <p className="page-intro">Legacy and manually escalated submissions appear here.</p>
           </div>
         </header>
         <div className="notice dashboard-notice" role="alert">
@@ -71,15 +71,18 @@ export default async function AdminSubmissionsPage() {
       <header className="dashboard-header">
         <div>
           <p className="eyebrow">Admin</p>
-          <h1 className="page-title">Submission review</h1>
-          <p className="page-intro">Review source identity, reuse evidence and embed safety.</p>
+          <h1 className="page-title">Submission exceptions</h1>
+          <p className="page-intro">
+            Passing submissions publish automatically. This queue is retained for legacy records and
+            manual intervention.
+          </p>
         </div>
         <span className="profile-role">{data.submissions.length} open</span>
       </header>
 
       <div className="notice dashboard-notice">
-        <strong>Approval publishes the reviewed asset.</strong> Only safe or restricted submissions
-        with recorded rights evidence enter the public asset index.
+        <strong>Manual approval remains an exception tool.</strong> Only use it for a legacy record
+        after verifying its evidence and embed behavior.
       </div>
 
       {data.submissions.length === 0 ? (
@@ -87,13 +90,13 @@ export default async function AdminSubmissionsPage() {
           <div className="dashboard-table__heading">
             <div>
               <h2 id="moderation-table-heading">Pending submissions</h2>
-              <p>All pending work is clear.</p>
+              <p>All exception work is clear.</p>
             </div>
             <span className="result-count">0 open</span>
           </div>
           <div className="empty-state empty-state--standalone">
             <strong>No submissions to review</strong>
-            <span>New creator submissions will appear here as pending.</span>
+            <span>Passing new submissions publish automatically and do not enter this queue.</span>
           </div>
         </section>
       ) : (

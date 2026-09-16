@@ -43,7 +43,7 @@ export function buildSubmissionInsertBindings(input: SubmissionInsertInput): unk
     submission.attributionUrl,
     submission.attributionTerms,
     submission.opportunityTopic,
-    JSON.stringify({ ...submission.rights, attested_at: input.now }),
+    buildDeclaredRightsJson(submission, input.now),
     preScreen.status,
     JSON.stringify(preScreen),
     input.now,
@@ -53,4 +53,16 @@ export function buildSubmissionInsertBindings(input: SubmissionInsertInput): unk
     input.since,
     input.submissionLimit,
   ];
+}
+
+export function buildDeclaredRightsJson(
+  submission: ValidatedSubmission,
+  attestedAt: string,
+  sourceScanId?: string,
+): string {
+  return JSON.stringify({
+    ...submission.rights,
+    attested_at: attestedAt,
+    ...(sourceScanId ? { source_scan_id: sourceScanId } : {}),
+  });
 }

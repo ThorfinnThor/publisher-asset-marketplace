@@ -131,18 +131,19 @@ export default function CreatorGuidePage() {
             </p>
           </GuideStep>
 
-          <GuideStep number="05" title="Submit once, then respond to review">
+          <GuideStep number="05" title="Run the checks and publish">
             <p>
               Sign in with GitHub and paste the four URLs plus your metadata and declarations. The
-              automated pre-screen checks format and safety. An admin then verifies the source, the
-              embed origin, the preview and the rights evidence before publication.
+              marketplace checks URL safety, host relationships, the preview, attribution, declared
+              reuse rights and sandbox confirmation. If every check passes, the asset is published
+              immediately. Otherwise, correct the reported fields and submit again.
             </p>
             <div className="creator-guide__callout creator-guide__callout--caution">
-              <strong>Review is asset-level.</strong>
+              <strong>Declarations are asset-level.</strong>
               <span>
-                Approval of one calculator does not automatically approve every tool on your domain.
-                A canonical URL also cannot be submitted twice, and each GitHub account is limited
-                to 10 submissions per 24 hours.
+                Publishing one calculator does not authorize every tool on your domain. False
+                declarations can lead to removal or account suspension. A canonical URL cannot be
+                submitted twice, and each GitHub account is limited to 10 submissions per 24 hours.
               </span>
             </div>
           </GuideStep>

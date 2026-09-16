@@ -1,5 +1,11 @@
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
+import { rebuildAssetSearchTrigrams } from "@/lib/search/search-index";
+import {
+  planAutonomousPublication,
+  prepareAutonomousPublicationStatements,
+} from "@/lib/submissions/auto-publish";
+import { buildDeclaredRightsJson } from "@/lib/submissions/create";
 import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
 import {
   buildConversionSubmissionInsertBindings,
@@ -88,6 +94,21 @@ export async function POST(
       );
     }
 
+    const preScreen = runSubmissionPreScreen(validation.value, {
+      marketplaceOrigin: new URL(request.url).origin,
+    });
+    if (preScreen.status !== "pass") {
+      return Response.json(
+        {
+          error:
+            "Automatic publication checks did not pass. Correct the flagged fields and try again.",
+          code: "auto_publish_checks_failed",
+          pre_screen: preScreen,
+        },
+        { status: 422, headers: { "cache-control": "no-store" } },
+      );
+    }
+
     const duplicate = await db
       .prepare(
         `
@@ -102,7 +123,7 @@ export async function POST(
     if (duplicate) return errorResponse(409, "canonical_url_exists", "This asset already exists.");
 
     const submissionId = crypto.randomUUID();
-    const preScreen = runSubmissionPreScreen(validation.value);
+    const declaredRightsJson = buildDeclaredRightsJson(validation.value, now, id);
     const insertBindings = buildConversionSubmissionInsertBindings({
       id: submissionId,
       creatorId: profile.id,
@@ -113,11 +134,28 @@ export async function POST(
       since,
       submissionLimit,
     });
+    const publication = planAutonomousPublication({
+      id: submissionId,
+      creatorId: profile.id,
+      submission: validation.value,
+      declaredRightsJson,
+      preScreen,
+      now,
+    });
+    if (!publication.ok) {
+      return errorResponse(
+        503,
+        publication.code,
+        "The asset could not be prepared for publication.",
+      );
+    }
+    const publicationStatements = prepareAutonomousPublicationStatements(db, publication.value);
     const results = await db.batch([
       db.prepare(conversionSubmissionInsertSql).bind(...insertBindings),
       db
         .prepare(conversionScanUpdateSql)
         .bind(submissionId, now, now, id, profile.id, now, submissionId, profile.id),
+      ...publicationStatements,
     ]);
     if (results[0].meta.changes === 0 || results[1].meta.changes === 0) {
       const recent = await db
@@ -131,15 +169,33 @@ export async function POST(
       }
       return errorResponse(409, "scan_not_convertible", "This scan cannot be submitted.");
     }
+    if (results[3].meta.changes === 0 || results[4].meta.changes === 0) {
+      return errorResponse(503, "auto_publish_failed", "The asset could not be published.");
+    }
+
+    try {
+      await rebuildAssetSearchTrigrams(db);
+    } catch (error) {
+      console.error(
+        JSON.stringify({
+          event: "autonomous_asset_search_index_refresh_failed",
+          asset_id: publication.value.asset.id,
+          message: error instanceof Error ? error.message : "unknown_error",
+        }),
+      );
+    }
 
     return Response.json(
       {
         ok: true,
         scan_id: id,
         submission_id: submissionId,
-        review_status: "pending",
+        review_status: "approved",
+        publication_status: "published",
+        asset_id: publication.value.asset.id,
+        asset_slug: publication.value.asset.slug,
         pre_screen: preScreen,
-        auto_publish: false,
+        auto_publish: true,
       },
       { status: 201, headers: { "cache-control": "no-store" } },
     );

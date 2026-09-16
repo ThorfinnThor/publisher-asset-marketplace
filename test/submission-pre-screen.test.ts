@@ -62,6 +62,42 @@ describe("submission automated pre-screen", () => {
     );
   });
 
+  it("accepts an authenticated marketplace preview upload", () => {
+    const result = runSubmissionPreScreen(
+      {
+        ...submission,
+        previewUrl:
+          "https://marketplace.example/api/submission-previews/11111111-1111-4111-8111-111111111111",
+      },
+      { marketplaceOrigin: "https://marketplace.example" },
+    );
+    expect(result.status).toBe("pass");
+    expect(result.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "preview_host", status: "pass" }),
+        expect.objectContaining({ code: "preview_format", status: "pass" }),
+      ]),
+    );
+  });
+
+  it("does not trust a marketplace-looking preview on another origin", () => {
+    const result = runSubmissionPreScreen(
+      {
+        ...submission,
+        previewUrl:
+          "https://attacker.example/api/submission-previews/11111111-1111-4111-8111-111111111111",
+      },
+      { marketplaceOrigin: "https://marketplace.example" },
+    );
+    expect(result.status).toBe("review");
+    expect(result.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "preview_host", status: "review" }),
+        expect.objectContaining({ code: "preview_format", status: "review" }),
+      ]),
+    );
+  });
+
   it("fails closed when a stored checklist is malformed", () => {
     expect(
       parseStoredSubmissionPreScreen('{"schema_version":1,"status":"pass","checks":[1]}'),
