@@ -98,15 +98,14 @@ export default function CreatorGuidePage() {
 
           <GuideStep number="03" title="Publish a real preview image">
             <p>
-              Provide a direct public HTTPS URL ending in a real image response, for example
-              <code>https://your-domain.example/previews/my-calculator.png</code>. The marketplace
-              displays this image on the asset page so publishers see actual data instead of an
-              interface placeholder.
+              On the submission form, upload a PNG, JPG or WebP (maximum 2 MB). The marketplace
+              stores it securely and attaches the public preview URL automatically. You can also
+              provide a direct HTTPS image URL hosted on your own domain.
             </p>
             <ul className="creator-guide__list">
               <li>PNG or JPG is preferred; 1200 × 675 px works well.</li>
-              <li>The URL must return an image directly, without a redirect to HTML or a login.</li>
-              <li>Do not use expiring signed URLs that will break after review.</li>
+              <li>The image must show the calculator, chart or table with real data.</li>
+              <li>For external URLs, the URL must return an image directly, without a login.</li>
             </ul>
           </GuideStep>
 

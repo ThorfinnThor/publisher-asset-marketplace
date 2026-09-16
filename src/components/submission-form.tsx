@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent, type MouseEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
 
 type SubmissionInitialValues = {
   canonical_url?: string;
@@ -53,7 +53,9 @@ export function SubmissionRequirements() {
           The embed must remain interactive with <code>sandbox=&quot;allow-scripts&quot;</code>{" "}
           only, without cookies, browser storage, forms, popups, downloads, or same-origin access.
         </li>
-        <li>Direct HTTPS preview image URL, preferably PNG or JPG, so real data is visible.</li>
+        <li>
+          Preview image: upload a PNG/JPG/WebP here, or provide a direct public HTTPS image URL.
+        </li>
         <li>Real source or brand name—not SEO keywords.</li>
         <li>
           Public HTTPS attribution URL and clear terms, such as Credit Example Source — CC BY 4.0.
@@ -79,6 +81,8 @@ export function SubmissionForm({
 }: SubmissionFormProps) {
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingPreview, setUploadingPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(initialValues?.preview_url ?? "");
   const [embedTest, setEmbedTest] = useState<{ url: string; loaded: boolean } | null>(null);
 
   function testEmbed(event: MouseEvent<HTMLButtonElement>) {
@@ -100,6 +104,40 @@ export function SubmissionForm({
     } catch {
       setEmbedTest(null);
       setStatus({ tone: "error", text: "Enter a public HTTPS embed URL before testing it." });
+    }
+  }
+
+  async function uploadPreview(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploadingPreview(true);
+    setStatus(null);
+    const body = new FormData();
+    body.set("csrf_token", csrfToken);
+    body.set("file", file);
+    try {
+      const response = await fetch("/api/submission-previews/upload", {
+        method: "POST",
+        credentials: "same-origin",
+        body,
+      });
+      const result = (await response.json().catch(() => null)) as {
+        preview_url?: string;
+        error?: string;
+      } | null;
+      if (!response.ok || !result?.preview_url) {
+        setStatus({
+          tone: "error",
+          text: result?.error ?? "The preview image could not be uploaded.",
+        });
+        return;
+      }
+      setPreviewUrl(result.preview_url);
+      setStatus({ tone: "success", text: "Preview uploaded and attached to this submission." });
+    } catch {
+      setStatus({ tone: "error", text: "The preview image could not be uploaded." });
+    } finally {
+      setUploadingPreview(false);
     }
   }
 
@@ -256,16 +294,28 @@ export function SubmissionForm({
             <p className="form-hint">Paste only the iframe source URL, never iframe HTML.</p>
           </div>
           <div className="form-field">
-            <label htmlFor="preview-url">Preview image URL</label>
+            <label htmlFor="preview-file">Preview image</label>
+            <input
+              id="preview-file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={uploadPreview}
+              type="file"
+            />
+            <p className="form-hint">
+              Upload a PNG, JPG or WebP (max 2 MB). It is stored securely and attached
+              automatically.
+            </p>
+            <label htmlFor="preview-url">Or use a public image URL</label>
             <input
               id="preview-url"
               name="preview_url"
+              onChange={(event) => setPreviewUrl(event.target.value)}
               placeholder="https://…/preview.png"
-              defaultValue={initialValues?.preview_url}
+              value={previewUrl}
               required
               type="url"
             />
-            <p className="form-hint">Direct public HTTPS image shown on the asset page.</p>
+            <p className="form-hint">The image must show real data and be publicly reachable.</p>
           </div>
         </div>
 
@@ -434,8 +484,16 @@ export function SubmissionForm({
             {status.text}
           </div>
         ) : null}
-        <button className="button button--primary" disabled={submitting} type="submit">
-          {submitting ? "Submitting…" : "Submit for review"}
+        <button
+          className="button button--primary"
+          disabled={submitting || uploadingPreview}
+          type="submit"
+        >
+          {submitting
+            ? "Submitting…"
+            : uploadingPreview
+              ? "Uploading preview…"
+              : "Submit for review"}
         </button>
       </div>
     </form>

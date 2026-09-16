@@ -45,9 +45,10 @@ ten-scans-per-24-hours limit.
 ## Preview boundary
 
 The private R2 screenshot is a temporary review aid and is never written into a public submission.
-The creator must provide a direct public HTTPS PNG/JPG-style preview URL and separately authorize
-its display. Admin review shows URL-scan provenance but still requires independent rights evidence
-and a fresh sandbox interaction before approval.
+Creators can upload a PNG/JPG/WebP preview (maximum 2 MB) to the marketplace's dedicated R2 bucket;
+the form receives a stable public image route automatically. A direct public HTTPS image URL remains
+supported as an alternative. Admin review shows URL-scan provenance but still requires independent
+rights evidence and a fresh sandbox interaction before approval.
 
 ## Adversarial coverage
 

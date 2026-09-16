@@ -23,6 +23,12 @@
       "migrations_dir": "migrations",
     },
   ],
+  "r2_buckets": [
+    {
+      "binding": "PREVIEW_UPLOADS",
+      "bucket_name": "publisher-asset-previews",
+    },
+  ],
   "queues": {
     "producers": [
       {
