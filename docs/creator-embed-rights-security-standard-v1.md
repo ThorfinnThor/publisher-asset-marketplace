@@ -279,16 +279,16 @@ submission security contract.
 
 Implement and review one calculator before adapting all planners:
 
-| Field            | Pilot value                                                   |
-| ---------------- | ------------------------------------------------------------- |
-| Asset            | Gartenhaus-Planer                                             |
-| Canonical        | `https://www.passendplanen.de/garten/gartenhaus-planer/`      |
-| Embed            | `https://www.passendplanen.de/embed/gartenhaus-planer/`       |
-| Preview          | `https://www.passendplanen.de/previews/gartenhaus-planer.png` |
-| Source name      | `PassendPlanen`                                               |
-| Attribution URL  | `https://www.passendplanen.de/garten/gartenhaus-planer/`      |
-| Rights evidence  | `https://www.passendplanen.de/garten/gartenhaus-planer/nutzungsrechte/` |
-| Sandbox profile  | `v1: allow-scripts`                                           |
+| Field           | Pilot value                                                             |
+| --------------- | ----------------------------------------------------------------------- |
+| Asset           | Gartenhaus-Planer                                                       |
+| Canonical       | `https://www.passendplanen.de/garten/gartenhaus-planer/`                |
+| Embed           | `https://www.passendplanen.de/embed/gartenhaus-planer/`                 |
+| Preview         | `https://www.passendplanen.de/previews/gartenhaus-planer.png`           |
+| Source name     | `PassendPlanen`                                                         |
+| Attribution URL | `https://www.passendplanen.de/garten/gartenhaus-planer/`                |
+| Rights evidence | `https://www.passendplanen.de/garten/gartenhaus-planer/nutzungsrechte/` |
+| Sandbox profile | `v1: allow-scripts`                                                     |
 
 The pilot URLs and rights page were deployed on 2026-09-16 and returned `200` during the LUNA
 verification pass. The acceptance matrix still applies: an admin must record the evidence before
