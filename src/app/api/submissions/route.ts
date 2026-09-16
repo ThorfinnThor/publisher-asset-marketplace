@@ -160,6 +160,9 @@ function validationErrorMessage(code: string): string {
   if (code === "commercial_marketplace_acknowledgement_required") {
     return "Confirm that the asset may be listed and promoted within the commercially operated marketplace.";
   }
+  if (code === "creator_terms_acceptance_required") {
+    return "Read and accept the current Creator Terms before publishing.";
+  }
   return "Please correct the highlighted submission fields.";
 }
 

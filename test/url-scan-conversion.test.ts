@@ -34,6 +34,7 @@ const submission: ValidatedSubmission = {
     preview_display_authorized: true,
     submitter_authorized: true,
     commercial_marketplace_acknowledged: true,
+    creator_terms_accepted: true,
   },
   opportunityTopic: null,
 };
@@ -74,6 +75,7 @@ describe("URL scan conversion gate", () => {
       submissionLimit: 10,
     });
     expect(conversionSubmissionInsertSql.match(/\?/gu)).toHaveLength(bindings.length);
+    expect(conversionSubmissionInsertSql).toContain("4, 'pending'");
     expect(bindings).toHaveLength(25);
     expect(conversionScanUpdateSql.match(/\?/gu)).toHaveLength(8);
     expect(String(bindings[13])).toContain('"source_scan_id"');

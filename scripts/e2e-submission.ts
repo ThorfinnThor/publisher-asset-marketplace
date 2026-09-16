@@ -73,6 +73,7 @@ async function run(): Promise<void> {
       preview_display_authorized: true,
       authorized_to_submit: true,
       commercial_marketplace_acknowledged: true,
+      creator_terms_accepted: true,
       opportunity_topic: null,
     },
   });

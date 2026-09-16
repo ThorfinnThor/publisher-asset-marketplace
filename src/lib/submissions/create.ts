@@ -1,7 +1,8 @@
 import type { SubmissionPreScreenResult } from "./pre-screen";
+import { currentCreatorTermsVersion } from "./creator-terms";
 import type { ValidatedSubmission } from "./validate";
 
-export const currentAuthorizationVersion = 3;
+export const currentAuthorizationVersion = 4;
 
 export const submissionInsertSql = `
   INSERT INTO submissions (
@@ -64,6 +65,7 @@ export function buildDeclaredRightsJson(
 ): string {
   return JSON.stringify({
     ...submission.rights,
+    creator_terms_version: currentCreatorTermsVersion,
     attested_at: attestedAt,
     ...(sourceScanId ? { source_scan_id: sourceScanId } : {}),
   });

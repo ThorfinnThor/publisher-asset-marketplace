@@ -167,6 +167,7 @@ export default function CreatorGuidePage() {
               <li>Rights page names the asset and owner.</li>
               <li>Commercial and embedding permissions are explicit.</li>
               <li>Attribution text is accurate and publisher-readable.</li>
+              <li>You have read the current Creator Terms.</li>
             </ul>
             <Link className="button button--secondary" href="/submit">
               Open submission form

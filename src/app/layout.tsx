@@ -58,6 +58,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               <Link href="/search">Browse</Link>
               <Link href="/submit">Publish</Link>
               <Link href="/creator/guide">Creator guide</Link>
+              <Link href="/creator/terms">Creator terms</Link>
             </nav>
           </div>
         </footer>

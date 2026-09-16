@@ -190,6 +190,8 @@ export function validatedSubmissionFromStored(
     authorized_to_submit: rights.submitter_authorized,
     commercial_marketplace_acknowledged:
       submission.authorization_version >= 3 ? rights.commercial_marketplace_acknowledged : true,
+    creator_terms_accepted:
+      submission.authorization_version >= 4 ? rights.creator_terms_accepted : true,
     opportunity_topic: submission.opportunity_topic ?? null,
   });
   return validation.ok ? validation.value : null;

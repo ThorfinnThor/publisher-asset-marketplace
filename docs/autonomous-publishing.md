@@ -22,6 +22,7 @@ The publishing gate requires:
 - source identity, attribution, preview-display and submitter-authorization attestations;
 - acknowledgement that the asset may be listed and promoted within a commercially operated
   marketplace without transferring ownership of the tool, source code or data;
+- acceptance of the current versioned Creator Terms;
 - canonical URL uniqueness; and
 - the existing rolling limit of 10 submissions per creator per 24 hours.
 
@@ -38,7 +39,8 @@ decision appends a `submission_reviews` row and stores:
 - `rights_reason_code = creator_attested_auto_publish`;
 - the attribution/rights URL as creator-declared evidence;
 - the exact declarations and attestation timestamp; and
-- authorization contract version `3`, including the commercial-marketplace acknowledgement; and
+- authorization contract version `4`, including the commercial-marketplace acknowledgement and
+  accepted Creator Terms version; and
 - the fixed sandbox profile and test timestamp.
 
 False declarations can result in asset removal and account suspension. Complaint handling,

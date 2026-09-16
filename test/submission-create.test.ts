@@ -29,6 +29,7 @@ const submission: ValidatedSubmission = {
     preview_display_authorized: true,
     submitter_authorized: true,
     commercial_marketplace_acknowledged: true,
+    creator_terms_accepted: true,
   },
   opportunityTopic: null,
 };
@@ -45,7 +46,12 @@ describe("submission insert contract", () => {
       submissionLimit: 10,
     });
     expect(submissionInsertSql.match(/\?/gu)).toHaveLength(bindings.length);
+    expect(submissionInsertSql).toContain("4, 'pending'");
     expect(bindings).toHaveLength(22);
+    expect(JSON.parse(String(bindings[13]))).toMatchObject({
+      creator_terms_accepted: true,
+      creator_terms_version: "1.0",
+    });
     expect(bindings.slice(16, 19)).toEqual([
       "2026-09-15T14:00:00.000Z",
       "2026-09-15T14:00:00.000Z",

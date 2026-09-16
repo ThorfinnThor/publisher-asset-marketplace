@@ -106,6 +106,7 @@ with raw creator input are prohibited.
 | `sandbox_compatible`                   | Must be exactly `true` after testing the fixed `allow-scripts` profile  |
 | authorization attestation              | Must be exactly `true`; record its version and timestamp                |
 | commercial marketplace acknowledgement | Must be exactly `true` for authorization version 3                      |
+| Creator Terms acceptance               | Must be exactly `true`; server records the current terms version        |
 
 The rights object is closed and versioned. E3 writes:
 
@@ -122,6 +123,8 @@ The rights object is closed and versioned. E3 writes:
   "attribution_terms": "Credit Example Source",
   "submitter_authorized": true,
   "commercial_marketplace_acknowledged": true,
+  "creator_terms_accepted": true,
+  "creator_terms_version": "1.0",
   "attested_at": "server-generated ISO-8601 timestamp"
 }
 ```

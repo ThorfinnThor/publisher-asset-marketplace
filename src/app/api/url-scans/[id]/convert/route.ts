@@ -217,9 +217,10 @@ function validationErrorMessage(code: string): string {
     code === "attribution_confirmation_required" ||
     code === "preview_display_authorization_required" ||
     code === "authorization_required" ||
-    code === "commercial_marketplace_acknowledgement_required"
+    code === "commercial_marketplace_acknowledgement_required" ||
+    code === "creator_terms_acceptance_required"
   ) {
-    return "Confirm the source, attribution, preview display, your authorization and the commercial marketplace acknowledgement.";
+    return "Confirm the source, attribution, preview display, your authorization, the commercial marketplace acknowledgement and the current Creator Terms.";
   }
   return "Please correct the highlighted submission fields.";
 }

@@ -2782,6 +2782,117 @@ summary {
   line-height: 1.55;
 }
 
+.creator-terms-page {
+  padding-top: 72px;
+  padding-bottom: 96px;
+}
+
+.creator-terms__header {
+  max-width: 820px;
+  margin-bottom: 56px;
+}
+
+.creator-terms__version {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.creator-terms__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 64px;
+  align-items: start;
+}
+
+.creator-terms__content {
+  border-top: 1px solid var(--line);
+}
+
+.creator-terms__section {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 20px;
+  padding: 34px 0 38px;
+  border-bottom: 1px solid var(--line);
+}
+
+.creator-terms__number {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.creator-terms__section h2 {
+  margin: 4px 0 14px;
+  font-size: clamp(1.3rem, 2vw, 1.75rem);
+  letter-spacing: -0.025em;
+}
+
+.creator-terms__section p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+
+.creator-terms__section p + p {
+  margin-top: 14px;
+}
+
+.creator-terms__aside {
+  position: sticky;
+  top: 104px;
+}
+
+.creator-terms__aside h2 {
+  margin: 8px 0 18px;
+  font-size: 1.55rem;
+}
+
+.creator-terms__summary-note {
+  margin: 20px 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 960px) {
+  .creator-terms__layout {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .creator-terms__aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .creator-terms-page {
+    padding-top: 48px;
+    padding-bottom: 72px;
+  }
+
+  .creator-terms__section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
 @media (max-width: 960px) {
   .site-nav {
     display: none;

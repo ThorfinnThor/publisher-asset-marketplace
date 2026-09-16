@@ -25,6 +25,7 @@ const validSubmission = {
   preview_display_authorized: true,
   authorized_to_submit: true,
   commercial_marketplace_acknowledged: true,
+  creator_terms_accepted: true,
   opportunity_topic: null,
 };
 
@@ -109,6 +110,19 @@ describe("submission security validation", () => {
       ok: false,
       code: "commercial_marketplace_acknowledgement_required",
       field: "commercial_marketplace_acknowledged",
+    });
+  });
+
+  it("requires acceptance of the current Creator Terms", () => {
+    expect(
+      validateSubmissionPayload({
+        ...validSubmission,
+        creator_terms_accepted: false,
+      }),
+    ).toMatchObject({
+      ok: false,
+      code: "creator_terms_acceptance_required",
+      field: "creator_terms_accepted",
     });
   });
 

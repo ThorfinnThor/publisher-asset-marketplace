@@ -24,9 +24,11 @@ const submission = {
     preview_display_authorized: true,
     submitter_authorized: true,
     commercial_marketplace_acknowledged: true,
+    creator_terms_accepted: true,
+    creator_terms_version: "1.0",
   }),
   created_at: "2026-09-14T12:00:00.000Z",
-  authorization_version: 3,
+  authorization_version: 4,
 };
 
 describe("E5 creator asset publishing", () => {
@@ -176,6 +178,41 @@ describe("E5 creator asset publishing", () => {
         {
           ...submission,
           authorization_version: 2,
+          declared_rights_json: JSON.stringify(declared),
+        },
+        review,
+      ).ok,
+    ).toBe(true);
+  });
+
+  it("requires a recorded Creator Terms version from authorization version 4 onward", () => {
+    const declared = JSON.parse(submission.declared_rights_json) as Record<string, unknown>;
+    delete declared.creator_terms_accepted;
+    delete declared.creator_terms_version;
+    const review = {
+      reviewed_by: "github:admin",
+      rights_status: "safe" as const,
+      rights_reason_code: "manual_review",
+      rights_evidence_url: "https://creator.example/terms",
+      title: null,
+      description: null,
+      attribution_name: null,
+      attribution_terms: null,
+      reviewed_at: "2026-09-14T13:00:00.000Z",
+      sandbox_tested: true as const,
+    };
+
+    expect(
+      buildCreatorAssetRecord(
+        { ...submission, declared_rights_json: JSON.stringify(declared) },
+        review,
+      ),
+    ).toEqual({ ok: false, code: "promotion_creator_terms_acceptance_required" });
+    expect(
+      buildCreatorAssetRecord(
+        {
+          ...submission,
+          authorization_version: 3,
           declared_rights_json: JSON.stringify(declared),
         },
         review,

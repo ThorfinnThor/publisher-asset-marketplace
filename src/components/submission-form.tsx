@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
 
+import { currentCreatorTermsVersion } from "@/lib/submissions/creator-terms";
+
 type SubmissionInitialValues = {
   canonical_url?: string;
   asset_type?: "chart" | "calculator" | "table" | "dataset" | "benchmark" | "widget";
@@ -71,6 +73,7 @@ export function SubmissionRequirements() {
           Acknowledgement that the marketplace is commercially operated and may list and promote the
           asset without taking ownership of the tool, source code, or data.
         </li>
+        <li>Acceptance of the current versioned Creator Terms.</li>
         <li>Maximum 10 submissions per GitHub account within 24 hours.</li>
         <li>The canonical URL must not already exist in the marketplace or another submission.</li>
       </ul>
@@ -198,6 +201,7 @@ export function SubmissionForm({
             authorized_to_submit: data.get("authorized_to_submit") === "on",
             commercial_marketplace_acknowledged:
               data.get("commercial_marketplace_acknowledged") === "on",
+            creator_terms_accepted: data.get("creator_terms_accepted") === "on",
             opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
           }),
         },
@@ -528,6 +532,16 @@ export function SubmissionForm({
             marketplace. I retain ownership of my tool, source code, and data; this acknowledgement
             grants no rights beyond those needed for the submitted listing, preview, attribution,
             and embed availability.
+          </span>
+        </label>
+        <label className="attestation">
+          <input name="creator_terms_accepted" required type="checkbox" />
+          <span>
+            I have read and accept the{" "}
+            <Link href="/creator/terms" rel="noreferrer" target="_blank">
+              Creator Terms, version {currentCreatorTermsVersion}
+            </Link>
+            .
           </span>
         </label>
         {status ? (

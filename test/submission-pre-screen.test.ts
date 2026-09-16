@@ -31,6 +31,7 @@ const submission: ValidatedSubmission = {
     preview_display_authorized: true,
     submitter_authorized: true,
     commercial_marketplace_acknowledged: true,
+    creator_terms_accepted: true,
   },
   opportunityTopic: null,
 };

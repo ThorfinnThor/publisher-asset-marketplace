@@ -118,6 +118,12 @@ export function buildCreatorAssetRecord(
   if (submission.authorization_version >= 3 && !declared.commercial_marketplace_acknowledged) {
     return { ok: false, code: "promotion_commercial_marketplace_acknowledgement_required" };
   }
+  if (
+    submission.authorization_version >= 4 &&
+    (!declared.creator_terms_accepted || !declared.creator_terms_version)
+  ) {
+    return { ok: false, code: "promotion_creator_terms_acceptance_required" };
+  }
   const embedOrigin = new URL(embed.value).origin;
   const rights = {
     schema_version: 1,
@@ -193,6 +199,8 @@ function parseDeclaredRights(value: string): {
   preview_display_authorized: boolean;
   submitter_authorized: boolean;
   commercial_marketplace_acknowledged: boolean;
+  creator_terms_accepted: boolean;
+  creator_terms_version: string | null;
   source_scan_id: string | null;
 } {
   try {
@@ -208,6 +216,8 @@ function parseDeclaredRights(value: string): {
         preview_display_authorized: false,
         submitter_authorized: false,
         commercial_marketplace_acknowledged: false,
+        creator_terms_accepted: false,
+        creator_terms_version: null,
         source_scan_id: null,
       };
     }
@@ -222,6 +232,11 @@ function parseDeclaredRights(value: string): {
       preview_display_authorized: rights.preview_display_authorized === true,
       submitter_authorized: rights.submitter_authorized === true,
       commercial_marketplace_acknowledged: rights.commercial_marketplace_acknowledged === true,
+      creator_terms_accepted: rights.creator_terms_accepted === true,
+      creator_terms_version:
+        typeof rights.creator_terms_version === "string" && rights.creator_terms_version.length > 0
+          ? rights.creator_terms_version
+          : null,
       source_scan_id: typeof rights.source_scan_id === "string" ? rights.source_scan_id : null,
     };
   } catch {
@@ -235,6 +250,8 @@ function parseDeclaredRights(value: string): {
       preview_display_authorized: false,
       submitter_authorized: false,
       commercial_marketplace_acknowledged: false,
+      creator_terms_accepted: false,
+      creator_terms_version: null,
       source_scan_id: null,
     };
   }
