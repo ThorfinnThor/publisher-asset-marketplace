@@ -1,0 +1,113 @@
+{
+  "contractVersion": 1,
+  "contract": "docs/url-first-onboarding-g1.md",
+  "requiredStates": [
+    "queued",
+    "running",
+    "needs_confirmation",
+    "needs_changes",
+    "failed",
+    "expired",
+    "converted"
+  ],
+  "cases": [
+    {
+      "id": "public-tool-ready-for-confirmation",
+      "condition": "Public HTTPS tool, source-hosted embed and preview candidates pass technical checks",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": null,
+      "autoPublish": false
+    },
+    {
+      "id": "http-url-rejected",
+      "condition": "Requested URL uses HTTP",
+      "expectedStatus": "failed",
+      "expectedIssue": "address_not_public",
+      "autoPublish": false
+    },
+    {
+      "id": "private-literal-rejected",
+      "condition": "Requested URL is a private or loopback IP literal",
+      "expectedStatus": "failed",
+      "expectedIssue": "address_not_public",
+      "autoPublish": false
+    },
+    {
+      "id": "mixed-dns-rejected",
+      "condition": "A hostname resolves to any mixture containing a non-public address",
+      "expectedStatus": "failed",
+      "expectedIssue": "address_not_public",
+      "autoPublish": false
+    },
+    {
+      "id": "redirect-to-private-rejected",
+      "condition": "A public URL redirects to a private, link-local or metadata address",
+      "expectedStatus": "failed",
+      "expectedIssue": "address_not_public",
+      "autoPublish": false
+    },
+    {
+      "id": "subresource-private-rejected",
+      "condition": "A rendered page requests a private, link-local or metadata subresource",
+      "expectedStatus": "needs_changes",
+      "expectedIssue": "address_not_public",
+      "autoPublish": false
+    },
+    {
+      "id": "redirect-limit",
+      "condition": "Navigation exceeds three redirects",
+      "expectedStatus": "failed",
+      "expectedIssue": "redirect_limit",
+      "autoPublish": false
+    },
+    {
+      "id": "oversized-document",
+      "condition": "The main document exceeds the bounded response contract",
+      "expectedStatus": "failed",
+      "expectedIssue": "response_too_large",
+      "autoPublish": false
+    },
+    {
+      "id": "authentication-wall",
+      "condition": "The tool requires a login or credentialed session",
+      "expectedStatus": "needs_changes",
+      "expectedIssue": "authentication_required",
+      "autoPublish": false
+    },
+    {
+      "id": "frame-ancestor-block",
+      "condition": "CSP frame-ancestors or X-Frame-Options prevents the candidate embed",
+      "expectedStatus": "needs_changes",
+      "expectedIssue": "frame_blocked",
+      "autoPublish": false
+    },
+    {
+      "id": "unguarded-session-storage",
+      "condition": "The candidate throws when browser storage is unavailable in allow-scripts sandbox",
+      "expectedStatus": "needs_changes",
+      "expectedIssue": "sandbox_runtime_error",
+      "autoPublish": false
+    },
+    {
+      "id": "unclear-rights-remain-unverified",
+      "condition": "Technical checks pass but no explicit item-level rights evidence is found",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": "rights_evidence_missing",
+      "autoPublish": false
+    },
+    {
+      "id": "manifest-does-not-auto-publish",
+      "condition": "A same-site publisher asset manifest provides every supported field",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": "ownership_unconfirmed",
+      "autoPublish": false
+    },
+    {
+      "id": "prompt-injection-is-data",
+      "condition": "Page text instructs the scanner or model to change policy or reveal secrets",
+      "expectedStatus": "needs_confirmation",
+      "expectedIssue": "prompt_injection_ignored",
+      "autoPublish": false
+    }
+  ]
+}

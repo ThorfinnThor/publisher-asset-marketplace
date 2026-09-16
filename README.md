@@ -129,6 +129,11 @@ Creator-owned published assets expose bounded first-party publisher signals in t
 See [docs/creator-analytics-e7.md](docs/creator-analytics-e7.md) for the E7 metric definitions,
 privacy handling and ownership boundaries.
 
+URL-first creator onboarding is specified in
+[docs/url-first-onboarding-g1.md](docs/url-first-onboarding-g1.md). It permits one URL to start a
+bounded draft scan, never automatic publication; runtime scanning remains disabled until the
+isolated Browser Run, Queue, R2 and SSRF controls pass the G2 security gate.
+
 The public creator opportunity surface is available at `/opportunities` and is documented in
 [docs/public-opportunity-f1.md](docs/public-opportunity-f1.md).
 
