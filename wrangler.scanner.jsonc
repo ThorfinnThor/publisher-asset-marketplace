@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "publisher-asset-url-scanner",
+  "main": "scanner/index.ts",
+  "workers_dev": false,
+  "compatibility_date": "2026-09-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "browser": {
+    "binding": "BROWSER",
+  },
+  "r2_buckets": [
+    {
+      "binding": "PREVIEWS",
+      "bucket_name": "publisher-asset-scan-previews",
+    },
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "SCAN_RESULTS",
+        "queue": "publisher-url-scan-results",
+      },
+    ],
+    "consumers": [
+      {
+        "queue": "publisher-url-scan-jobs",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 3,
+        "dead_letter_queue": "publisher-url-scan-jobs-dlq",
+        "max_concurrency": 2,
+      },
+    ],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+}

@@ -10,6 +10,7 @@ export default tseslint.config(
       ".wrangler/**",
       "coverage/**",
       "worker-configuration.d.ts",
+      "scanner-configuration.d.ts",
     ],
   },
   ...tseslint.configs.recommended,

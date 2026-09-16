@@ -20,6 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run cf:typegen
+      - run: npm run cf:typegen:scanner
       - run: npm run db:migrate:local
       - run: npm run check
       - run: npm run e2e:embed-sandbox

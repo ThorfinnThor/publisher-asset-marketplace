@@ -5,8 +5,10 @@ import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
 import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner";
 import { withSecurityHeaders } from "../src/lib/security-headers";
+import { expireUrlScanJobs } from "../src/lib/submissions/url-scan-jobs";
+import { consumeUrlScanResults } from "./url-scan-results";
 
-type WorkerEnv = { DB: D1Database };
+type WorkerEnv = { DB: D1Database; URL_SCAN_JOBS: Queue };
 
 const worker = {
   fetch(request: Request, env: WorkerEnv, context: ExecutionContext): Promise<Response> {
@@ -18,6 +20,16 @@ const worker = {
     context: ExecutionContext,
   ): Promise<void> {
     const scheduledAt = new Date(controller.scheduledTime).toISOString();
+    context.waitUntil(
+      expireUrlScanJobs(env.DB, scheduledAt).catch((error: unknown) => {
+        console.error(
+          JSON.stringify({
+            event: "url_scan_expiration_failed",
+            message: error instanceof Error ? error.message : "unknown_error",
+          }),
+        );
+      }),
+    );
     context.waitUntil(
       runAssetRefresh(env.DB, {
         now: scheduledAt,
@@ -99,6 +111,9 @@ const worker = {
           );
         }),
     );
+  },
+  async queue(batch: MessageBatch<unknown>, env: WorkerEnv): Promise<void> {
+    await consumeUrlScanResults(batch, env.DB);
   },
 };
 

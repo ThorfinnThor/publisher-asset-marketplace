@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "publisher-asset-marketplace",
-  "compatibility_date": "2026-09-14",
+  "compatibility_date": "2026-09-16",
   "compatibility_flags": ["nodejs_compat"],
   "main": "worker/index.ts",
   "triggers": {
@@ -23,6 +23,23 @@
       "migrations_dir": "migrations",
     },
   ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "URL_SCAN_JOBS",
+        "queue": "publisher-url-scan-jobs",
+      },
+    ],
+    "consumers": [
+      {
+        "queue": "publisher-url-scan-results",
+        "max_batch_size": 5,
+        "max_batch_timeout": 5,
+        "max_retries": 3,
+        "dead_letter_queue": "publisher-url-scan-results-dlq",
+      },
+    ],
+  },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,

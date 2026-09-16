@@ -12,7 +12,9 @@
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "deploy": "vinext-cloudflare deploy --config dist/server/wrangler.json",
+    "deploy:scanner": "wrangler deploy --config wrangler.scanner.jsonc",
     "cf:typegen": "wrangler types",
+    "cf:typegen:scanner": "wrangler types scanner-configuration.d.ts --config wrangler.scanner.jsonc --env-file /dev/null --env-interface ScannerEnvBindings --include-runtime false && prettier --write scanner-configuration.d.ts",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "ingest:dry-run": "tsx scripts/ingest-owid.ts data/seed/owid-first-10.csv",
@@ -28,7 +30,7 @@
     "release:smoke": "tsx scripts/release-smoke.ts",
     "e2e:submission": "tsx scripts/e2e-submission.ts",
     "e2e:embed-sandbox": "tsx scripts/e2e-embed-sandbox.ts",
-    "lint": "eslint src scripts test",
+    "lint": "eslint src scripts test worker scanner",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
@@ -44,6 +46,7 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@cloudflare/puppeteer": "^1.4.0",
     "@cloudflare/vite-plugin": "1.54.8",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "26.5.1",

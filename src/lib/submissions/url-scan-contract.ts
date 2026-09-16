@@ -33,6 +33,12 @@ export const urlScanContractV1 = {
 
 export type UrlScanStatus = (typeof urlScanContractV1.statuses)[number];
 
+export type UrlScanJobMessageV1 = {
+  schema_version: 1;
+  job_id: string;
+  requested_url: string;
+};
+
 export type UrlScanIssueCode =
   | "address_not_public"
   | "authentication_required"
@@ -88,3 +94,25 @@ export type UrlScanResultV1 = {
   raw_content_stored: false;
   auto_publish: false;
 };
+
+export type UrlScanResultMessageV1 =
+  | {
+      schema_version: 1;
+      job_id: string;
+      attempt: number;
+      status: "running";
+    }
+  | {
+      schema_version: 1;
+      job_id: string;
+      attempt: number;
+      status: "needs_confirmation" | "needs_changes";
+      result: UrlScanResultV1;
+    }
+  | {
+      schema_version: 1;
+      job_id: string;
+      attempt: number;
+      status: "failed";
+      error_code: UrlScanIssueCode;
+    };
