@@ -15,6 +15,12 @@ describe("OWID catalogue selection", () => {
     );
   });
 
+  it("keeps explicitly excluded source slugs out of future imports", () => {
+    expect(selectMissingOwidAssets(catalogue, new Set(), new Set(["two"]))).toMatchObject([
+      { slug: "one" },
+    ]);
+  });
+
   it("writes a clean CSV accepted by the normalizer", () => {
     const csv = owidAssetsToCsv(selectMissingOwidAssets(catalogue, new Set(["one"])));
     const normalized = normalizeOwidInput(csv, "csv");

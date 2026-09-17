@@ -3,8 +3,11 @@ import type { AcceptedInput } from "./normalize-input";
 export function selectMissingOwidAssets(
   catalogue: readonly AcceptedInput[],
   existingSlugs: ReadonlySet<string>,
+  excludedSlugs: ReadonlySet<string> = new Set(),
 ): AcceptedInput[] {
-  return catalogue.filter((asset) => !existingSlugs.has(asset.slug));
+  return catalogue.filter(
+    (asset) => !existingSlugs.has(asset.slug) && !excludedSlugs.has(asset.slug),
+  );
 }
 
 function csvField(value: string): string {

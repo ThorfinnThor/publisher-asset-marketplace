@@ -77,6 +77,7 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const inputPath = args[0];
   const outputPath = optionValue(args, "--output");
+  const excludePath = optionValue(args, "--exclude");
   if (!inputPath || !outputPath || !args.includes("--remote")) {
     throw new Error(
       "Usage: npm run ingest:owid:missing -- <catalog.csv|json|txt> --remote --output <missing.csv>",
@@ -91,10 +92,18 @@ async function main(): Promise<void> {
     throw new Error("OWID catalogue input must not contain invalid or duplicate rows");
   }
   const existing = await existingOwidSlugs();
-  const missing = selectMissingOwidAssets(normalized.accepted, existing);
+  const excluded = excludePath
+    ? new Set(
+        (await readFile(resolve(excludePath), "utf8"))
+          .split(/\r?\n/)
+          .map((slug) => slug.trim().toLocaleLowerCase("en"))
+          .filter((slug) => slug !== "" && !slug.startsWith("#")),
+      )
+    : new Set<string>();
+  const missing = selectMissingOwidAssets(normalized.accepted, existing, excluded);
   await writeFile(resolve(outputPath), owidAssetsToCsv(missing), "utf8");
   process.stdout.write(
-    `${JSON.stringify({ catalogueAssets: normalized.accepted.length, existingAssets: existing.size, missingAssets: missing.length, output: resolve(outputPath) }, null, 2)}\n`,
+    `${JSON.stringify({ catalogueAssets: normalized.accepted.length, existingAssets: existing.size, excludedAssets: excluded.size, missingAssets: missing.length, output: resolve(outputPath) }, null, 2)}\n`,
   );
 }
 

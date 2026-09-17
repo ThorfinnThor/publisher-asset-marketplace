@@ -1,0 +1,8 @@
+# OWID catalog entries with persistent metadata HTTP 503 responses.
+# They are intentionally excluded from Marketplace import until re-enabled.
+covid-19-daily-tests-vs-daily-new-confirmed-cases
+covid-19-daily-tests-vs-daily-new-confirmed-cases-per-million
+covid-19-tests-cases-scatter-with-comparisons
+covid-19-total-confirmed-cases-vs-total-tests-conducted
+covid-daily-vs-total-cases-per-million
+covid-vaccinations-vs-covid-death-rate

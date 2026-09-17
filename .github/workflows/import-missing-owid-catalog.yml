@@ -38,7 +38,8 @@ jobs:
         id: missing
         run: |
           npm run ingest:owid:missing -- "$RUNNER_TEMP/owid-catalog.csv" \
-            --remote --output "$RUNNER_TEMP/owid-missing.csv"
+            --remote --exclude data/seed/owid-excluded-slugs.txt \
+            --output "$RUNNER_TEMP/owid-missing.csv"
           COUNT=$(node -e 'const fs=require("node:fs"); process.stdout.write(String(Math.max(0,fs.readFileSync(process.env.MISSING,"utf8").trim().split(/\r?\n/).length-1)))')
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Found $COUNT new OWID catalogue assets"
