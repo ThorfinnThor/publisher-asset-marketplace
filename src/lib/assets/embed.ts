@@ -2,6 +2,9 @@ import { normalizePublicHttpsUrl } from "../submissions/validate";
 
 type EmbedRights = {
   embed_allowed?: boolean | null;
+  marketplace_rendered_embed_allowed?: boolean | null;
+  embed_provenance?: "source_hosted" | "marketplace_rendered" | null;
+  embed_review_version?: string | null;
   attribution_required?: boolean | null;
 };
 
@@ -47,12 +50,18 @@ export function isSourceHostedEmbed(
 
 export function canCopyEmbed(asset: EmbedAsset): boolean {
   const rights = parseEmbedRights(asset.rights_json);
-  return (
-    (asset.rights_status === "safe" || asset.rights_status === "restricted") &&
+  const marketplaceRendered =
+    rights.marketplace_rendered_embed_allowed === true &&
+    rights.embed_provenance === "marketplace_rendered" &&
+    isReviewedEmbed(asset.embed_url, asset.embed_origin ?? null);
+  const sourceHosted =
     rights.embed_allowed === true &&
     (asset.embed_origin
       ? isReviewedEmbed(asset.embed_url, asset.embed_origin)
-      : isSourceHostedEmbed(asset.embed_url, asset.source_base_url)) &&
+      : isSourceHostedEmbed(asset.embed_url, asset.source_base_url));
+  return (
+    (asset.rights_status === "safe" || asset.rights_status === "restricted") &&
+    (marketplaceRendered || sourceHosted) &&
     (asset.source_id !== null ||
       (rights.attribution_required === true && hasReviewedCreatorAttribution(asset)))
   );
@@ -60,7 +69,10 @@ export function canCopyEmbed(asset: EmbedAsset): boolean {
 
 export function buildEmbedMarkup(asset: EmbedAsset): string {
   if (!canCopyEmbed(asset) || !asset.embed_url) return "";
-  const iframe = `<iframe src="${escapeAttribute(asset.embed_url)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts" style="${MARKETPLACE_IFRAME_STYLE}"></iframe>`;
+  const rights = parseEmbedRights(asset.rights_json);
+  const sandbox =
+    rights.embed_provenance === "marketplace_rendered" ? 'sandbox=""' : 'sandbox="allow-scripts"';
+  const iframe = `<iframe src="${escapeAttribute(asset.embed_url)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" ${sandbox} style="${MARKETPLACE_IFRAME_STYLE}"></iframe>`;
   if (asset.source_id !== null) return iframe;
 
   return `<figure>${iframe}<figcaption>Source: <a href="${escapeAttribute(asset.attribution_url ?? "")}">${escapeText(asset.attribution_name ?? "")}</a></figcaption></figure>`;

@@ -12,6 +12,10 @@ export type RightsReviewManifestAsset = {
   manual_review_completed: boolean;
   embed_available: boolean;
   citation_only_allowed: boolean;
+  marketplace_rendered_embed_allowed?: boolean;
+  marketplace_embed_url?: string;
+  marketplace_embed_origin?: string;
+  embed_review_version?: string;
   chart_reuse_prohibited: boolean;
   evidence_conflict: boolean;
   evidence_url: string;
@@ -37,6 +41,8 @@ export type RightsReviewAssetRow = {
   citation_text: string | null;
   attribution_name?: string | null;
   attribution_url?: string | null;
+  embed_url?: string | null;
+  embed_origin?: string | null;
   rights_status: RightsStatus;
   status: "draft" | "review" | "published" | "hidden";
   metadata_json: string | null;
@@ -54,6 +60,8 @@ export type RightsReviewUpdate = {
   citation_text: string | null;
   attribution_name: string | null;
   attribution_url: string | null;
+  embed_url: string | null;
+  embed_origin: string | null;
   status: RightsReviewAssetRow["status"];
   updated_at: string;
   review: {
@@ -180,6 +188,31 @@ function parseManifestAsset(value: unknown): RightsReviewManifestAsset {
       throw new Error(`Rights review attribution_url must use HTTPS for ${slug}`);
     }
   }
+  const marketplaceRenderedEmbedAllowed =
+    value.marketplace_rendered_embed_allowed === undefined
+      ? false
+      : requiredBoolean(value, "marketplace_rendered_embed_allowed");
+  const marketplaceEmbedUrl = optionalString(value, "marketplace_embed_url");
+  const marketplaceEmbedOrigin = optionalString(value, "marketplace_embed_origin");
+  const embedReviewVersion = optionalString(value, "embed_review_version");
+  if (marketplaceRenderedEmbedAllowed) {
+    if (!marketplaceEmbedUrl || !marketplaceEmbedOrigin || !embedReviewVersion) {
+      throw new Error(`Marketplace embed review fields are incomplete for ${slug}`);
+    }
+    const parsedEmbed = new URL(marketplaceEmbedUrl);
+    const parsedOrigin = new URL(marketplaceEmbedOrigin);
+    if (parsedEmbed.protocol !== "https:" || parsedOrigin.protocol !== "https:") {
+      throw new Error(`Marketplace embed URLs must use HTTPS for ${slug}`);
+    }
+    if (parsedEmbed.origin !== parsedOrigin.origin) {
+      throw new Error(`Marketplace embed URL and origin differ for ${slug}`);
+    }
+    if (parsedEmbed.pathname !== `/embed/${slug}`) {
+      throw new Error(`Marketplace embed path must match the reviewed slug for ${slug}`);
+    }
+  } else if (marketplaceEmbedUrl || marketplaceEmbedOrigin || embedReviewVersion) {
+    throw new Error(`Marketplace embed fields require explicit approval for ${slug}`);
+  }
 
   return {
     slug,
@@ -192,6 +225,10 @@ function parseManifestAsset(value: unknown): RightsReviewManifestAsset {
     manual_review_completed: requiredBoolean(value, "manual_review_completed"),
     embed_available: embedAvailable,
     citation_only_allowed: citationOnlyAllowed,
+    marketplace_rendered_embed_allowed: marketplaceRenderedEmbedAllowed,
+    marketplace_embed_url: marketplaceEmbedUrl,
+    marketplace_embed_origin: marketplaceEmbedOrigin,
+    embed_review_version: embedReviewVersion,
     chart_reuse_prohibited: requiredBoolean(value, "chart_reuse_prohibited"),
     evidence_conflict: requiredBoolean(value, "evidence_conflict"),
     evidence_url: evidenceUrl,
@@ -300,6 +337,14 @@ export function prepareRightsReview(
       throw new Error(`Reviewed asset is hidden and cannot be published: ${review.slug}`);
     }
     const metadata = parseMetadata(row.metadata_json, row.slug);
+    if (
+      review.marketplace_rendered_embed_allowed &&
+      (metadata.source !== "eurostat" || !review.slug.startsWith("eurostat-"))
+    ) {
+      throw new Error(
+        `Marketplace-rendered embed review is limited to Eurostat assets: ${review.slug}`,
+      );
+    }
     const previousEvidence = metadata.rights_evidence as unknown as RightsEvidence;
     if (!Array.isArray(previousEvidence.indicator_evidence)) {
       throw new Error(`Asset ${review.slug} has no indicator rights evidence`);
@@ -336,6 +381,9 @@ export function prepareRightsReview(
       manual_review_completed: review.manual_review_completed,
       embed_available: review.embed_available,
       citation_only_allowed: review.citation_only_allowed,
+      marketplace_rendered_embed_allowed: review.marketplace_rendered_embed_allowed,
+      embed_provenance: review.marketplace_rendered_embed_allowed ? "marketplace_rendered" : null,
+      embed_review_version: review.embed_review_version ?? null,
       chart_reuse_prohibited: review.chart_reuse_prohibited,
       evidence_conflict: review.evidence_conflict,
       citation_available: Boolean((review.citation_text ?? row.citation_text)?.trim()),
@@ -369,6 +417,12 @@ export function prepareRightsReview(
       citation_text: review.citation_text ?? row.citation_text,
       attribution_name: review.attribution_name ?? row.attribution_name ?? null,
       attribution_url: review.attribution_url ?? row.attribution_url ?? null,
+      embed_url: review.marketplace_rendered_embed_allowed
+        ? (review.marketplace_embed_url ?? null)
+        : (row.embed_url ?? null),
+      embed_origin: review.marketplace_rendered_embed_allowed
+        ? (review.marketplace_embed_origin ?? null)
+        : (row.embed_origin ?? null),
       status: nextStatus,
       updated_at: manifest.reviewed_at,
       review: {
@@ -401,7 +455,7 @@ function sqlLiteral(value: unknown): string {
 
 export function buildRightsReviewSql(plan: RightsReviewPlan): string {
   const statements = plan.updates.flatMap((update) => [
-    `UPDATE assets SET license_code = ${sqlLiteral(update.license_code)}, rights_status = ${sqlLiteral(update.rights_status)}, rights_json = ${sqlLiteral(update.rights_json)}, metadata_json = ${sqlLiteral(update.metadata_json)}, citation_text = ${sqlLiteral(update.citation_text)}, attribution_name = ${sqlLiteral(update.attribution_name)}, attribution_url = ${sqlLiteral(update.attribution_url)}, status = ${sqlLiteral(update.status)}, updated_at = ${sqlLiteral(update.updated_at)} WHERE id = ${sqlLiteral(update.asset_id)} AND slug = ${sqlLiteral(update.slug)} AND canonical_url = ${sqlLiteral(update.canonical_url)};`,
+    `UPDATE assets SET license_code = ${sqlLiteral(update.license_code)}, rights_status = ${sqlLiteral(update.rights_status)}, rights_json = ${sqlLiteral(update.rights_json)}, metadata_json = ${sqlLiteral(update.metadata_json)}, citation_text = ${sqlLiteral(update.citation_text)}, attribution_name = ${sqlLiteral(update.attribution_name)}, attribution_url = ${sqlLiteral(update.attribution_url)}, embed_url = ${sqlLiteral(update.embed_url)}, embed_origin = ${sqlLiteral(update.embed_origin)}, status = ${sqlLiteral(update.status)}, updated_at = ${sqlLiteral(update.updated_at)} WHERE id = ${sqlLiteral(update.asset_id)} AND slug = ${sqlLiteral(update.slug)} AND canonical_url = ${sqlLiteral(update.canonical_url)};`,
     `INSERT OR IGNORE INTO rights_reviews (id, asset_id, decision, reason_code, notes, evidence_url, reviewed_by, created_at) VALUES (${sqlLiteral(update.review.id)}, ${sqlLiteral(update.asset_id)}, ${sqlLiteral(update.rights_status)}, ${sqlLiteral(update.reason_code)}, ${sqlLiteral(update.review.notes)}, ${sqlLiteral(update.review.evidence_url)}, NULL, ${sqlLiteral(update.review.created_at)});`,
   ]);
   return `${statements.join("\n\n")}\n`;
@@ -410,7 +464,7 @@ export function buildRightsReviewSql(plan: RightsReviewPlan): string {
 export function buildRightsReviewQueries(plan: RightsReviewPlan): RightsReviewQuery[] {
   return plan.updates.flatMap((update) => [
     {
-      sql: `UPDATE assets SET license_code = ?, rights_status = ?, rights_json = ?, metadata_json = ?, citation_text = ?, attribution_name = ?, attribution_url = ?, status = ?, updated_at = ? WHERE id = ? AND slug = ? AND canonical_url = ?`,
+      sql: `UPDATE assets SET license_code = ?, rights_status = ?, rights_json = ?, metadata_json = ?, citation_text = ?, attribution_name = ?, attribution_url = ?, embed_url = ?, embed_origin = ?, status = ?, updated_at = ? WHERE id = ? AND slug = ? AND canonical_url = ?`,
       params: [
         update.license_code,
         update.rights_status,
@@ -419,6 +473,8 @@ export function buildRightsReviewQueries(plan: RightsReviewPlan): RightsReviewQu
         update.citation_text,
         update.attribution_name,
         update.attribution_url,
+        update.embed_url,
+        update.embed_origin,
         update.status,
         update.updated_at,
         update.asset_id,

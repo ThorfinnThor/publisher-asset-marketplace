@@ -6,7 +6,7 @@ import { AssetAnalyticsBeacon, TrackedSourceLink } from "@/components/analytics-
 import { ArrowUpRightIcon, ChartPreview, RightsBadge } from "@/components/design-system";
 import { CopyCitationButton } from "@/components/copy-citation-button";
 import { CopyEmbedButton } from "@/components/copy-embed-button";
-import { buildEmbedMarkup, canCopyEmbed } from "@/lib/assets/embed";
+import { buildEmbedMarkup, canCopyEmbed, parseEmbedRights } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import {
@@ -25,6 +25,8 @@ type AssetPageProps = {
 
 type AssetRights = {
   embed_allowed?: boolean | null;
+  marketplace_rendered_embed_allowed?: boolean | null;
+  embed_provenance?: "source_hosted" | "marketplace_rendered" | null;
   commercial_use?: boolean | null;
   modification_allowed?: boolean | null;
   citation_required?: boolean | null;
@@ -59,6 +61,10 @@ export default async function AssetPage({ params }: AssetPageProps) {
   const normalizedPreview = normalizePublicHttpsUrl(asset.preview_url);
   const previewUrl = normalizedPreview.ok ? normalizedPreview.value : null;
   const eurostatSample = parseEurostatSample(asset.metadata_json);
+  const embedRights = parseEmbedRights(asset.rights_json);
+  const marketplaceEmbed =
+    embedRights.embed_provenance === "marketplace_rendered" &&
+    embedRights.marketplace_rendered_embed_allowed === true;
 
   return (
     <main className="asset-detail page-shell">
@@ -173,7 +179,10 @@ export default async function AssetPage({ params }: AssetPageProps) {
             </RightsBadge>
           </div>
           <dl className="rights-table">
-            <PermissionRow label="Chart / embed use" value={rights.embed_allowed} />
+            <PermissionRow label="Source-hosted embed use" value={rights.embed_allowed} />
+            {marketplaceEmbed ? (
+              <PermissionRow label="Marketplace-rendered embed" value={true} />
+            ) : null}
             <PermissionRow label="Commercial use" value={rights.commercial_use} />
             <PermissionRow label="Modification" value={rights.modification_allowed} />
             <PermissionRow label="Attribution" value={rights.attribution_required} />
@@ -232,7 +241,9 @@ export default async function AssetPage({ params }: AssetPageProps) {
           <section className="detail-panel detail-panel--compact" aria-labelledby="embed-heading">
             <div className="detail-panel__heading">
               <div>
-                <p className="eyebrow">Source-hosted only</p>
+                <p className="eyebrow">
+                  {marketplaceEmbed ? "Marketplace-rendered embed" : "Source-hosted only"}
+                </p>
                 <h2 id="embed-heading">Embed instructions</h2>
               </div>
               <CopyEmbedButton
@@ -250,7 +261,9 @@ export default async function AssetPage({ params }: AssetPageProps) {
             <p className="detail-supporting-text">
               {asset.source_id === null
                 ? "Creator embeds include visible reviewed source attribution. The exact markup shown above is copied."
-                : "Embeds stay hosted by the source; this marketplace does not proxy or republish the underlying chart."}
+                : marketplaceEmbed
+                  ? "This iframe is rendered by Publisher Asset Marketplace from the reviewed Eurostat sample. It is not an official Eurostat embed."
+                  : "Embeds stay hosted by the source; this marketplace does not proxy or republish the underlying chart."}
             </p>
           </section>
         </div>

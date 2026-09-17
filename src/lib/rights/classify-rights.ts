@@ -26,6 +26,9 @@ export type RightsEvidence = {
   chart_license_explicit: boolean;
   manual_review_completed: boolean;
   embed_available: TriState;
+  marketplace_rendered_embed_allowed?: TriState;
+  embed_provenance?: "source_hosted" | "marketplace_rendered" | null;
+  embed_review_version?: string | null;
   citation_only_allowed?: boolean;
   chart_reuse_prohibited: TriState;
   evidence_conflict: boolean;
@@ -273,7 +276,7 @@ function rightsFor(
       : evidence.embed_available === null
         ? null
         : evidence.embed_available;
-  return {
+  const rights: AssetRights = {
     embed_allowed: embedAllowed,
     commercial_use: permissions.commercial_use,
     modification_allowed: permissions.modification_allowed,
@@ -284,6 +287,12 @@ function rightsFor(
     evidence_url: evidence.evidence_url,
     evidence_checked_at: evidence.evidence_checked_at,
   };
+  if (evidence.marketplace_rendered_embed_allowed !== undefined) {
+    rights.marketplace_rendered_embed_allowed = evidence.marketplace_rendered_embed_allowed;
+    rights.embed_provenance = evidence.embed_provenance ?? null;
+    rights.embed_review_version = evidence.embed_review_version ?? null;
+  }
+  return rights;
 }
 
 function actionPermissions(

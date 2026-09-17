@@ -70,6 +70,35 @@ describe("C5 source-hosted embed", () => {
     expect(markup).not.toContain("rel=");
   });
 
+  it("permits a reviewed marketplace-rendered embed without granting source embed rights", () => {
+    const eurostatAsset = {
+      ...safeAsset,
+      embed_url: "https://publisher-asset-marketplace.shuu9599.workers.dev/embed/eurostat-tps00001",
+      embed_origin: "https://publisher-asset-marketplace.shuu9599.workers.dev",
+      source_id: "source_eurostat",
+      source_base_url: "https://ec.europa.eu/eurostat",
+      rights_json: JSON.stringify({
+        embed_allowed: false,
+        marketplace_rendered_embed_allowed: true,
+        embed_provenance: "marketplace_rendered",
+        attribution_required: true,
+      }),
+    };
+    expect(canCopyEmbed(eurostatAsset)).toBe(true);
+    expect(buildEmbedMarkup(eurostatAsset)).toContain('sandbox=""');
+    expect(buildEmbedMarkup(eurostatAsset)).not.toContain("allow-scripts");
+    expect(
+      canCopyEmbed({
+        ...eurostatAsset,
+        rights_json: JSON.stringify({
+          embed_allowed: false,
+          marketplace_rendered_embed_allowed: true,
+          embed_provenance: "source_hosted",
+        }),
+      }),
+    ).toBe(false);
+  });
+
   it("fails closed without reviewed brand attribution and escapes visible anchor text", () => {
     const creatorAsset = {
       ...safeAsset,

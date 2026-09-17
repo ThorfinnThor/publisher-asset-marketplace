@@ -38,6 +38,9 @@ export type RightsReasonCode =
 
 export type AssetRights = {
   embed_allowed: TriState;
+  marketplace_rendered_embed_allowed?: TriState;
+  embed_provenance?: "source_hosted" | "marketplace_rendered" | null;
+  embed_review_version?: string | null;
   commercial_use: TriState;
   modification_allowed: TriState;
   citation_required: TriState;

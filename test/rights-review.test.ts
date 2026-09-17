@@ -110,6 +110,21 @@ describe("rights evidence review", () => {
     expect(plan.updates.every((update) => update.license_code === "EU_COMMISSION_REUSE_2011")).toBe(
       true,
     );
+    expect(
+      plan.updates.every((update) => update.embed_url?.includes("/embed/eurostat-") === true),
+    ).toBe(true);
+    expect(
+      plan.updates.every(
+        (update) =>
+          update.embed_origin === "https://publisher-asset-marketplace.shuu9599.workers.dev",
+      ),
+    ).toBe(true);
+    expect(JSON.parse(plan.updates[0]!.rights_json)).toMatchObject({
+      embed_allowed: false,
+      marketplace_rendered_embed_allowed: true,
+      embed_provenance: "marketplace_rendered",
+      embed_review_version: "eurostat-pilot-marketplace-embed-v1",
+    });
   });
 
   it("parses ten unique, asset-specific OWID decisions", () => {
@@ -189,6 +204,40 @@ describe("rights evidence review", () => {
     );
     expect(() => prepareRightsReview(unchangedRows, changedManifest)).toThrow(
       "Raw-data decision mismatch",
+    );
+  });
+
+  it("does not allow the marketplace embed exception on a non-Eurostat record", () => {
+    const manifest = parseRightsReviewManifest(eurostatManifestJson);
+    const rows = manifest.assets.map((asset) =>
+      row(asset.slug, asset.expected_raw_data_redistribution, {
+        id: `asset_${asset.slug}`,
+        slug: asset.slug,
+        canonical_url: asset.canonical_url,
+        metadata_json: JSON.stringify({
+          source: "owid",
+          rights_evidence: {
+            chart_owner: "third_party",
+            chart_license_code: null,
+            chart_license_raw: null,
+            chart_license_url: null,
+            chart_license_explicit: false,
+            manual_review_completed: false,
+            embed_available: null,
+            citation_only_allowed: true,
+            chart_reuse_prohibited: null,
+            evidence_conflict: false,
+            citation_available: true,
+            indicator_evidence: [],
+            evidence_url: asset.canonical_url,
+            evidence_checked_at: "2026-09-17T00:00:00.000Z",
+          },
+        }),
+      }),
+    );
+
+    expect(() => prepareRightsReview(rows, manifest)).toThrow(
+      "Marketplace-rendered embed review is limited to Eurostat assets",
     );
   });
 });

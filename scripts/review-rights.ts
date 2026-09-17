@@ -43,7 +43,7 @@ async function readAssets(
   if (!/^source_[a-z0-9_]+$/.test(sourceId)) {
     throw new Error("Source id contains unsupported characters");
   }
-  const query = `SELECT id, slug, canonical_url, citation_text, attribution_name, attribution_url, rights_status, status, metadata_json
+  const query = `SELECT id, slug, canonical_url, citation_text, attribution_name, attribution_url, embed_url, embed_origin, rights_status, status, metadata_json
     FROM assets
     WHERE source_id = '${sourceId}'
     ORDER BY slug`;

@@ -10,7 +10,12 @@ import { consumeUrlScanResults } from "./url-scan-results";
 
 const worker = {
   fetch(request: Request, env: Env, context: ExecutionContext): Promise<Response> {
-    return handler.fetch(request, env, context).then(withSecurityHeaders);
+    const pathname = new URL(request.url).pathname;
+    return handler.fetch(request, env, context).then((response: Response) =>
+      withSecurityHeaders(response, {
+        allowEmbedding: response.ok && pathname.startsWith("/embed/eurostat-"),
+      }),
+    );
   },
   async scheduled(
     controller: ScheduledController,

@@ -35,6 +35,26 @@ const checks: SmokeCheck[] = [
     includes: ["Copy citation", "Copy embed", "Commercial use"],
   },
   {
+    path: "/embed/eurostat-tps00001",
+    expectedStatus: 200,
+    includes: [
+      "Reviewed Eurostat observations",
+      "Source: Eurostat",
+      "Custom EU27 selection from 2020",
+      "not an official Eurostat embed",
+    ],
+  },
+  {
+    path: "/embed/eurostat-nama_10_gdp",
+    expectedStatus: 200,
+    includes: ["Reviewed Eurostat observations", "Source: Eurostat"],
+  },
+  {
+    path: "/embed/eurostat-une_rt_a",
+    expectedStatus: 200,
+    includes: ["Reviewed Eurostat observations", "Source: Eurostat"],
+  },
+  {
     path: "/asset/children-not-in-school",
     expectedStatus: 404,
     includes: ["Not found"],
@@ -90,6 +110,15 @@ async function run(): Promise<void> {
     }
     for (const unexpected of check.excludes ?? []) {
       if (body.includes(unexpected)) failures.push(`${check.path}: unexpected text ${unexpected}`);
+    }
+    if (check.path.startsWith("/embed/eurostat-")) {
+      if (response.headers.get("x-frame-options") !== null) {
+        failures.push(`${check.path}: embed must not send x-frame-options`);
+      }
+      const csp = response.headers.get("content-security-policy") ?? "";
+      if (!csp.includes("frame-ancestors *") || !csp.includes("script-src 'none'")) {
+        failures.push(`${check.path}: isolated embed CSP is incomplete`);
+      }
     }
     if (check.path === "/" && response.headers.get("x-frame-options") !== "DENY") {
       failures.push("/: missing x-frame-options=DENY");

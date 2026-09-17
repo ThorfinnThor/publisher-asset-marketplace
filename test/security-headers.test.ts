@@ -14,4 +14,13 @@ describe("production security headers", () => {
     expect(response.headers.get("strict-transport-security")).toContain("max-age=31536000");
     expect(await response.text()).toBe("ok");
   });
+
+  it("allows only the isolated marketplace embed response to be framed", () => {
+    const response = withSecurityHeaders(new Response("embed"), { allowEmbedding: true });
+    expect(response.headers.get("x-frame-options")).toBeNull();
+    expect(response.headers.get("cross-origin-resource-policy")).toBe("cross-origin");
+    expect(response.headers.get("cache-control")).toContain("max-age=300");
+    expect(response.headers.get("content-security-policy")).toContain("frame-ancestors *");
+    expect(response.headers.get("content-security-policy")).toContain("script-src 'none'");
+  });
 });
