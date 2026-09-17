@@ -1,6 +1,6 @@
 # F3 source connector contract
 
-Status: **World Bank F4 implemented; Eurostat F3 approved; no Eurostat production records onboarded**
+Status: **World Bank F4 implemented; Eurostat F4 implemented; no Eurostat production records onboarded**
 
 Design owner: **SOL**  
 Implementation owner: **LUNA (F4)**
@@ -322,5 +322,15 @@ LUNA may implement the parser after encoding these checks:
 9. production import remains an explicit separate command after item-level
    rights review.
 
-No Eurostat production records may be imported by F3. The next task is the
-LUNA-owned F4 parser, fixtures, migration row, CLI dry-run, and refresh adapter.
+The LUNA-owned F4 implementation is in `src/lib/ingest/eurostat-source-client.ts`,
+with import and refresh adapters, three reviewed JSON-stat fixtures, migration
+`0018_eurostat_source.sql`, and the dry-run command:
+
+```text
+npm run ingest:eurostat
+```
+
+The command defaults to all three pilot datasets and performs no database write.
+Database writes require both `--apply` and `--reviewed-rights`, plus an explicit
+`--local` or `--remote` target. No Eurostat production records may be imported
+until the SOL-owned item-level rights review is complete.

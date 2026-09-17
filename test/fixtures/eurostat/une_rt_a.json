@@ -1,0 +1,35 @@
+{
+  "version": "2.0",
+  "class": "dataset",
+  "label": "Unemployment by sex and age",
+  "source": "Eurostat",
+  "updated": "2026-09-10T23:00:00+02:00",
+  "id": ["freq", "sex", "age", "geo", "time"],
+  "size": [1, 1, 1, 1, 3],
+  "dimension": {
+    "freq": {
+      "label": "Frequency",
+      "category": { "index": { "A": 0 }, "label": { "A": "Annual" } }
+    },
+    "sex": { "label": "Sex", "category": { "index": { "T": 0 }, "label": { "T": "Total" } } },
+    "age": {
+      "label": "Age",
+      "category": { "index": { "Y15-74": 0 }, "label": { "Y15-74": "From 15 to 74 years" } }
+    },
+    "geo": {
+      "label": "Geopolitical entity",
+      "category": {
+        "index": { "EU27_2020": 0 },
+        "label": { "EU27_2020": "European Union - 27 countries (from 2020)" }
+      }
+    },
+    "time": {
+      "label": "Time",
+      "category": {
+        "index": { "2020": 0, "2021": 1, "2022": 2 },
+        "label": { "2020": "2020", "2021": "2021", "2022": "2022" }
+      }
+    }
+  },
+  "value": [7.2, 7.1, 6.2]
+}
