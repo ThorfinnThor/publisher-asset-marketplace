@@ -62,6 +62,7 @@ jobs:
           npm run rights:review --
           --source source_eurostat
           --manifest /tmp/eurostat-catalog-rights.json
+          --manifest-only
           --remote --apply
           ${{ inputs.publish && '--publish' || '' }}
         env:

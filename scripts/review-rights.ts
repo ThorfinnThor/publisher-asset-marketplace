@@ -33,35 +33,48 @@ function rowsFromWrangler(value: unknown): RightsReviewAssetRow[] {
 
 async function runWrangler(args: string[]): Promise<{ stdout: string; stderr: string }> {
   const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-  return execFileAsync(npx, ["wrangler", ...args], { maxBuffer: 20 * 1024 * 1024 });
+  return execFileAsync(npx, ["wrangler", ...args], { maxBuffer: 128 * 1024 * 1024 });
 }
 
 async function readAssets(
   target: "local" | "remote",
   sourceId: string,
+  slugs?: string[],
 ): Promise<RightsReviewAssetRow[]> {
   if (!/^source_[a-z0-9_]+$/.test(sourceId)) {
     throw new Error("Source id contains unsupported characters");
   }
-  const query = `SELECT id, slug, canonical_url, citation_text, attribution_name, attribution_url, embed_url, embed_origin, rights_status, status, metadata_json
-    FROM assets
-    WHERE source_id = '${sourceId}'
-    ORDER BY slug`;
-  const { stdout, stderr } = await runWrangler([
-    "d1",
-    "execute",
-    "DB",
-    `--${target}`,
-    "--command",
-    query,
-    "--config",
-    "wrangler.jsonc",
-    "--json",
-  ]);
-  if (stderr.trim() !== "") {
-    process.stderr.write(stderr);
+  const slugBatches: (string[] | undefined)[] = [];
+  if (!slugs || slugs.length === 0) slugBatches.push(undefined);
+  else {
+    for (let index = 0; index < slugs.length; index += 500) {
+      slugBatches.push(slugs.slice(index, index + 500));
+    }
   }
-  return rowsFromWrangler(JSON.parse(stdout));
+  const rows: RightsReviewAssetRow[] = [];
+  for (const slugBatch of slugBatches) {
+    const slugFilter = slugBatch
+      ? ` AND slug IN (${slugBatch.map((slug) => `'${slug.replaceAll("'", "''")}'`).join(", ")})`
+      : "";
+    const query = `SELECT id, slug, canonical_url, citation_text, attribution_name, attribution_url, embed_url, embed_origin, rights_status, status, metadata_json
+      FROM assets
+      WHERE source_id = '${sourceId}'${slugFilter}
+      ORDER BY slug`;
+    const { stdout, stderr } = await runWrangler([
+      "d1",
+      "execute",
+      "DB",
+      `--${target}`,
+      "--command",
+      query,
+      "--config",
+      "wrangler.jsonc",
+      "--json",
+    ]);
+    if (stderr.trim() !== "") process.stderr.write(stderr);
+    rows.push(...rowsFromWrangler(JSON.parse(stdout)));
+  }
+  return rows;
 }
 
 async function applySql(sqlPath: string, target: "local" | "remote"): Promise<void> {
@@ -90,6 +103,7 @@ async function main(): Promise<void> {
   const remote = args.includes("--remote");
   const apply = args.includes("--apply");
   const publish = args.includes("--publish");
+  const manifestOnly = args.includes("--manifest-only");
   if (local && remote) {
     throw new Error("Choose only one target: --local or --remote");
   }
@@ -101,7 +115,10 @@ async function main(): Promise<void> {
   const manifestPath = resolve(optionValue(args, "--manifest") ?? defaultManifest);
   const sqlOutput = optionValue(args, "--sql-out");
   const manifest = parseRightsReviewManifest(JSON.parse(await readFile(manifestPath, "utf8")));
-  const plan = prepareRightsReview(await readAssets(target, sourceId), manifest, { publish });
+  const manifestSlugs = manifestOnly ? manifest.assets.map((asset) => asset.slug) : undefined;
+  const plan = prepareRightsReview(await readAssets(target, sourceId, manifestSlugs), manifest, {
+    publish,
+  });
   const sql = buildRightsReviewSql(plan);
 
   let tempDirectory: string | undefined;
