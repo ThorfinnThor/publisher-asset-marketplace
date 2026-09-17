@@ -140,6 +140,13 @@ function metadataParts(metadataJson: Record<string, unknown> | null): {
   indicatorCount: number;
   nextUpdates: string[];
   evidence: Record<string, unknown> | null;
+  creatorEvidence: {
+    evidenceUrl: string;
+    reviewedAt: string;
+    reviewedBy: string;
+    reasonCode: string;
+    authorizationVersion: number;
+  } | null;
 } {
   const metadata = isRecord(metadataJson?.metadata) ? metadataJson.metadata : null;
   const chart = isRecord(metadata?.chart) ? metadata.chart : null;
@@ -157,7 +164,31 @@ function metadataParts(metadataJson: Record<string, unknown> | null): {
     .filter(nonEmptyString)
     .filter((value) => validDate(value));
   const evidence = isRecord(metadataJson?.rights_evidence) ? metadataJson.rights_evidence : null;
-  return { chartTitle, description, indicatorCount: indicators.length, nextUpdates, evidence };
+  const creatorEvidence =
+    metadataJson?.source === "creator_submission" &&
+    nonEmptyString(metadataJson.rights_evidence_url) &&
+    validDate(typeof metadataJson.reviewed_at === "string" ? metadataJson.reviewed_at : null) &&
+    nonEmptyString(metadataJson.reviewed_by) &&
+    nonEmptyString(metadataJson.rights_reason_code) &&
+    typeof metadataJson.authorization_version === "number" &&
+    Number.isInteger(metadataJson.authorization_version) &&
+    metadataJson.authorization_version >= 2
+      ? {
+          evidenceUrl: metadataJson.rights_evidence_url,
+          reviewedAt: metadataJson.reviewed_at as string,
+          reviewedBy: metadataJson.reviewed_by,
+          reasonCode: metadataJson.rights_reason_code,
+          authorizationVersion: metadataJson.authorization_version,
+        }
+      : null;
+  return {
+    chartTitle,
+    description,
+    indicatorCount: indicators.length,
+    nextUpdates,
+    evidence,
+    creatorEvidence,
+  };
 }
 
 function sourceIsStale(
@@ -233,8 +264,9 @@ function auditAsset(
   const evidenceUrl = metadata.evidence?.evidence_url;
   const evidenceCheckedAt = metadata.evidence?.evidence_checked_at;
   const hasEvidence =
-    nonEmptyString(evidenceUrl) &&
-    validDate(typeof evidenceCheckedAt === "string" ? evidenceCheckedAt : null);
+    (nonEmptyString(evidenceUrl) &&
+      validDate(typeof evidenceCheckedAt === "string" ? evidenceCheckedAt : null)) ||
+    metadata.creatorEvidence !== null;
   if (!hasEvidence) {
     add("missing_rights_evidence", "error", "Rights evidence URL or audit date is missing.");
   }
@@ -242,11 +274,14 @@ function auditAsset(
   if (asset.rights_status === "safe" || asset.rights_status === "restricted") {
     const chartOwner = metadata.evidence?.chart_owner;
     const explicitLicense = metadata.evidence?.chart_license_explicit === true;
-    if ((chartOwner !== "owid" && chartOwner !== "third_party") || !explicitLicense) {
+    if (
+      metadata.creatorEvidence === null &&
+      ((chartOwner !== "owid" && chartOwner !== "third_party") || !explicitLicense)
+    ) {
       add(
         "unverified_chart_evidence",
         "error",
-        "A public rights status requires a verified chart owner and explicit chart license.",
+        "A public rights status requires either verified chart-license evidence or a reviewed creator submission attestation.",
       );
     }
   }

@@ -142,6 +142,34 @@ describe("B6 import audit", () => {
     });
   });
 
+  it("accepts reviewed creator-attestation evidence without OWID-style license metadata", () => {
+    const creator = asset("creator-calculator", "restricted", {
+      status: "published",
+      metadata_json: JSON.stringify({
+        source: "creator_submission",
+        submission_id: "submission-1",
+        authorization_version: 4,
+        reviewed_by: "system:auto-publisher",
+        reviewed_at: auditedAt,
+        rights_evidence_url: "https://creator.example/terms",
+        rights_reason_code: "creator_attested_auto_publish",
+      }),
+      rights_json: JSON.stringify({
+        ...rights("restricted"),
+        embed_allowed: true,
+        commercial_use: true,
+        modification_allowed: false,
+        evidence_url: "https://creator.example/terms",
+        evidence_checked_at: auditedAt,
+      }),
+    });
+
+    const report = auditImportAssets([creator], { audited_at: auditedAt });
+
+    expect(report.gate_b).toEqual({ passed: true, reasons: [] });
+    expect(report.findings.filter((finding) => finding.severity === "error")).toEqual([]);
+  });
+
   it("fails rights invariants and quarantines malformed metadata for review", () => {
     const report = auditImportAssets(
       [
