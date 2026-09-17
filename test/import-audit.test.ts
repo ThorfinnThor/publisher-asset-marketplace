@@ -148,7 +148,7 @@ describe("B6 import audit", () => {
       metadata_json: JSON.stringify({
         source: "creator_submission",
         submission_id: "submission-1",
-        authorization_version: 4,
+        authorization_version: 1,
         reviewed_by: "system:auto-publisher",
         reviewed_at: auditedAt,
         rights_evidence_url: "https://creator.example/terms",

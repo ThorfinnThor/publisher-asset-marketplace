@@ -172,7 +172,7 @@ function metadataParts(metadataJson: Record<string, unknown> | null): {
     nonEmptyString(metadataJson.rights_reason_code) &&
     typeof metadataJson.authorization_version === "number" &&
     Number.isInteger(metadataJson.authorization_version) &&
-    metadataJson.authorization_version >= 2
+    metadataJson.authorization_version >= 1
       ? {
           evidenceUrl: metadataJson.rights_evidence_url,
           reviewedAt: metadataJson.reviewed_at as string,
