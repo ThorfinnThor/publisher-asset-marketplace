@@ -90,6 +90,12 @@ For these three reviewed slices, LUNA may set:
 these records. It does not block a citation-only dataset asset whose reviewed
 sample is rendered directly by the marketplace.
 
+This field refers to an official source-hosted iframe. A separate SOL review now
+permits a tightly controlled marketplace-rendered iframe for the same three data
+slices, subject to implementation and release gates. See
+[`eurostat-marketplace-embed-rights-review.md`](./eurostat-marketplace-embed-rights-review.md).
+Until those gates pass, the public embed action must remain disabled.
+
 ## Required public presentation
 
 Publishing is allowed only after the asset page renders the real retained

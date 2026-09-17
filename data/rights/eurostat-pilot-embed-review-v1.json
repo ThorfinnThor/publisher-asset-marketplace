@@ -1,0 +1,36 @@
+{
+  "review_version": "eurostat-pilot-marketplace-embed-v1",
+  "source_review_version": "eurostat-pilot-eu27-v1",
+  "reviewed_at": "2026-09-17T00:00:00.000Z",
+  "hosting_model": "marketplace_rendered",
+  "source_embed_available": false,
+  "required_disclaimer": "This is a customised presentation by Publisher Asset Marketplace, not an official Eurostat embed. Eurostat does not endorse and is not responsible for this customised presentation.",
+  "assets": [
+    {
+      "slug": "eurostat-tps00001",
+      "marketplace_rendered_embed_allowed": true,
+      "embed_path": "/embed/eurostat-tps00001"
+    },
+    {
+      "slug": "eurostat-nama_10_gdp",
+      "marketplace_rendered_embed_allowed": true,
+      "embed_path": "/embed/eurostat-nama_10_gdp"
+    },
+    {
+      "slug": "eurostat-une_rt_a",
+      "marketplace_rendered_embed_allowed": true,
+      "embed_path": "/embed/eurostat-une_rt_a"
+    }
+  ],
+  "required_controls": {
+    "attribution_inside_iframe": true,
+    "canonical_source_link_inside_iframe": true,
+    "selection_notice_inside_iframe": true,
+    "modification_disclosure_inside_iframe": true,
+    "non_liability_notice_inside_iframe": true,
+    "attribution_may_be_hidden": false,
+    "eurostat_brand_assets_allowed": false,
+    "publisher_html_allowed": false,
+    "third_party_scripts_allowed": false
+  }
+}

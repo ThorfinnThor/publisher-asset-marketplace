@@ -336,7 +336,10 @@ Database writes require both `--apply` and `--reviewed-rights`, plus an explicit
 
 The SOL-owned review in
 [`docs/eurostat-pilot-rights-review.md`](eurostat-pilot-rights-review.md)
-approves only the three fixed EU27 selections. The remaining LUNA release task
-must add the dedicated `EU_COMMISSION_REUSE_2011` rights code, render the real
-retained observations on public asset pages, encode the review manifest, and
-complete the production import and smoke test.
+approves only the three fixed EU27 selections. Those records are now imported,
+classified with `EU_COMMISSION_REUSE_2011`, and rendered with real retained
+observations. A second SOL review in
+[`docs/eurostat-marketplace-embed-rights-review.md`](eurostat-marketplace-embed-rights-review.md)
+permits marketplace-rendered iframe views for exactly those three records. The
+remaining LUNA task must implement the isolated embed route and keep the source
+iframe decision separate from the marketplace-rendered embed decision.
