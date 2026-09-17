@@ -307,7 +307,7 @@ export function selectEurostatCatalogueCandidates(
   const start = Math.max(0, Math.floor(options.start ?? 0));
   const limit = Math.max(0, Math.floor(options.limit ?? 1_500));
   const selected = [...entries]
-    .filter((entry) => entry.type === "table")
+    .filter((entry) => entry.type === "table" || entry.type === "dataset")
     .filter((entry) => DATASET_PATTERN.test(entry.code))
     .filter((entry) => !entry.code.startsWith("ds_"))
     .filter((entry) => !AUTOMATED_REVIEW_EXCLUSIONS.test(`${entry.code} ${entry.title}`))

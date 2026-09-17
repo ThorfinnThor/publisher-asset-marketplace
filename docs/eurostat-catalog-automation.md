@@ -6,7 +6,7 @@ when that many candidates pass the gates.
 
 ## Automated gates
 
-The workflow only considers catalogue entries of type `table`. It excludes
+The workflow considers catalogue entries of type `table` or `dataset`. It excludes
 catalogue categories that may contain third-party material or separate reuse
 conditions, including Comext, Prodcom, microdata, confidential material, logos,
 trademarks, photographs and images. Each candidate is then fetched through the

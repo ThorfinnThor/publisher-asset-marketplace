@@ -79,7 +79,7 @@ function buildAutomatedManifest(
     review_version: `eurostat-catalog-${reviewedAt.slice(0, 10)}`,
     reviewed_at: reviewedAt,
     review_scope:
-      "Automated Eurostat catalogue policy gate: English EU27_2020 observations from 2020 onward, statistical tables only, source and attribution retained, excluded catalogue categories filtered, and marketplace-rendered presentation used instead of an official iframe. This is an automated reuse screen, not a legal opinion; item-level notices remain authoritative.",
+      "Automated Eurostat catalogue policy gate: English EU27_2020 observations from 2020 onward, statistical table and dataset products, source and attribution retained, excluded catalogue categories filtered, and marketplace-rendered presentation used instead of an official iframe. This is an automated reuse screen, not a legal opinion; item-level notices remain authoritative.",
     assets: assets.map((asset) => ({
       slug: `eurostat-${asset.datasetCode}`,
       canonical_url: asset.normalized.canonicalUrl,
