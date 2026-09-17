@@ -24,6 +24,7 @@ describe("creator dashboard analytics", () => {
           slug: "solar",
           title: "Solar",
           asset_type: "chart",
+          preview_url: "https://example.test/solar.png",
           status: "published",
           impressions: "4",
           detail_views: 2,
@@ -45,6 +46,7 @@ describe("creator dashboard analytics", () => {
       embed_copies: 0,
       citation_copies: 1,
       source_clicks: 0,
+      preview_url: "https://example.test/solar.png",
       top_discovery_queries: [{ query: "solar pv", impressions: 5 }],
     });
   });
@@ -77,6 +79,7 @@ describe("creator dashboard analytics", () => {
               slug: "solar",
               title: "Solar",
               asset_type: "chart",
+              preview_url: "https://example.test/solar.png",
               status: "published",
               impressions: 1,
               detail_views: 1,

@@ -231,7 +231,7 @@ function filterSql(filters: SearchRequest["filters"]): { sql: string; bindings: 
     bindings.push(...filters.rights_statuses);
   }
   if (filters?.updated_since) {
-    clauses.push("a.source_updated_at >= ?");
+    clauses.push("COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) >= ?");
     bindings.push(filters.updated_since);
   }
   return { sql: clauses.join(" AND "), bindings };
@@ -242,7 +242,9 @@ export function buildPrimarySearchSql(filters: SearchRequest["filters"] = {}): s
   return `
     WITH ranked AS (
       SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
-        a.rights_status, a.rights_json, a.source_updated_at, a.canonical_url, a.embed_url, a.preview_url,
+        a.rights_status, a.rights_json,
+        COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
+        a.canonical_url, a.embed_url, a.preview_url,
         a.citation_text,
         ROW_NUMBER() OVER (ORDER BY bm25(assets_fts, 0.0, 10.0, 4.0, 6.0, 1.0), a.slug) AS bm25_rank
       FROM assets_fts
@@ -264,7 +266,9 @@ export function buildFallbackSearchSql(
   const placeholders = Array.from({ length: trigramCount }, () => "?").join(", ");
   return `
     SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
-      a.rights_status, a.rights_json, a.source_updated_at, a.canonical_url, a.embed_url, a.preview_url,
+      a.rights_status, a.rights_json,
+      COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
+      a.canonical_url, a.embed_url, a.preview_url,
       a.citation_text,
       COUNT(DISTINCT index_trigrams.trigram) AS shared_trigrams,
       (SELECT COUNT(*) FROM asset_search_trigrams all_trigrams WHERE all_trigrams.asset_id = a.id) AS asset_trigram_count

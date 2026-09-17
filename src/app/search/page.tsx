@@ -2,12 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SearchAnalyticsBeacon, TrackedSourceLink } from "@/components/analytics-components";
-import {
-  ArrowUpRightIcon,
-  ChartPreview,
-  RightsBadge,
-  SearchIcon,
-} from "@/components/design-system";
+import { AssetPreview } from "@/components/asset-preview";
+import { ArrowUpRightIcon, RightsBadge, SearchIcon } from "@/components/design-system";
 import { getDatabase } from "@/lib/db/client";
 import {
   assetTypeOptions,
@@ -243,7 +239,12 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
         className="asset-card__preview"
         href={`/asset/${asset.slug}`}
       >
-        <ChartPreview compact variant={previewVariant(asset.asset_type)} />
+        <AssetPreview
+          compact
+          previewUrl={asset.preview_url}
+          title={asset.title}
+          variant={previewVariant(asset.asset_type)}
+        />
       </Link>
       <div className="asset-card__body">
         <div className="asset-card__eyebrow">

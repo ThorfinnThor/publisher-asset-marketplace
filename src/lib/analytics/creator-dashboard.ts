@@ -10,6 +10,7 @@ type CreatorAssetSqlRow = {
   slug: string;
   title: string;
   asset_type: string;
+  preview_url: string | null;
   status: "published";
   impressions: number | string | null;
   detail_views: number | string | null;
@@ -34,6 +35,7 @@ export type CreatorAssetAnalytics = {
   slug: string;
   title: string;
   asset_type: string;
+  preview_url: string | null;
   status: "published";
   impressions: number;
   detail_views: number;
@@ -49,7 +51,7 @@ export type CreatorDashboardData = {
 };
 
 export const creatorAssetAnalyticsSql = `
-  SELECT a.id, a.slug, a.title, a.asset_type, a.status,
+  SELECT a.id, a.slug, a.title, a.asset_type, a.preview_url, a.status,
     SUM(CASE WHEN ae.event_type = 'impression' THEN 1 ELSE 0 END) AS impressions,
     SUM(CASE WHEN ae.event_type = 'detail_view' THEN 1 ELSE 0 END) AS detail_views,
     SUM(CASE WHEN ae.event_type = 'embed_copy' THEN 1 ELSE 0 END) AS embed_copies,
@@ -62,7 +64,7 @@ export const creatorAssetAnalyticsSql = `
     AND ae.created_at < ?
   WHERE a.creator_id = ?
     AND a.status = 'published'
-  GROUP BY a.id, a.slug, a.title, a.asset_type, a.status, a.updated_at
+  GROUP BY a.id, a.slug, a.title, a.asset_type, a.preview_url, a.status, a.updated_at
   ORDER BY a.updated_at DESC, a.slug ASC
   LIMIT ?
 `;
@@ -132,6 +134,7 @@ export function normalizeCreatorAssetAnalytics(
     slug: row.slug,
     title: row.title,
     asset_type: row.asset_type,
+    preview_url: row.preview_url,
     status: "published",
     impressions: asInteger(row.impressions),
     detail_views: asInteger(row.detail_views),

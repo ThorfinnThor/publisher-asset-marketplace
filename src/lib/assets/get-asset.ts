@@ -50,7 +50,7 @@ const detailSql = `
     a.attribution_name,
     a.attribution_url,
     a.attribution_terms,
-    a.source_updated_at,
+    COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
     a.last_checked_at,
     a.license_code,
     a.rights_status,
@@ -75,7 +75,7 @@ const relatedSql = `
     a.title,
     a.asset_type,
     COALESCE(s.name, a.attribution_name, '') AS source_name,
-    a.source_updated_at
+    COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at
   FROM assets a
   LEFT JOIN sources s ON s.id = a.source_id
   WHERE a.slug <> ?

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
 
+import { AssetPreview } from "@/components/asset-preview";
 import { currentCreatorTermsVersion } from "@/lib/submissions/creator-terms";
 
 type SubmissionInitialValues = {
@@ -31,6 +32,13 @@ type SubmissionResponse = {
     status: "pass" | "review";
     checks?: Array<{ status: "pass" | "review"; message: string }>;
   };
+};
+
+type PublishedAsset = {
+  assetType: string;
+  previewUrl: string;
+  slug: string;
+  title: string;
 };
 
 export function SubmissionRequirements() {
@@ -67,7 +75,10 @@ export function SubmissionRequirements() {
         <li>
           Public HTTPS attribution URL and clear terms, such as Credit Example Source — CC BY 4.0.
         </li>
-        <li>Accurate declarations for commercial use, embedding, modification, and citation.</li>
+        <li>
+          Commercial use and embedding must be allowed for publication. Modification and citation
+          requirements must be declared accurately.
+        </li>
         <li>Confirmation that you are authorized to submit the asset.</li>
         <li>
           Acknowledgement that the marketplace is commercially operated and may list and promote the
@@ -100,6 +111,7 @@ export function SubmissionForm({
   const [uploadingPreview, setUploadingPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(initialValues?.preview_url ?? "");
   const [embedTest, setEmbedTest] = useState<{ url: string; loaded: boolean } | null>(null);
+  const [publishedAsset, setPublishedAsset] = useState<PublishedAsset | null>(null);
 
   function testEmbed(event: MouseEvent<HTMLButtonElement>) {
     const field = event.currentTarget.form?.elements.namedItem("embed_url");
@@ -220,20 +232,71 @@ export function SubmissionForm({
         });
         return;
       }
+      const submittedTitle = String(data.get("title") ?? "Published asset").trim();
+      const submittedAssetType = String(data.get("asset_type") ?? "widget");
+      const submittedPreviewUrl = String(data.get("preview_url") ?? "").trim();
       form.reset();
       setPreviewUrl("");
       setEmbedTest(null);
-      setStatus({
-        tone: "success",
-        text: result?.auto_publish
-          ? `All automated checks passed. Your asset is now published${result.asset_slug ? ` at /asset/${result.asset_slug}` : ""}.`
-          : "The submission was saved but could not be published automatically.",
-      });
+      if (result?.auto_publish && result.asset_slug) {
+        setPublishedAsset({
+          assetType: submittedAssetType,
+          previewUrl: submittedPreviewUrl,
+          slug: result.asset_slug,
+          title: submittedTitle,
+        });
+        setStatus(null);
+      } else {
+        setStatus({
+          tone: "success",
+          text: "The submission was saved but could not be published automatically.",
+        });
+      }
     } catch {
       setStatus({ tone: "error", text: "The submission could not be reached. Please try again." });
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (publishedAsset) {
+    return (
+      <section className="submission-success" aria-labelledby="submission-success-heading">
+        <div className="submission-success__preview">
+          <AssetPreview
+            previewUrl={publishedAsset.previewUrl}
+            title={publishedAsset.title}
+            variant={previewVariant(publishedAsset.assetType)}
+          />
+        </div>
+        <div className="submission-success__body">
+          <span className="submission-success__mark" aria-hidden="true">
+            ✓
+          </span>
+          <p className="eyebrow">Published successfully</p>
+          <h2 id="submission-success-heading">Your asset is live.</h2>
+          <p>
+            All automated checks passed. Publishers can now find, preview and reuse{" "}
+            <strong>{publishedAsset.title}</strong>.
+          </p>
+          <div className="submission-success__actions">
+            <Link className="button button--primary" href={`/asset/${publishedAsset.slug}`}>
+              View published asset
+            </Link>
+            <Link className="button button--secondary" href="/creator/dashboard">
+              Open creator dashboard
+            </Link>
+            <button
+              className="button button--text"
+              onClick={() => setPublishedAsset(null)}
+              type="button"
+            >
+              Publish another asset
+            </button>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -474,20 +537,24 @@ export function SubmissionForm({
           <div>
             <h2 id="rights-declaration-heading">Usage rights</h2>
             <p>
-              Declare each condition separately. These declarations are used for automatic
-              publication.
+              Commercial use and embedding are required for this publisher marketplace. Modification
+              and citation remain your choice.
             </p>
           </div>
         </div>
         <fieldset className="rights-declaration">
           <legend className="sr-only">Declared usage rights</legend>
           <label>
-            <input name="commercial_use" type="checkbox" />
-            <span>Commercial use allowed</span>
+            <input name="commercial_use" required type="checkbox" />
+            <span>
+              Commercial use allowed <small>Required</small>
+            </span>
           </label>
           <label>
-            <input name="embed_allowed" type="checkbox" />
-            <span>Embedding allowed</span>
+            <input name="embed_allowed" required type="checkbox" />
+            <span>
+              Embedding allowed <small>Required</small>
+            </span>
           </label>
           <label>
             <input name="modification_allowed" type="checkbox" />
@@ -566,4 +633,10 @@ export function SubmissionForm({
       </div>
     </form>
   );
+}
+
+function previewVariant(assetType: string): "line" | "bars" | "steps" {
+  if (assetType === "calculator" || assetType === "benchmark") return "steps";
+  if (assetType === "dataset" || assetType === "table") return "bars";
+  return "line";
 }

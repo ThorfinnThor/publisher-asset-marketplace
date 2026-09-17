@@ -102,7 +102,7 @@ export function runSubmissionPreScreen(
           code: "declared_reuse",
           status: "review",
           message:
-            "Embedding or commercial use is not declared allowed; verify the intended restricted use.",
+            "Commercial use and embedding must both be allowed before an asset can be published in this marketplace.",
         },
     {
       code: "sandbox_compatibility",

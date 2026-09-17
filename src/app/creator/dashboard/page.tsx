@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 
+import { AssetPreview } from "@/components/asset-preview";
+import { DeleteCreatorAssetButton } from "@/components/delete-creator-asset-button";
 import {
   getCreatorDashboard,
   type CreatorAssetAnalytics,
   type CreatorDashboardData,
 } from "@/lib/analytics/creator-dashboard";
-import { getAuthenticatedProfile } from "@/lib/auth/github";
+import { csrfTokenForRequest, getAuthenticatedProfile } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +24,7 @@ type CreatorDashboardProps = {
 
 export default async function CreatorDashboardPage({ searchParams }: CreatorDashboardProps) {
   const params = await searchParams;
-  const profile = await loadProfile();
+  const { profile, csrfToken } = await loadAuthContext();
 
   if (!profile) {
     return (
@@ -88,7 +90,7 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
         <span className="profile-role">{profile.role}</span>
       </section>
 
-      <CreatorAnalyticsSection data={analytics} />
+      <CreatorAnalyticsSection csrfToken={csrfToken ?? ""} data={analytics} />
 
       <section className="dashboard-table" aria-labelledby="creator-next-heading">
         <div className="dashboard-table__heading">
@@ -119,7 +121,13 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
   );
 }
 
-function CreatorAnalyticsSection({ data }: { data: CreatorDashboardData | null }) {
+function CreatorAnalyticsSection({
+  csrfToken,
+  data,
+}: {
+  csrfToken: string;
+  data: CreatorDashboardData | null;
+}) {
   if (!data) {
     return (
       <div className="notice dashboard-notice" role="status">
@@ -152,7 +160,7 @@ function CreatorAnalyticsSection({ data }: { data: CreatorDashboardData | null }
       ) : (
         <div className="creator-assets-list">
           {data.assets.map((asset) => (
-            <CreatorAssetCard key={asset.id} asset={asset} />
+            <CreatorAssetCard key={asset.id} asset={asset} csrfToken={csrfToken} />
           ))}
         </div>
       )}
@@ -160,22 +168,45 @@ function CreatorAnalyticsSection({ data }: { data: CreatorDashboardData | null }
   );
 }
 
-function CreatorAssetCard({ asset }: { asset: CreatorAssetAnalytics }) {
+function CreatorAssetCard({
+  asset,
+  csrfToken,
+}: {
+  asset: CreatorAssetAnalytics;
+  csrfToken: string;
+}) {
   return (
     <article className="creator-asset-card">
       <header className="creator-asset-card__header">
-        <div>
-          <p className="eyebrow">
-            {asset.asset_type} · {asset.status}
-          </p>
-          <h3>
-            <a href={`/asset/${asset.slug}`}>{asset.title}</a>
-          </h3>
-          <p>/{asset.slug}</p>
+        <div className="creator-asset-card__summary">
+          <a
+            aria-label={`Preview ${asset.title}`}
+            className="creator-asset-card__preview"
+            href={`/asset/${asset.slug}`}
+          >
+            <AssetPreview
+              compact
+              previewUrl={asset.preview_url}
+              title={asset.title}
+              variant={previewVariant(asset.asset_type)}
+            />
+          </a>
+          <div>
+            <p className="eyebrow">
+              {asset.asset_type} · {asset.status}
+            </p>
+            <h3>
+              <a href={`/asset/${asset.slug}`}>{asset.title}</a>
+            </h3>
+            <p>/{asset.slug}</p>
+          </div>
         </div>
-        <a className="text-link" href={`/asset/${asset.slug}`}>
-          View asset
-        </a>
+        <div className="creator-asset-card__actions">
+          <a className="text-link" href={`/asset/${asset.slug}`}>
+            View asset
+          </a>
+          <DeleteCreatorAssetButton csrfToken={csrfToken} slug={asset.slug} title={asset.title} />
+        </div>
       </header>
       <div className="creator-asset-card__metrics" aria-label={`${asset.title} activity metrics`}>
         <Metric label="Search impressions" value={asset.impressions} />
@@ -223,15 +254,17 @@ function formatInteger(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-async function loadProfile() {
+async function loadAuthContext() {
   try {
     const requestHeaders = await headers();
-    return await getAuthenticatedProfile(
-      new Request("http://internal.invalid/", { headers: requestHeaders }),
-      getDatabase(),
-    );
+    const request = new Request("http://internal.invalid/", { headers: requestHeaders });
+    const [profile, csrfToken] = await Promise.all([
+      getAuthenticatedProfile(request, getDatabase()),
+      csrfTokenForRequest(request),
+    ]);
+    return { profile, csrfToken };
   } catch {
-    return null;
+    return { profile: null, csrfToken: null };
   }
 }
 
@@ -241,4 +274,10 @@ async function loadCreatorDashboard(creatorId: string): Promise<CreatorDashboard
   } catch {
     return null;
   }
+}
+
+function previewVariant(assetType: string): "line" | "bars" | "steps" {
+  if (assetType === "calculator" || assetType === "benchmark") return "steps";
+  if (assetType === "dataset" || assetType === "table") return "bars";
+  return "line";
 }
