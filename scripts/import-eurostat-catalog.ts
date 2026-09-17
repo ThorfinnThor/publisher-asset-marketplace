@@ -24,8 +24,8 @@ const DEFAULT_MARKETPLACE_ORIGIN = "https://publisher-asset-marketplace.shuu9599
 const DEFAULT_TARGET = 1_000;
 const DEFAULT_MAX_CANDIDATES = 1_500;
 const DEFAULT_BATCH_SIZE = 50;
-const DEFAULT_APPLY_BATCH_SIZE = 100;
-const MAX_D1_ASSET_SQL_BYTES = 800_000;
+const DEFAULT_APPLY_BATCH_SIZE = 25;
+const MAX_D1_ASSET_SQL_BYTES = 64_000;
 const AUTOMATED_REVIEW_VERSION = "eurostat-automated-policy-v1";
 const EMBED_REVIEW_VERSION = "eurostat-marketplace-embed-v2";
 const MAX_METABASE_DECOMPRESSED_BYTES = 64 * 1024 * 1024;
@@ -89,7 +89,7 @@ function isD1AssetSafe(asset: EurostatAssetFetch): boolean {
 async function fetchExistingEurostatCodes(): Promise<Set<string>> {
   const npx = process.platform === "win32" ? "npx.cmd" : "npx";
   const query =
-    "SELECT slug FROM assets WHERE source_id = 'source_eurostat' AND slug LIKE 'eurostat-%'";
+    "SELECT slug FROM assets WHERE source_id = 'source_eurostat' AND status = 'published' AND slug LIKE 'eurostat-%'";
   const { stdout, stderr } = await execFileAsync(
     npx,
     [
