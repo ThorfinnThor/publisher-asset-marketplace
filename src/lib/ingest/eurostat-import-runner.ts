@@ -180,6 +180,9 @@ export async function writeEurostatImport(
   return writeImport(db, plan, batchSize);
 }
 
-export function buildEurostatImportSql(plan: EurostatImportPlan): string {
-  return buildImportSql(plan);
+export function buildEurostatImportSql(
+  plan: EurostatImportPlan,
+  options: { rebuildSearchIndex?: boolean } = {},
+): string {
+  return buildImportSql(plan, options);
 }

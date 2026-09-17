@@ -24,6 +24,7 @@ const DEFAULT_MARKETPLACE_ORIGIN = "https://publisher-asset-marketplace.shuu9599
 const DEFAULT_TARGET = 1_000;
 const DEFAULT_MAX_CANDIDATES = 1_500;
 const DEFAULT_BATCH_SIZE = 50;
+const DEFAULT_APPLY_BATCH_SIZE = 100;
 const AUTOMATED_REVIEW_VERSION = "eurostat-automated-policy-v1";
 const EMBED_REVIEW_VERSION = "eurostat-marketplace-embed-v2";
 const MAX_METABASE_DECOMPRESSED_BYTES = 64 * 1024 * 1024;
@@ -205,6 +206,10 @@ async function main(): Promise<void> {
   const start = integerOption(args, "--start", 0);
   const maxCandidates = integerOption(args, "--max-candidates", DEFAULT_MAX_CANDIDATES);
   const batchSize = Math.max(1, integerOption(args, "--batch-size", DEFAULT_BATCH_SIZE));
+  const applyBatchSize = Math.max(
+    1,
+    integerOption(args, "--apply-batch-size", DEFAULT_APPLY_BATCH_SIZE),
+  );
   const manifestOutput = optionValue(args, "--manifest-out");
   const sqlOutput = optionValue(args, "--sql-out");
   const marketplaceOrigin = (process.env.MARKETPLACE_ORIGIN ?? DEFAULT_MARKETPLACE_ORIGIN).replace(
@@ -303,9 +308,30 @@ async function main(): Promise<void> {
     if (sqlPath) await writeFile(sqlPath, buildEurostatImportSql(plan), "utf8");
     if (apply) {
       tempDirectory = await mkdtemp(join(tmpdir(), "publisher-eurostat-catalog-"));
-      sqlPath ??= join(tempDirectory, "import.sql");
-      await writeFile(sqlPath, buildEurostatImportSql(plan), "utf8");
-      await applyWithWrangler(sqlPath, remote ? "remote" : "local");
+      const assetBatches = chunks(selected, applyBatchSize);
+      for (const [batchIndex, assetBatch] of assetBatches.entries()) {
+        const batchPlan = buildEurostatImportPlan(
+          assetBatch.map((asset) => asset.datasetCode),
+          { successful: assetBatch, failed: [] },
+        );
+        sqlPath = join(tempDirectory, `import-${batchIndex + 1}.sql`);
+        await writeFile(
+          sqlPath,
+          buildEurostatImportSql(batchPlan, {
+            rebuildSearchIndex: batchIndex === assetBatches.length - 1,
+          }),
+          "utf8",
+        );
+        await applyWithWrangler(sqlPath, remote ? "remote" : "local");
+        process.stdout.write(
+          `${JSON.stringify({
+            event: "eurostat_catalog_d1_batch",
+            batch: batchIndex + 1,
+            batches: assetBatches.length,
+            assets: assetBatch.length,
+          })}\n`,
+        );
+      }
       summary.databaseWritten = true;
     }
   } finally {
