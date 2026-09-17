@@ -302,7 +302,7 @@ async function main(): Promise<void> {
   const inputPath = args[0];
   if (!inputPath || !args.includes("--remote")) {
     throw new Error(
-      "Usage: npm run rights:owid-corpus -- <input.csv|json|txt> --remote [--start 0] [--limit 3000] [--batch-size 25] [--concurrency 8] [--apply --publish]",
+      "Usage: npm run rights:owid-corpus -- <input.csv|json|txt> --remote [--start 0] [--limit 3000] [--batch-size 25] [--concurrency 8] [--allow-empty] [--apply --publish]",
     );
   }
   if (args.includes("--publish") && !args.includes("--apply")) {
@@ -388,7 +388,7 @@ async function main(): Promise<void> {
   }
 
   const verified = plans.reduce((total, plan) => total + plan.counts.reviewed, 0);
-  if (selected.length > 0 && verified === 0) {
+  if (selected.length > 0 && verified === 0 && !args.includes("--allow-empty")) {
     throw new Error(
       "No asset-specific OWID rights evidence could be verified; nothing was written",
     );

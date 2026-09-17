@@ -40,22 +40,13 @@ jobs:
         run: npm run ingest:owid:catalog -- --output "$RUNNER_TEMP/owid-catalog.csv"
       - name: Validate and import the discovered catalogue
         run: |
-          set +e
           OWID_COUNT=$(node -e 'const fs=require("node:fs"); process.stdout.write(String(fs.readFileSync(process.env.CATALOG,"utf8").trim().split(/\r?\n/).length-1))')
           test "$OWID_COUNT" -gt 0
           echo "Discovered $OWID_COUNT OWID charts"
           npm run ingest:corpus -- "$RUNNER_TEMP/owid-catalog.csv" \
             --expected-count "$OWID_COUNT" \
             --batch-size "${{ inputs.batch_size }}" \
-            --apply --remote
-          IMPORT_STATUS=$?
-          set -e
-          if test "$IMPORT_STATUS" -gt 1; then
-            exit "$IMPORT_STATUS"
-          fi
-          if test "$IMPORT_STATUS" -eq 1; then
-            echo "Some OWID source requests failed; continuing with rights review for rows written to D1."
-          fi
+            --allow-partial --apply --remote
         env:
           CATALOG: ${{ runner.temp }}/owid-catalog.csv
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

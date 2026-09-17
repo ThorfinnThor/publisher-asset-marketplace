@@ -12,7 +12,11 @@ import {
   prepareOwidImport,
 } from "../src/lib/ingest/import-runner";
 import { normalizeOwidInput } from "../src/lib/ingest/normalize-input";
-import { rebuildAssetSearchTrigramsSql } from "../src/lib/search/search-index";
+import { OwidSourceClient } from "../src/lib/ingest/owid-source-client";
+import {
+  rebuildSelectedAssetSearchTrigramQueries,
+  rebuildSelectedAssetSearchTrigramsSql,
+} from "../src/lib/search/search-index";
 
 const execFileAsync = promisify(execFile);
 const supportedFormats = new Set(["csv", "json", "txt"] as const);
@@ -193,7 +197,7 @@ async function main(): Promise<void> {
 
   if (!inputPath) {
     throw new Error(
-      "Usage: npm run ingest:corpus -- <input.csv|input.json|input.txt> [--expected-count 3000] [--batch-size 25] [--start 0] [--limit 3000] [--apply --remote|--local]",
+      "Usage: npm run ingest:corpus -- <input.csv|input.json|input.txt> [--expected-count 3000] [--batch-size 25] [--start 0] [--limit 3000] [--source-timeout-ms 10000] [--source-attempts 3] [--source-concurrency 4] [--allow-partial] [--apply --remote|--local]",
     );
   }
   if (apply && remote === local) {
@@ -226,6 +230,9 @@ async function main(): Promise<void> {
   const start = integerOption(args, "--start", 0, 0);
   const limit = integerOption(args, "--limit", report.accepted.length - start, 0);
   const batchSize = integerOption(args, "--batch-size", 25, 1);
+  const sourceTimeoutMs = integerOption(args, "--source-timeout-ms", 10_000, 1);
+  const sourceAttempts = integerOption(args, "--source-attempts", 3, 1);
+  const sourceConcurrency = integerOption(args, "--source-concurrency", 4, 1);
   const batchPlan = planCorpusBatches(report, {
     start,
     limit,
@@ -259,6 +266,11 @@ async function main(): Promise<void> {
   let accepted = 0;
   let errors = 0;
   let importedBatches = 0;
+  const sourceClient = new OwidSourceClient({
+    timeoutMs: sourceTimeoutMs,
+    maxAttempts: sourceAttempts,
+    concurrency: sourceConcurrency,
+  });
 
   for (const [index, batch] of batchPlan.batches.entries()) {
     const batchInput = JSON.stringify(
@@ -266,15 +278,23 @@ async function main(): Promise<void> {
     );
     const plan = await prepareOwidImport(batchInput, "json", {
       allow_source_fallback: args.includes("--allow-source-fallback"),
+      source_client: sourceClient,
     });
     if (target === "remote") {
       await applyRemoteQueries(
-        buildOwidImportQueries(plan, { rebuildSearchIndex: false }),
+        [
+          ...buildOwidImportQueries(plan, { rebuildSearchIndex: false }),
+          ...rebuildSelectedAssetSearchTrigramQueries(plan.assets.map((asset) => asset.id)),
+        ],
         `batch-${index + 1}`,
       );
     } else {
       await applySql(
-        buildOwidImportSql(plan, { rebuildSearchIndex: false }),
+        `${buildOwidImportSql(plan, { rebuildSearchIndex: false })}${
+          plan.assets.length > 0
+            ? `${rebuildSelectedAssetSearchTrigramsSql(plan.assets.map((asset) => asset.id))}\n`
+            : ""
+        }`,
         target,
         `batch-${index + 1}`,
       );
@@ -297,22 +317,6 @@ async function main(): Promise<void> {
     }
   }
 
-  if (target === "remote") {
-    await applyRemoteQueries(
-      [
-        { sql: "DELETE FROM asset_search_trigrams", params: [] },
-        { sql: rebuildAssetSearchTrigramsSql, params: [] },
-      ],
-      "rebuild-search-index",
-    );
-  } else {
-    await applySql(
-      `DELETE FROM asset_search_trigrams;\n${rebuildAssetSearchTrigramsSql.trim()};\n`,
-      target,
-      "rebuild-search-index",
-    );
-  }
-
   process.stdout.write(
     `${JSON.stringify(
       {
@@ -324,13 +328,13 @@ async function main(): Promise<void> {
         importedBatches,
         importedAssets: accepted,
         errors,
-        searchIndexRebuilt: true,
+        searchIndexRebuilt: "incremental",
       },
       null,
       2,
     )}\n`,
   );
-  if (errors > 0) {
+  if (errors > 0 && !args.includes("--allow-partial")) {
     process.exitCode = 1;
   }
 }
