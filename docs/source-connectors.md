@@ -1,6 +1,6 @@
 # F3 source connector contract
 
-Status: **World Bank F4 implemented; Eurostat F4 implemented; no Eurostat production records onboarded**
+Status: **World Bank F4 implemented; Eurostat F4 implemented and pilot rights reviewed; no Eurostat production records onboarded**
 
 Design owner: **SOL**  
 Implementation owner: **LUNA (F4)**
@@ -332,5 +332,11 @@ npm run ingest:eurostat
 
 The command defaults to all three pilot datasets and performs no database write.
 Database writes require both `--apply` and `--reviewed-rights`, plus an explicit
-`--local` or `--remote` target. No Eurostat production records may be imported
-until the SOL-owned item-level rights review is complete.
+`--local` or `--remote` target.
+
+The SOL-owned review in
+[`docs/eurostat-pilot-rights-review.md`](eurostat-pilot-rights-review.md)
+approves only the three fixed EU27 selections. The remaining LUNA release task
+must add the dedicated `EU_COMMISSION_REUSE_2011` rights code, render the real
+retained observations on public asset pages, encode the review manifest, and
+complete the production import and smoke test.
