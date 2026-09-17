@@ -25,6 +25,7 @@ const DEFAULT_TARGET = 1_000;
 const DEFAULT_MAX_CANDIDATES = 1_500;
 const DEFAULT_BATCH_SIZE = 50;
 const DEFAULT_APPLY_BATCH_SIZE = 100;
+const MAX_D1_ASSET_SQL_BYTES = 800_000;
 const AUTOMATED_REVIEW_VERSION = "eurostat-automated-policy-v1";
 const EMBED_REVIEW_VERSION = "eurostat-marketplace-embed-v2";
 const MAX_METABASE_DECOMPRESSED_BYTES = 64 * 1024 * 1024;
@@ -72,6 +73,17 @@ function chunks<T>(values: readonly T[], size: number): T[][] {
     result.push(values.slice(index, index + size));
   }
   return result;
+}
+
+function isD1AssetSafe(asset: EurostatAssetFetch): boolean {
+  const plan = buildEurostatImportPlan([asset.datasetCode], {
+    successful: [asset],
+    failed: [],
+  });
+  return (
+    Buffer.byteLength(buildEurostatImportSql(plan, { rebuildSearchIndex: false }), "utf8") <=
+    MAX_D1_ASSET_SQL_BYTES
+  );
 }
 
 async function fetchExistingEurostatCodes(): Promise<Set<string>> {
@@ -251,6 +263,7 @@ async function main(): Promise<void> {
     timeoutMs: 10_000,
     maxAttempts: 2,
   });
+  const fetchTarget = target + (additional ? 100 : 0);
   const successful: EurostatAssetFetch[] = [];
   const failed: EurostatBatchFailure[] = [];
   for (const [index, batch] of chunks(candidates, batchSize).entries()) {
@@ -268,15 +281,16 @@ async function main(): Promise<void> {
         target,
       })}\n`,
     );
-    if (successful.length >= target) break;
+    if (successful.length >= fetchTarget) break;
   }
 
   const selected = successful
     .sort((left, right) => left.datasetCode.localeCompare(right.datasetCode))
+    .filter(isD1AssetSafe)
     .slice(0, target);
   if (selected.length < target) {
     throw new Error(
-      `Eurostat catalogue produced only ${selected.length} reviewed samples after ${candidates.length} candidates; increase --max-candidates or inspect the failure report`,
+      `Eurostat catalogue produced only ${selected.length} D1-safe reviewed samples after ${candidates.length} candidates; increase --max-candidates or inspect the failure report`,
     );
   }
   const selectedCodes = selected.map((asset) => asset.datasetCode);
