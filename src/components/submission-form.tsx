@@ -6,7 +6,7 @@ import { useState, type ChangeEvent, type FormEvent, type MouseEvent } from "rea
 import { AssetPreview } from "@/components/asset-preview";
 import { currentCreatorTermsVersion } from "@/lib/submissions/creator-terms";
 
-type SubmissionInitialValues = {
+export type SubmissionInitialValues = {
   canonical_url?: string;
   asset_type?: "chart" | "calculator" | "table" | "dataset" | "benchmark" | "widget";
   title?: string;
@@ -15,6 +15,11 @@ type SubmissionInitialValues = {
   preview_url?: string;
   attribution_name?: string;
   attribution_url?: string;
+  attribution_terms?: string;
+  commercial_use?: boolean;
+  embed_allowed?: boolean;
+  modification_allowed?: boolean;
+  citation_required?: boolean;
 };
 
 type SubmissionFormProps = {
@@ -22,6 +27,8 @@ type SubmissionFormProps = {
   opportunityTopic?: string | null;
   initialValues?: SubmissionInitialValues;
   scanId?: string;
+  mode?: "create" | "edit";
+  assetSlug?: string;
 };
 
 type SubmissionResponse = {
@@ -105,6 +112,8 @@ export function SubmissionForm({
   opportunityTopic = null,
   initialValues,
   scanId,
+  mode = "create",
+  assetSlug,
 }: SubmissionFormProps) {
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -185,39 +194,42 @@ export function SubmissionForm({
       return;
     }
     try {
-      const response = await fetch(
-        scanId ? `/api/url-scans/${encodeURIComponent(scanId)}/convert` : "/api/submissions",
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          credentials: "same-origin",
-          body: JSON.stringify({
-            csrf_token: csrfToken,
-            canonical_url: data.get("canonical_url"),
-            asset_type: data.get("asset_type"),
-            title: data.get("title"),
-            description: data.get("description"),
-            embed_url: embedUrl,
-            preview_url: String(data.get("preview_url") ?? "").trim() || null,
-            attribution_name: data.get("attribution_name"),
-            attribution_url: data.get("attribution_url"),
-            attribution_terms: data.get("attribution_terms"),
-            commercial_use: data.get("commercial_use") === "on",
-            embed_allowed: data.get("embed_allowed") === "on",
-            modification_allowed: data.get("modification_allowed") === "on",
-            citation_required: data.get("citation_required") === "on",
-            sandbox_compatible: data.get("sandbox_compatible") === "on",
-            source_identity_confirmed: data.get("source_identity_confirmed") === "on",
-            attribution_confirmed: data.get("attribution_confirmed") === "on",
-            preview_display_authorized: data.get("preview_display_authorized") === "on",
-            authorized_to_submit: data.get("authorized_to_submit") === "on",
-            commercial_marketplace_acknowledged:
-              data.get("commercial_marketplace_acknowledged") === "on",
-            creator_terms_accepted: data.get("creator_terms_accepted") === "on",
-            opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
-          }),
-        },
-      );
+      const endpoint =
+        mode === "edit" && assetSlug
+          ? `/api/creator/assets/${encodeURIComponent(assetSlug)}`
+          : scanId
+            ? `/api/url-scans/${encodeURIComponent(scanId)}/convert`
+            : "/api/submissions";
+      const response = await fetch(endpoint, {
+        method: mode === "edit" ? "PATCH" : "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          csrf_token: csrfToken,
+          canonical_url: data.get("canonical_url"),
+          asset_type: data.get("asset_type"),
+          title: data.get("title"),
+          description: data.get("description"),
+          embed_url: embedUrl,
+          preview_url: String(data.get("preview_url") ?? "").trim() || null,
+          attribution_name: data.get("attribution_name"),
+          attribution_url: data.get("attribution_url"),
+          attribution_terms: data.get("attribution_terms"),
+          commercial_use: data.get("commercial_use") === "on",
+          embed_allowed: data.get("embed_allowed") === "on",
+          modification_allowed: data.get("modification_allowed") === "on",
+          citation_required: data.get("citation_required") === "on",
+          sandbox_compatible: data.get("sandbox_compatible") === "on",
+          source_identity_confirmed: data.get("source_identity_confirmed") === "on",
+          attribution_confirmed: data.get("attribution_confirmed") === "on",
+          preview_display_authorized: data.get("preview_display_authorized") === "on",
+          authorized_to_submit: data.get("authorized_to_submit") === "on",
+          commercial_marketplace_acknowledged:
+            data.get("commercial_marketplace_acknowledged") === "on",
+          creator_terms_accepted: data.get("creator_terms_accepted") === "on",
+          opportunity_topic: String(data.get("opportunity_topic") ?? "").trim() || null,
+        }),
+      });
       const result = (await response.json().catch(() => null)) as SubmissionResponse | null;
       if (!response.ok) {
         const failedChecks = result?.pre_screen?.checks
@@ -228,15 +240,20 @@ export function SubmissionForm({
           text:
             failedChecks && failedChecks.length > 0
               ? `Automatic publication blocked: ${failedChecks.join(" ")}`
-              : (result?.error ?? "The submission could not be saved."),
+              : (result?.error ??
+                (mode === "edit"
+                  ? "The asset could not be updated."
+                  : "The submission could not be saved.")),
         });
         return;
       }
       const submittedTitle = String(data.get("title") ?? "Published asset").trim();
       const submittedAssetType = String(data.get("asset_type") ?? "widget");
       const submittedPreviewUrl = String(data.get("preview_url") ?? "").trim();
-      form.reset();
-      setPreviewUrl("");
+      if (mode === "create") {
+        form.reset();
+        setPreviewUrl("");
+      }
       setEmbedTest(null);
       if (result?.auto_publish && result.asset_slug) {
         setPublishedAsset({
@@ -253,7 +270,13 @@ export function SubmissionForm({
         });
       }
     } catch {
-      setStatus({ tone: "error", text: "The submission could not be reached. Please try again." });
+      setStatus({
+        tone: "error",
+        text:
+          mode === "edit"
+            ? "The asset update could not be reached. Please try again."
+            : "The submission could not be reached. Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -273,8 +296,12 @@ export function SubmissionForm({
           <span className="submission-success__mark" aria-hidden="true">
             ✓
           </span>
-          <p className="eyebrow">Published successfully</p>
-          <h2 id="submission-success-heading">Your asset is live.</h2>
+          <p className="eyebrow">
+            {mode === "edit" ? "Updated successfully" : "Published successfully"}
+          </p>
+          <h2 id="submission-success-heading">
+            {mode === "edit" ? "Your changes are live." : "Your asset is live."}
+          </h2>
           <p>
             All automated checks passed. Publishers can now find, preview and reuse{" "}
             <strong>{publishedAsset.title}</strong>.
@@ -286,13 +313,15 @@ export function SubmissionForm({
             <Link className="button button--secondary" href="/creator/dashboard">
               Open creator dashboard
             </Link>
-            <button
-              className="button button--text"
-              onClick={() => setPublishedAsset(null)}
-              type="button"
-            >
-              Publish another asset
-            </button>
+            {mode === "create" ? (
+              <button
+                className="button button--text"
+                onClick={() => setPublishedAsset(null)}
+                type="button"
+              >
+                Publish another asset
+              </button>
+            ) : null}
           </div>
         </div>
       </section>
@@ -513,6 +542,7 @@ export function SubmissionForm({
               placeholder="Credit PassendPlanen — commercial use and embedding permitted with attribution"
               minLength={2}
               maxLength={1000}
+              defaultValue={initialValues?.attribution_terms}
               required
               type="text"
             />
@@ -545,23 +575,41 @@ export function SubmissionForm({
         <fieldset className="rights-declaration">
           <legend className="sr-only">Declared usage rights</legend>
           <label>
-            <input name="commercial_use" required type="checkbox" />
+            <input
+              defaultChecked={initialValues?.commercial_use}
+              name="commercial_use"
+              required
+              type="checkbox"
+            />
             <span>
               Commercial use allowed <small>Required</small>
             </span>
           </label>
           <label>
-            <input name="embed_allowed" required type="checkbox" />
+            <input
+              defaultChecked={initialValues?.embed_allowed}
+              name="embed_allowed"
+              required
+              type="checkbox"
+            />
             <span>
               Embedding allowed <small>Required</small>
             </span>
           </label>
           <label>
-            <input name="modification_allowed" type="checkbox" />
+            <input
+              defaultChecked={initialValues?.modification_allowed}
+              name="modification_allowed"
+              type="checkbox"
+            />
             <span>Modification allowed</span>
           </label>
           <label>
-            <input name="citation_required" type="checkbox" />
+            <input
+              defaultChecked={initialValues?.citation_required}
+              name="citation_required"
+              type="checkbox"
+            />
             <span>Citation required</span>
           </label>
         </fieldset>
@@ -628,7 +676,9 @@ export function SubmissionForm({
             ? "Submitting…"
             : uploadingPreview
               ? "Uploading preview…"
-              : "Run checks and publish"}
+              : mode === "edit"
+                ? "Run checks and update"
+                : "Run checks and publish"}
         </button>
       </div>
     </form>

@@ -10,7 +10,7 @@ import { validateSubmissionPayload, type ValidatedSubmission } from "./validate"
 export const autonomousPublisherId = "system:auto-publisher";
 export const autonomousRightsReasonCode = "creator_attested_auto_publish";
 
-const autonomousReviewNotes =
+export const autonomousReviewNotes =
   "Automatically published after all deterministic URL, host, preview, reuse, sandbox, attribution and creator-attestation checks passed.";
 
 type AutonomousPublicationInput = {

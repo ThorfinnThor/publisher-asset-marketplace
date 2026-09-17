@@ -6,10 +6,153 @@ import {
   prepareCreatorAssetDeletionStatements,
   type CreatorAssetDeletionRow,
 } from "@/lib/assets/delete-creator-asset";
+import {
+  creatorAssetUpdateDuplicateSql,
+  creatorAssetUpdateLookupSql,
+  prepareCreatorAssetUpdateStatements,
+  type CreatorAssetUpdateLookupRow,
+} from "@/lib/assets/update-creator-asset";
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
+import { rebuildAssetSearchTrigrams } from "@/lib/search/search-index";
+import { planAutonomousPublication } from "@/lib/submissions/auto-publish";
+import { buildDeclaredRightsJson, currentAuthorizationVersion } from "@/lib/submissions/create";
+import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
+import { validateSubmissionPayload } from "@/lib/submissions/validate";
 
-const maxBodyBytes = 2 * 1024;
+const maxDeleteBodyBytes = 2 * 1024;
+const maxUpdateBodyBytes = 32 * 1024;
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> },
+): Promise<Response> {
+  if (!sameOrigin(request)) {
+    return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
+  }
+
+  const db = getDatabase();
+  const profile = await loadProfile(request, db);
+  if (!profile) {
+    return errorResponse(401, "authentication_required", "Sign in to update an asset.");
+  }
+
+  const body = await readLimitedJson(request, maxUpdateBodyBytes);
+  if (!body.ok || typeof body.value.csrf_token !== "string") {
+    return errorResponse(403, "csrf_failed", "Asset update security check failed.");
+  }
+  if (!(await verifyCsrfToken(request, body.value.csrf_token))) {
+    return errorResponse(403, "csrf_failed", "Asset update security check failed.");
+  }
+
+  const { slug } = await params;
+  if (!isValidSlug(slug)) return errorResponse(404, "asset_not_found", "Asset not found.");
+
+  const payload = { ...body.value };
+  delete payload.csrf_token;
+  const validation = validateSubmissionPayload(payload);
+  if (!validation.ok) {
+    return errorResponse(400, validation.code, "Please correct the highlighted asset fields.");
+  }
+  const preScreen = runSubmissionPreScreen(validation.value, {
+    marketplaceOrigin: new URL(request.url).origin,
+  });
+  if (preScreen.status !== "pass") {
+    return Response.json(
+      {
+        error:
+          "Automatic publication checks did not pass. Correct the flagged fields and try again.",
+        code: "auto_publish_checks_failed",
+        pre_screen: preScreen,
+      },
+      { status: 422, headers: { "cache-control": "no-store" } },
+    );
+  }
+
+  try {
+    const lookup = await db
+      .prepare(creatorAssetUpdateLookupSql)
+      .bind(slug, profile.id)
+      .first<CreatorAssetUpdateLookupRow>();
+    if (!lookup) return errorResponse(404, "asset_not_found", "Asset not found.");
+
+    const duplicate = await db
+      .prepare(creatorAssetUpdateDuplicateSql)
+      .bind(
+        validation.value.canonicalUrl,
+        lookup.asset_id,
+        validation.value.canonicalUrl,
+        lookup.submission_id,
+      )
+      .first<{ duplicate: number }>();
+    if (duplicate) {
+      return errorResponse(409, "canonical_url_exists", "This canonical URL is already in use.");
+    }
+
+    const now = new Date().toISOString();
+    const declaredRightsJson = buildDeclaredRightsJson(validation.value, now);
+    const publication = planAutonomousPublication({
+      id: lookup.submission_id,
+      creatorId: profile.id,
+      submission: validation.value,
+      declaredRightsJson,
+      preScreen,
+      authorizationVersion: currentAuthorizationVersion,
+      now,
+    });
+    if (!publication.ok) {
+      return errorResponse(503, publication.code, "The asset update could not be prepared.");
+    }
+
+    const results = await db.batch(
+      prepareCreatorAssetUpdateStatements(db, {
+        lookup,
+        submission: validation.value,
+        declaredRightsJson,
+        preScreen,
+        publication: publication.value,
+        authorizationVersion: currentAuthorizationVersion,
+        now,
+      }),
+    );
+    if (results.some((result) => (result.meta.changes ?? 0) === 0)) {
+      return errorResponse(409, "asset_update_conflict", "The asset could not be updated.");
+    }
+
+    try {
+      await rebuildAssetSearchTrigrams(db);
+    } catch (error) {
+      console.error(
+        JSON.stringify({
+          event: "creator_asset_update_search_refresh_failed",
+          asset_id: lookup.asset_id,
+          message: error instanceof Error ? error.message : "unknown_error",
+        }),
+      );
+    }
+
+    if (lookup.preview_url !== validation.value.previewUrl) {
+      await deleteOwnedPreview(lookup.preview_url, new URL(request.url).origin, profile.id);
+    }
+    return Response.json(
+      { ok: true, auto_publish: true, asset_slug: lookup.slug, pre_screen: preScreen },
+      { headers: { "cache-control": "no-store" } },
+    );
+  } catch (error) {
+    if (error instanceof Error && /unique/i.test(error.message)) {
+      return errorResponse(409, "canonical_url_exists", "This canonical URL is already in use.");
+    }
+    console.error(
+      JSON.stringify({
+        event: "creator_asset_update_failed",
+        creator_id: profile.id,
+        slug,
+        message: error instanceof Error ? error.message : "unknown_error",
+      }),
+    );
+    return errorResponse(503, "asset_update_unavailable", "The asset could not be updated.");
+  }
+}
 
 export async function DELETE(
   request: Request,
@@ -25,7 +168,7 @@ export async function DELETE(
     return errorResponse(401, "authentication_required", "Sign in to delete an asset.");
   }
 
-  const body = await readLimitedJson(request);
+  const body = await readLimitedJson(request, maxDeleteBodyBytes);
   if (!body.ok || typeof body.value.csrf_token !== "string") {
     return errorResponse(403, "csrf_failed", "Asset deletion security check failed.");
   }
@@ -34,7 +177,7 @@ export async function DELETE(
   }
 
   const { slug } = await params;
-  if (!/^[a-z0-9][a-z0-9_-]{0,255}$/u.test(slug)) {
+  if (!isValidSlug(slug)) {
     return errorResponse(404, "asset_not_found", "Asset not found.");
   }
 
@@ -105,6 +248,7 @@ function sameOrigin(request: Request): boolean {
 
 async function readLimitedJson(
   request: Request,
+  maxBodyBytes: number,
 ): Promise<{ ok: true; value: Record<string, unknown> } | { ok: false }> {
   const contentLength = Number(request.headers.get("content-length"));
   if (Number.isFinite(contentLength) && contentLength > maxBodyBytes) return { ok: false };
@@ -139,6 +283,10 @@ async function readLimitedJson(
   } catch {
     return { ok: false };
   }
+}
+
+function isValidSlug(value: string): boolean {
+  return /^[a-z0-9][a-z0-9_-]{0,255}$/u.test(value);
 }
 
 function errorResponse(status: number, code: string, message: string): Response {

@@ -202,6 +202,9 @@ function CreatorAssetCard({
           </div>
         </div>
         <div className="creator-asset-card__actions">
+          <a className="text-link" href={`/creator/assets/${asset.slug}/edit`}>
+            Edit asset
+          </a>
           <a className="text-link" href={`/asset/${asset.slug}`}>
             View asset
           </a>
