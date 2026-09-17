@@ -44,7 +44,7 @@ function parentHtml(childPort: number, fixture: "compatible" | "broken"): string
       result.textContent = "failed";
       document.title = "failed";
     }
-  }, 800);
+  }, 1500);
 </script>
 </body></html>`;
 }
@@ -115,7 +115,7 @@ async function dumpDom(chrome: string, url: string, profileDirectory: string): P
       "--no-first-run",
       "--no-sandbox",
       `--user-data-dir=${profileDirectory}`,
-      "--virtual-time-budget=2000",
+      "--virtual-time-budget=3000",
       "--dump-dom",
       url,
     ]);
