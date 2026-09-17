@@ -160,6 +160,9 @@ export async function writeWorldBankImport(
   return writeImport(db, plan, batchSize);
 }
 
-export function buildWorldBankImportSql(plan: WorldBankImportPlan): string {
-  return buildImportSql(plan);
+export function buildWorldBankImportSql(
+  plan: WorldBankImportPlan,
+  options: { rebuildSearchIndex?: boolean } = {},
+): string {
+  return buildImportSql(plan, options);
 }
