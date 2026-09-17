@@ -77,10 +77,10 @@ export function parseEurostatSample(value: string | null): EurostatSample | null
 
 export function isReviewedEurostatSample(sample: EurostatSample): boolean {
   return (
+    /^[a-z0-9][a-z0-9_]{1,63}$/u.test(sample.datasetCode) &&
     sample.selector.lang === "en" &&
     sample.selector.geo === "EU27_2020" &&
-    sample.selector.sinceTimePeriod === "2020" &&
-    /^(tps00001|nama_10_gdp|une_rt_a)$/.test(sample.datasetCode)
+    sample.selector.sinceTimePeriod === "2020"
   );
 }
 

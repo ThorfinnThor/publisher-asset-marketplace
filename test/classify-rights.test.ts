@@ -201,6 +201,41 @@ describe("classifyRights", () => {
     });
   });
 
+  it("allows a transparent automated Eurostat policy gate without pretending it was manual", () => {
+    const result = classify({
+      chart_owner: "third_party",
+      chart_license_code: "EU_COMMISSION_REUSE_2011",
+      chart_license_raw: "Eurostat reuse policy under Commission Decision 2011/833/EU",
+      chart_license_explicit: true,
+      manual_review_completed: false,
+      automated_review_completed: true,
+      automated_review_version: "eurostat-automated-policy-v1",
+      embed_available: false,
+      citation_only_allowed: true,
+      indicator_evidence: [
+        {
+          indicator_url: "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/x",
+          non_redistributable: false,
+          origins: [
+            {
+              license_code: "EU_COMMISSION_REUSE_2011",
+              license_raw: "Eurostat reuse policy",
+              license_url: "https://ec.europa.eu/eurostat/help/copyright-notice",
+            },
+          ],
+        },
+      ],
+    });
+    expect(result).toMatchObject({
+      rights_status: "safe",
+      reason_code: "automated_policy_verified_third_party",
+      rights: {
+        automated_review_completed: true,
+        automated_review_version: "eurostat-automated-policy-v1",
+      },
+    });
+  });
+
   it("blocks a missing embed unless citation-only use was explicitly reviewed", () => {
     const result = classify({ embed_available: false });
     expect(result).toMatchObject({

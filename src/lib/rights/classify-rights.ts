@@ -29,6 +29,8 @@ export type RightsEvidence = {
   marketplace_rendered_embed_allowed?: TriState;
   embed_provenance?: "source_hosted" | "marketplace_rendered" | null;
   embed_review_version?: string | null;
+  automated_review_completed?: boolean;
+  automated_review_version?: string | null;
   citation_only_allowed?: boolean;
   chart_reuse_prohibited: TriState;
   evidence_conflict: boolean;
@@ -292,6 +294,10 @@ function rightsFor(
     rights.embed_provenance = evidence.embed_provenance ?? null;
     rights.embed_review_version = evidence.embed_review_version ?? null;
   }
+  if (evidence.automated_review_completed !== undefined) {
+    rights.automated_review_completed = evidence.automated_review_completed;
+    rights.automated_review_version = evidence.automated_review_version ?? null;
+  }
   return rights;
 }
 
@@ -334,7 +340,11 @@ export function classifyRights(evidence: RightsEvidence): RightsClassification {
     reasonCode = "unknown_chart_owner";
   } else if (!evidence.chart_license_explicit) {
     reasonCode = "chart_license_not_explicit";
-  } else if (evidence.chart_owner === "third_party" && !evidence.manual_review_completed) {
+  } else if (
+    evidence.chart_owner === "third_party" &&
+    !evidence.manual_review_completed &&
+    evidence.automated_review_completed !== true
+  ) {
     reasonCode = "third_party_review_required";
   } else if (license === "CUSTOM_OR_UNKNOWN") {
     reasonCode = "unknown_chart_license";
@@ -349,9 +359,15 @@ export function classifyRights(evidence: RightsEvidence): RightsClassification {
   } else if (evidence.chart_owner === "owid" && evidence.embed_available === true) {
     status = "safe";
     reasonCode = "verified_permissive_chart";
-  } else if (evidence.chart_owner === "third_party" && evidence.manual_review_completed) {
+  } else if (
+    evidence.chart_owner === "third_party" &&
+    (evidence.manual_review_completed || evidence.automated_review_completed === true)
+  ) {
     status = permissions.base_status;
-    reasonCode = "manually_verified_third_party";
+    reasonCode =
+      evidence.automated_review_completed === true
+        ? "automated_policy_verified_third_party"
+        : "manually_verified_third_party";
   }
 
   const rights = rightsFor(license, evidence, rawDataRights);

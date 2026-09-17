@@ -23,7 +23,7 @@ const sampleJson = JSON.stringify({
 });
 
 describe("Eurostat marketplace presentation", () => {
-  it("accepts only the reviewed selector and pilot dataset", () => {
+  it("accepts the reviewed selector for any safe dataset code", () => {
     const sample = parseEurostatSample(sampleJson);
     expect(sample).not.toBeNull();
     expect(isReviewedEurostatSample(sample!)).toBe(true);
@@ -31,6 +31,8 @@ describe("Eurostat marketplace presentation", () => {
     expect(
       isReviewedEurostatSample({ ...sample!, selector: { ...sample!.selector, geo: "DE" } }),
     ).toBe(false);
+    expect(isReviewedEurostatSample({ ...sample!, datasetCode: "ei_bpm6ca_q" })).toBe(true);
+    expect(isReviewedEurostatSample({ ...sample!, datasetCode: "ds-123" })).toBe(false);
   });
 
   it("fails closed for malformed or non-Eurostat metadata", () => {

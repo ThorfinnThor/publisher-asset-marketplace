@@ -1,6 +1,11 @@
 # Eurostat pilot rights review
 
-Status: **approved and implemented for the reviewed EU27 data slices; production import is the final release action**
+Status: **historical pilot review; superseded for bulk ingestion by the automated catalogue policy gate**
+
+The three records in this document remain the reference pilot fixtures. Bulk
+Eurostat imports now use the repeatable workflow documented in
+[`eurostat-catalog-automation.md`](./eurostat-catalog-automation.md), which
+keeps the same EU27/2020 selector and marketplace-rendered embed restrictions.
 
 Review owner: **SOL**  
 Review date: **2026-09-17**  

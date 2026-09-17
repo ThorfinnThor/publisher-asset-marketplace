@@ -106,6 +106,23 @@ export async function prepareEurostatImport(
   const sourceId = options.source_id ?? DEFAULT_SOURCE_ID;
   const sourceClient = options.source_client ?? new EurostatSourceClient();
   const fetched = await sourceClient.fetchAssets(datasetCodes);
+  return buildEurostatImportPlan(datasetCodes, fetched, {
+    ...options,
+    now: completedAt,
+    run_id: runId,
+    source_id: sourceId,
+  });
+}
+
+export function buildEurostatImportPlan(
+  datasetCodes: string[],
+  fetched: EurostatBatchResult,
+  options: Pick<EurostatImportOptions, "source_id" | "now" | "run_id"> = {},
+): EurostatImportPlan {
+  const startedAt = options.now ?? nowIso();
+  const completedAt = options.now ?? nowIso();
+  const runId = options.run_id ?? createRunId(startedAt);
+  const sourceId = options.source_id ?? DEFAULT_SOURCE_ID;
   const assets = fetched.successful.map((asset) =>
     buildEurostatImportAssetRecord(asset, completedAt, sourceId),
   );

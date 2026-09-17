@@ -4,6 +4,8 @@ import type { SupportedLicense } from "../rights/contracts";
 const EUROSTAT_API_HOST = "ec.europa.eu";
 const EUROSTAT_API_PATH = "/eurostat/api/dissemination/statistics/1.0/data/";
 const EUROSTAT_BROWSER_PATH = "/eurostat/databrowser/view/";
+export const EUROSTAT_CATALOGUE_URL =
+  "https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en";
 export const EUROSTAT_POLICY_URL = "https://ec.europa.eu/eurostat/help/copyright-notice";
 const EUROSTAT_API_DOCS_URL =
   "https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started";
@@ -15,6 +17,7 @@ const MAX_RESPONSE_BYTES = 512 * 1024;
 const MAX_OBSERVATIONS = 50;
 const MAX_ATTEMPTS = 3;
 const MAX_CONCURRENCY = 3;
+const MAX_CATALOGUE_BYTES = 4 * 1024 * 1024;
 
 export type EurostatSelector = {
   lang: "en";
@@ -26,6 +29,17 @@ export type EurostatPilotDataset = {
   code: string;
   subject: string;
   selector: EurostatSelector;
+};
+
+export type EurostatCatalogueEntry = {
+  title: string;
+  code: string;
+  type: "table" | "dataset" | "folder" | "unknown";
+  lastUpdate: string | null;
+  structureChanged: string | null;
+  dataStart: string | null;
+  dataEnd: string | null;
+  values: number | null;
 };
 
 export const EUROSTAT_PILOT_DATASETS: readonly EurostatPilotDataset[] = [
@@ -216,10 +230,6 @@ export function buildEurostatSourceUrls(
   selector: EurostatSelector = EUROSTAT_PILOT_DATASETS[0].selector,
 ): EurostatSourceUrls {
   const datasetCode = normalizeDatasetCode(input);
-  const reviewed = reviewedEurostatPilot(datasetCode);
-  if (!reviewed) {
-    throw new Error(`Eurostat dataset is not in the reviewed pilot manifest: ${datasetCode}`);
-  }
   const normalizedSelector = normalizeSelector(selector);
   const encodedCode = encodeURIComponent(datasetCode);
   const query = selectorQuery(normalizedSelector);
@@ -230,6 +240,84 @@ export function buildEurostatSourceUrls(
     embedUrl: null,
     selector: normalizedSelector,
   };
+}
+
+function catalogueFields(line: string): string[] {
+  const fields: string[] = [];
+  let field = "";
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+    if (character === '"') {
+      if (quoted && line[index + 1] === '"') {
+        field += '"';
+        index += 1;
+      } else {
+        quoted = !quoted;
+      }
+    } else if (character === "\t" && !quoted) {
+      fields.push(field);
+      field = "";
+    } else {
+      field += character;
+    }
+  }
+  fields.push(field);
+  return fields.map((value) => value.trim());
+}
+
+function optionalCatalogueValue(value: string): string | null {
+  const normalized = value.trim();
+  return normalized === "" ? null : normalized;
+}
+
+function catalogueType(value: string): EurostatCatalogueEntry["type"] {
+  return value === "table" || value === "dataset" || value === "folder" ? value : "unknown";
+}
+
+export function parseEurostatCatalogue(value: string): EurostatCatalogueEntry[] {
+  const lines = value.split(/\r?\n/u);
+  const entries: EurostatCatalogueEntry[] = [];
+  for (const line of lines.slice(1)) {
+    if (line.trim() === "") continue;
+    const fields = catalogueFields(line);
+    if (fields.length < 8 || fields[1] === "") continue;
+    const values = Number(fields[7]);
+    entries.push({
+      title: fields[0],
+      code: fields[1].toLocaleLowerCase("en"),
+      type: catalogueType(fields[2]),
+      lastUpdate: optionalCatalogueValue(fields[3]),
+      structureChanged: optionalCatalogueValue(fields[4]),
+      dataStart: optionalCatalogueValue(fields[5]),
+      dataEnd: optionalCatalogueValue(fields[6]),
+      values: Number.isSafeInteger(values) && values >= 0 ? values : null,
+    });
+  }
+  return entries;
+}
+
+const AUTOMATED_REVIEW_EXCLUSIONS =
+  /\b(?:comext|prodcom|microdata|confidential|copyright|trademark|logo|photographs?|images?)\b/iu;
+
+export function selectEurostatCatalogueCandidates(
+  entries: readonly EurostatCatalogueEntry[],
+  options: { start?: number; limit?: number } = {},
+): EurostatCatalogueEntry[] {
+  const start = Math.max(0, Math.floor(options.start ?? 0));
+  const limit = Math.max(0, Math.floor(options.limit ?? 1_500));
+  return [...entries]
+    .filter((entry) => entry.type === "table")
+    .filter((entry) => DATASET_PATTERN.test(entry.code))
+    .filter((entry) => !entry.code.startsWith("ds_"))
+    .filter((entry) => !AUTOMATED_REVIEW_EXCLUSIONS.test(`${entry.code} ${entry.title}`))
+    .filter((entry) => entry.values === null || entry.values > 0)
+    .sort(
+      (left, right) =>
+        (left.values ?? Number.MAX_SAFE_INTEGER) - (right.values ?? Number.MAX_SAFE_INTEGER) ||
+        left.code.localeCompare(right.code),
+    )
+    .slice(start, start + limit);
 }
 
 function policyFingerprint(): string {
@@ -415,6 +503,34 @@ function parseJsonStat(
   };
 }
 
+function assertReviewedSelector(
+  datasetCode: string,
+  parsed: Omit<EurostatAssetFetch, "urls" | "normalized" | "rightsEvidence">,
+): void {
+  const geoDimension = parsed.dimensions.find((dimension) => dimension.id === "geo");
+  const timeDimension = parsed.dimensions.find((dimension) => dimension.id === "time");
+  if (!geoDimension?.codes.includes("EU27_2020") || !timeDimension) {
+    throw createError(
+      datasetCode,
+      "selector_not_supported",
+      "Eurostat dataset does not expose the reviewed EU27_2020 and time dimensions",
+    );
+  }
+  const invalidObservation = parsed.observations.find((observation) => {
+    if (observation.coordinates.geo !== "EU27_2020") return true;
+    const time = observation.coordinates.time;
+    const year = Number.parseInt(time.slice(0, 4), 10);
+    return !Number.isInteger(year) || year < 2020;
+  });
+  if (invalidObservation) {
+    throw createError(
+      datasetCode,
+      "selector_not_supported",
+      "Eurostat response contains observations outside the reviewed EU27_2020/2020+ selection",
+    );
+  }
+}
+
 async function readBoundedText(response: Response, maxBytes: number): Promise<string> {
   const contentLength = response.headers.get("content-length");
   if (contentLength && Number(contentLength) > maxBytes) {
@@ -494,11 +610,10 @@ export class EurostatSourceClient {
   async fetchAsset(input: string, selector?: EurostatSelector): Promise<EurostatAssetFetch> {
     const datasetCode = normalizeDatasetCode(input);
     const reviewed = reviewedEurostatPilot(datasetCode);
-    if (!reviewed)
-      throw new Error(`Eurostat dataset is not in the reviewed pilot manifest: ${datasetCode}`);
-    const urls = buildEurostatSourceUrls(datasetCode, selector ?? reviewed.selector);
+    const urls = buildEurostatSourceUrls(datasetCode, selector ?? reviewed?.selector);
     const response = await this.fetchJson(datasetCode, urls.apiUrl);
     const parsed = parseJsonStat(datasetCode, response);
+    assertReviewedSelector(datasetCode, parsed);
     const citationText = `Eurostat: ${parsed.title} (${datasetCode}), accessed ${new Date().toISOString().slice(0, 10)}.`;
     const rightsEvidence: RightsEvidence = {
       chart_owner: "third_party",
@@ -676,6 +791,26 @@ export class EurostatSourceClient {
     const next = this.slotWaiters.shift();
     if (next) next();
     else this.availableSlots += 1;
+  }
+}
+
+export async function fetchEurostatCatalogue(
+  fetchImpl: FetchImpl = fetch,
+  maxResponseBytes = MAX_CATALOGUE_BYTES,
+): Promise<EurostatCatalogueEntry[]> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const response = await fetchImpl(EUROSTAT_CATALOGUE_URL, {
+      headers: { accept: "text/plain", "user-agent": DEFAULT_USER_AGENT },
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Eurostat catalogue request returned HTTP ${response.status}`);
+    }
+    return parseEurostatCatalogue(await readBoundedText(response, maxResponseBytes));
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

@@ -34,6 +34,7 @@ export type RightsReasonCode =
   | "raw_data_non_redistributable"
   | "verified_permissive_chart"
   | "manually_verified_third_party"
+  | "automated_policy_verified_third_party"
   | "unmatched_evidence";
 
 export type AssetRights = {
@@ -41,6 +42,8 @@ export type AssetRights = {
   marketplace_rendered_embed_allowed?: TriState;
   embed_provenance?: "source_hosted" | "marketplace_rendered" | null;
   embed_review_version?: string | null;
+  automated_review_completed?: boolean;
+  automated_review_version?: string | null;
   commercial_use: TriState;
   modification_allowed: TriState;
   citation_required: TriState;

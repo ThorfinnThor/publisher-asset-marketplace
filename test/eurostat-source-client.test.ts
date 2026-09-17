@@ -7,6 +7,8 @@ import {
   buildEurostatSourceUrls,
   EurostatSourceClient,
   EurostatSourceClientError,
+  parseEurostatCatalogue,
+  selectEurostatCatalogueCandidates,
 } from "../src/lib/ingest/eurostat-source-client";
 
 async function fixture(code: string): Promise<string> {
@@ -14,7 +16,7 @@ async function fixture(code: string): Promise<string> {
 }
 
 describe("Eurostat source client", () => {
-  it("builds URLs only for reviewed pilot datasets", () => {
+  it("builds URLs for valid Eurostat dataset codes", () => {
     expect(buildEurostatSourceUrls("TPS00001")).toMatchObject({
       canonicalUrl: "https://ec.europa.eu/eurostat/databrowser/view/tps00001/default/table?lang=en",
       apiUrl:
@@ -23,7 +25,22 @@ describe("Eurostat source client", () => {
       embedUrl: null,
     });
     expect(() => buildEurostatSourceUrls("ds-123")).toThrow("invalid Eurostat dataset code");
-    expect(() => buildEurostatSourceUrls("unknown_dataset")).toThrow("reviewed pilot manifest");
+    expect(buildEurostatSourceUrls("unknown_dataset").apiUrl).toContain("unknown_dataset");
+  });
+
+  it("parses and conservatively filters the official catalogue TOC", () => {
+    const catalogue = parseEurostatCatalogue(
+      [
+        '"title"\t"code"\t"type"\t"last update of data"\t"last table structure change"\t"data start"\t"data end"\t"values"',
+        '"Title A"\t"table_a"\t"table"\t"17.09.2026"\t"17.09.2026"\t"2020"\t"2025"\t100',
+        '"Comext item"\t"comext_a"\t"table"\t"17.09.2026"\t"17.09.2026"\t"2020"\t"2025"\t100',
+        '"Folder"\t"folder"\t"folder"\t" "\t" "\t" "\t" "\t" "',
+      ].join("\n"),
+    );
+    expect(catalogue).toHaveLength(3);
+    expect(selectEurostatCatalogueCandidates(catalogue).map((entry) => entry.code)).toEqual([
+      "table_a",
+    ]);
   });
 
   it("parses JSON-stat dimensions and keeps Eurostat rights unknown", async () => {

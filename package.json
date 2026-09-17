@@ -23,6 +23,8 @@
     "ingest:corpus": "tsx scripts/import-owid-corpus.ts",
     "ingest:worldbank": "tsx scripts/import-worldbank.ts",
     "ingest:eurostat": "tsx scripts/import-eurostat.ts",
+    "ingest:eurostat:catalog": "tsx scripts/import-eurostat-catalog.ts",
+    "verify:eurostat:catalog": "tsx scripts/verify-eurostat-catalog.ts",
     "audit:import": "tsx scripts/audit-import.ts",
     "refresh:assets": "tsx scripts/refresh-assets.ts",
     "rights:review": "tsx scripts/review-rights.ts",

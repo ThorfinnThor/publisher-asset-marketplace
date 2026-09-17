@@ -1,6 +1,10 @@
 # Eurostat marketplace-rendered embed rights review
 
-Status: **approved for implementation for the three reviewed EU27 pilot assets**
+Status: **approved for the pilot and reused by the automated catalogue gate**
+
+The pilot entries below define the embed contract. The catalogue workflow may
+apply the same contract to additional Eurostat table records only after each
+record passes the bounded EU27/2020 data and automated policy checks.
 
 Review owner: **SOL**  
 Review date: **2026-09-17**  

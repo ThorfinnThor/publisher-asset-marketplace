@@ -16,6 +16,8 @@ export type RightsReviewManifestAsset = {
   marketplace_embed_url?: string;
   marketplace_embed_origin?: string;
   embed_review_version?: string;
+  automated_review_completed?: boolean;
+  automated_review_version?: string;
   chart_reuse_prohibited: boolean;
   evidence_conflict: boolean;
   evidence_url: string;
@@ -195,6 +197,17 @@ function parseManifestAsset(value: unknown): RightsReviewManifestAsset {
   const marketplaceEmbedUrl = optionalString(value, "marketplace_embed_url");
   const marketplaceEmbedOrigin = optionalString(value, "marketplace_embed_origin");
   const embedReviewVersion = optionalString(value, "embed_review_version");
+  const automatedReviewCompleted =
+    value.automated_review_completed === undefined
+      ? false
+      : requiredBoolean(value, "automated_review_completed");
+  const automatedReviewVersion = optionalString(value, "automated_review_version");
+  if (automatedReviewCompleted && !automatedReviewVersion) {
+    throw new Error(`Automated review version is required for ${slug}`);
+  }
+  if (!automatedReviewCompleted && automatedReviewVersion) {
+    throw new Error(`Automated review version requires explicit approval for ${slug}`);
+  }
   if (marketplaceRenderedEmbedAllowed) {
     if (!marketplaceEmbedUrl || !marketplaceEmbedOrigin || !embedReviewVersion) {
       throw new Error(`Marketplace embed review fields are incomplete for ${slug}`);
@@ -229,6 +242,8 @@ function parseManifestAsset(value: unknown): RightsReviewManifestAsset {
     marketplace_embed_url: marketplaceEmbedUrl,
     marketplace_embed_origin: marketplaceEmbedOrigin,
     embed_review_version: embedReviewVersion,
+    automated_review_completed: automatedReviewCompleted,
+    automated_review_version: automatedReviewVersion,
     chart_reuse_prohibited: requiredBoolean(value, "chart_reuse_prohibited"),
     evidence_conflict: requiredBoolean(value, "evidence_conflict"),
     evidence_url: evidenceUrl,
@@ -384,6 +399,8 @@ export function prepareRightsReview(
       marketplace_rendered_embed_allowed: review.marketplace_rendered_embed_allowed,
       embed_provenance: review.marketplace_rendered_embed_allowed ? "marketplace_rendered" : null,
       embed_review_version: review.embed_review_version ?? null,
+      automated_review_completed: review.automated_review_completed ?? false,
+      automated_review_version: review.automated_review_version ?? null,
       chart_reuse_prohibited: review.chart_reuse_prohibited,
       evidence_conflict: review.evidence_conflict,
       citation_available: Boolean((review.citation_text ?? row.citation_text)?.trim()),

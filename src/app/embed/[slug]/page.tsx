@@ -21,7 +21,7 @@ type EmbedRights = {
 
 export default async function EurostatEmbedPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (!/^eurostat-(tps00001|nama_10_gdp|une_rt_a)$/.test(slug)) notFound();
+  if (!/^eurostat-[a-z0-9][a-z0-9_]{1,63}$/u.test(slug)) notFound();
 
   let record: Awaited<ReturnType<typeof getPublishedAssetBySlug>>;
   try {
