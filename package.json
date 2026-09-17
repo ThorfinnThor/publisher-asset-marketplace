@@ -21,6 +21,7 @@
     "ingest:fetch": "tsx scripts/fetch-owid.ts",
     "ingest:import": "tsx scripts/import-owid.ts",
     "ingest:corpus": "tsx scripts/import-owid-corpus.ts",
+    "ingest:owid:catalog": "tsx scripts/fetch-owid-catalog.ts",
     "ingest:worldbank": "tsx scripts/import-worldbank.ts",
     "ingest:eurostat": "tsx scripts/import-eurostat.ts",
     "ingest:eurostat:catalog": "tsx scripts/import-eurostat-catalog.ts",
