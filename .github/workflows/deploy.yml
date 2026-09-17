@@ -42,3 +42,5 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       - name: Run production release smoke
         run: npm run release:smoke
+        env:
+          RELEASE_INCLUDE_EUROSTAT_EMBEDS: "false"

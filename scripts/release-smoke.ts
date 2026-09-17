@@ -91,9 +91,18 @@ const checks: SmokeCheck[] = [
   },
 ];
 
+// Eurostat marketplace-rendered embeds become available only after the reviewed
+// rights manifest is applied to D1. The deploy workflow therefore runs the
+// baseline smoke before that import, while the import workflow runs this full
+// smoke afterwards.
+const checksToRun =
+  process.env.RELEASE_INCLUDE_EUROSTAT_EMBEDS === "false"
+    ? checks.filter((check) => !check.path.startsWith("/embed/eurostat-"))
+    : checks;
+
 async function run(): Promise<void> {
   const failures: string[] = [];
-  for (const check of checks) {
+  for (const check of checksToRun) {
     const url = new URL(check.path, `${baseUrl}/`);
     url.searchParams.set("__release_smoke", process.env.GITHUB_SHA ?? Date.now().toString());
     const response = await fetch(url, {
@@ -127,7 +136,7 @@ async function run(): Promise<void> {
   if (failures.length > 0) {
     throw new Error(`Release smoke failed:\n- ${failures.join("\n- ")}`);
   }
-  console.log(`Release smoke passed for ${baseUrl} (${checks.length} checks).`);
+  console.log(`Release smoke passed for ${baseUrl} (${checksToRun.length} checks).`);
 }
 
 run().catch((error: unknown) => {

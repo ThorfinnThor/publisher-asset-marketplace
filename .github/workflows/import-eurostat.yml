@@ -57,3 +57,5 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_D1_DATABASE_ID: 93b3f1b1-a71e-4387-bbfc-64d237e9551d
+      - name: Run production smoke including Eurostat embeds
+        run: npm run release:smoke
