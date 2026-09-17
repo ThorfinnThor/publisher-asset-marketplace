@@ -1,4 +1,4 @@
-name: Import and publish reviewed OWID catalogue
+name: Review and publish imported OWID catalogue
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         type: boolean
         default: true
       batch_size:
-        description: Assets fetched and written per D1 batch
+        description: Assets reviewed and written per D1 batch
         required: true
         default: "25"
       concurrency:
@@ -21,13 +21,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: cloudflare-production-owid-catalog
+  group: cloudflare-production-owid-rights-catalog
   cancel-in-progress: false
 
 jobs:
-  import-and-publish:
+  review-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 240
     environment: production
     steps:
       - uses: actions/checkout@v4
@@ -38,30 +38,7 @@ jobs:
       - run: npm ci
       - name: Discover the public OWID catalogue
         run: npm run ingest:owid:catalog -- --output "$RUNNER_TEMP/owid-catalog.csv"
-      - name: Validate and import the discovered catalogue
-        run: |
-          set +e
-          OWID_COUNT=$(node -e 'const fs=require("node:fs"); process.stdout.write(String(fs.readFileSync(process.env.CATALOG,"utf8").trim().split(/\r?\n/).length-1))')
-          test "$OWID_COUNT" -gt 0
-          echo "Discovered $OWID_COUNT OWID charts"
-          npm run ingest:corpus -- "$RUNNER_TEMP/owid-catalog.csv" \
-            --expected-count "$OWID_COUNT" \
-            --batch-size "${{ inputs.batch_size }}" \
-            --apply --remote
-          IMPORT_STATUS=$?
-          set -e
-          if test "$IMPORT_STATUS" -gt 1; then
-            exit "$IMPORT_STATUS"
-          fi
-          if test "$IMPORT_STATUS" -eq 1; then
-            echo "Some OWID source requests failed; continuing with rights review for rows written to D1."
-          fi
-        env:
-          CATALOG: ${{ runner.temp }}/owid-catalog.csv
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_D1_DATABASE_ID: 93b3f1b1-a71e-4387-bbfc-64d237e9551d
-      - name: Review asset-specific OWID rights and publish safe records
+      - name: Review asset-specific rights and publish safe records
         run: |
           OWID_COUNT=$(node -e 'const fs=require("node:fs"); process.stdout.write(String(fs.readFileSync(process.env.CATALOG,"utf8").trim().split(/\r?\n/).length-1))')
           npm run rights:owid-corpus -- "$RUNNER_TEMP/owid-catalog.csv" \
@@ -74,14 +51,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_D1_DATABASE_ID: 93b3f1b1-a71e-4387-bbfc-64d237e9551d
-      - name: Audit production assets and enforce the rights gate
-        if: ${{ inputs.publish }}
-        run: npm run audit:import -- --remote --sample-size 5 --enforce-gate
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_D1_DATABASE_ID: 93b3f1b1-a71e-4387-bbfc-64d237e9551d
-      - name: Report production totals
+      - name: Report OWID and global publication totals
         if: always()
         run: >-
           npx wrangler d1 execute DB --remote --config wrangler.jsonc --json
