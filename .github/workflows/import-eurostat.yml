@@ -79,3 +79,7 @@ jobs:
       - name: Sample live Eurostat embeds across the catalogue
         if: ${{ inputs.publish }}
         run: npm run verify:eurostat:catalog -- --min ${{ inputs.target }} --sample 20
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: 93b3f1b1-a71e-4387-bbfc-64d237e9551d
