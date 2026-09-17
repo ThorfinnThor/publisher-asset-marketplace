@@ -34,6 +34,19 @@ type AssetRights = {
   evidence_checked_at?: string | null;
 };
 
+type EurostatSample = {
+  datasetCode: string;
+  observationCount: number;
+  selector: Record<string, string>;
+  dimensions: Array<{ id: string; label: string }>;
+  observations: Array<{
+    value: number | string;
+    status: string | null;
+    coordinates: Record<string, string>;
+    labels: Record<string, string>;
+  }>;
+};
+
 export default async function AssetPage({ params }: AssetPageProps) {
   const { slug } = await params;
   const record = await loadAsset(slug);
@@ -45,6 +58,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
   const citationAvailable = Boolean(asset.citation_text);
   const normalizedPreview = normalizePublicHttpsUrl(asset.preview_url);
   const previewUrl = normalizedPreview.ok ? normalizedPreview.value : null;
+  const eurostatSample = parseEurostatSample(asset.metadata_json);
 
   return (
     <main className="asset-detail page-shell">
@@ -125,7 +139,9 @@ export default async function AssetPage({ params }: AssetPageProps) {
         </div>
 
         <div className="asset-detail__preview">
-          {previewUrl ? (
+          {eurostatSample ? (
+            <EurostatDataPreview sample={eurostatSample} />
+          ) : previewUrl ? (
             <img
               className="asset-detail__source-image"
               src={previewUrl}
@@ -136,9 +152,11 @@ export default async function AssetPage({ params }: AssetPageProps) {
             <ChartPreview variant={previewVariant(asset.asset_type)} />
           )}
           <p>
-            {previewUrl
-              ? `Data visualization loaded directly from ${asset.source_name || "the source"}.`
-              : "A source data visualization is not available for this asset."}
+            {eurostatSample
+              ? "Live values from the reviewed Eurostat selection; this is a customised presentation."
+              : previewUrl
+                ? `Data visualization loaded directly from ${asset.source_name || "the source"}.`
+                : "A source data visualization is not available for this asset."}
           </p>
         </div>
       </section>
@@ -300,6 +318,130 @@ function parseRights(value: string | null): AssetRights {
   } catch {
     return {};
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function stringMap(value: unknown): Record<string, string> | null {
+  if (!isRecord(value)) return null;
+  const entries = Object.entries(value);
+  if (entries.some(([, entry]) => typeof entry !== "string")) return null;
+  return Object.fromEntries(entries) as Record<string, string>;
+}
+
+function parseEurostatSample(value: string | null): EurostatSample | null {
+  if (!value) return null;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!isRecord(parsed) || parsed.source !== "eurostat") return null;
+    const datasetCode = typeof parsed.dataset_code === "string" ? parsed.dataset_code : null;
+    const observationCount =
+      typeof parsed.observation_count === "number" && Number.isFinite(parsed.observation_count)
+        ? parsed.observation_count
+        : null;
+    const selector = stringMap(parsed.selector);
+    const dimensions = Array.isArray(parsed.dimensions)
+      ? parsed.dimensions.flatMap((dimension) => {
+          if (!isRecord(dimension)) return [];
+          const id = typeof dimension.id === "string" ? dimension.id : null;
+          const label = typeof dimension.label === "string" ? dimension.label : null;
+          return id && label ? [{ id, label }] : [];
+        })
+      : [];
+    const observations = Array.isArray(parsed.observations)
+      ? parsed.observations.flatMap((observation) => {
+          if (!isRecord(observation)) return [];
+          const observationValue =
+            (typeof observation.value === "number" && Number.isFinite(observation.value)) ||
+            typeof observation.value === "string"
+              ? observation.value
+              : null;
+          const coordinates = stringMap(observation.coordinates);
+          const labels = stringMap(observation.labels);
+          const status =
+            observation.status === null || typeof observation.status === "string"
+              ? observation.status
+              : null;
+          return observationValue !== null && coordinates && labels
+            ? [{ value: observationValue, status, coordinates, labels }]
+            : [];
+        })
+      : [];
+    if (
+      !datasetCode ||
+      observationCount === null ||
+      !selector ||
+      dimensions.length === 0 ||
+      observations.length === 0
+    ) {
+      return null;
+    }
+    return { datasetCode, observationCount, selector, dimensions, observations };
+  } catch {
+    return null;
+  }
+}
+
+function formatObservationValue(value: number | string): string {
+  if (typeof value === "number") {
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 6 }).format(value);
+  }
+  return value;
+}
+
+function EurostatDataPreview({ sample }: { sample: EurostatSample }) {
+  return (
+    <div className="eurostat-data-preview">
+      <div className="eurostat-data-preview__header">
+        <span>DATA SAMPLE</span>
+        <span>{sample.datasetCode}</span>
+      </div>
+      <div className="eurostat-data-preview__table-wrap">
+        <table>
+          <caption className="sr-only">
+            Reviewed Eurostat observations for {sample.datasetCode}
+          </caption>
+          <thead>
+            <tr>
+              {sample.dimensions.map((dimension) => (
+                <th key={dimension.id} scope="col">
+                  {dimension.label}
+                </th>
+              ))}
+              <th scope="col">Value</th>
+              <th scope="col">Flag</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sample.observations.map((observation, index) => (
+              <tr key={`${index}-${observation.value}`}>
+                {sample.dimensions.map((dimension) => (
+                  <td key={dimension.id}>
+                    {observation.labels[dimension.id] ??
+                      observation.coordinates[dimension.id] ??
+                      "—"}
+                  </td>
+                ))}
+                <td className="eurostat-data-preview__value">
+                  {formatObservationValue(observation.value)}
+                </td>
+                <td>{observation.status ?? "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="eurostat-data-preview__note">
+        Showing {sample.observations.length} of {sample.observationCount} retained observations ·{" "}
+        {Object.entries(sample.selector)
+          .filter(([key]) => key !== "lang")
+          .map(([key, selected]) => `${key}=${selected}`)
+          .join(" · ")}
+      </p>
+    </div>
+  );
 }
 
 function permissionLabel(value: boolean | null | undefined): string {

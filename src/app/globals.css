@@ -1392,6 +1392,72 @@ summary {
   font-size: 10px;
 }
 
+.eurostat-data-preview {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.eurostat-data-preview__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+}
+
+.eurostat-data-preview__table-wrap {
+  max-height: 330px;
+  overflow: auto;
+}
+
+.eurostat-data-preview table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.eurostat-data-preview th,
+.eurostat-data-preview td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.eurostat-data-preview th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--warm);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.eurostat-data-preview tr:last-child td {
+  border-bottom: 0;
+}
+
+.eurostat-data-preview__value {
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.eurostat-data-preview__note {
+  margin: 0;
+  padding: 10px 13px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
 .asset-detail__columns {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);

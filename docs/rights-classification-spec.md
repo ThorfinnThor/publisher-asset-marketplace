@@ -1,8 +1,8 @@
 # Rights classification specification (B3)
 
 Status: implementation-ready contract for B4  
-Evidence reviewed: 2026-09-14  
-Scope: source-hosted OWID chart embeds and citations in the publisher marketplace
+Evidence reviewed: 2026-09-17
+Scope: source-hosted OWID chart embeds plus reviewed citation-only dataset assets in the publisher marketplace
 
 This is a deterministic policy specification, not legal advice and not an LLM
 classification prompt. B4 must implement it as pure functions with no network calls.
@@ -70,18 +70,19 @@ B4 may normalize case, whitespace, punctuation around version numbers, and the w
 `International`. It must not use substring or semantic matching. An unlisted label is
 `CUSTOM_OR_UNKNOWN` until reviewed.
 
-| Canonical code        | Accepted exact families                                    |
-| --------------------- | ---------------------------------------------------------- |
-| `CC0_1_0`             | CC0, CC0 1.0                                               |
-| `PUBLIC_DOMAIN`       | Public domain, Public Domain Mark, PDM                     |
-| `CC_BY`               | CC BY 2.0, 2.5, 3.0, 4.0, CC BY 3.0 DEED, or unversioned   |
-| `CC_BY_SA`            | CC BY-SA 2.0, 2.5, 3.0, 4.0, or CC BY-SA without a version |
-| `CC_BY_ND`            | CC BY-ND 2.0, 2.5, 3.0, 4.0, or CC BY-ND without a version |
-| `CC_BY_NC`            | CC BY-NC with or without a supported version               |
-| `CC_BY_NC_SA`         | CC BY-NC-SA with or without a supported version            |
-| `CC_BY_NC_ND`         | CC BY-NC-ND with or without a supported version            |
-| `ALL_RIGHTS_RESERVED` | All rights reserved                                        |
-| `CUSTOM_OR_UNKNOWN`   | Every other value, including a missing value               |
+| Canonical code             | Accepted exact families                                                                                           |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `CC0_1_0`                  | CC0, CC0 1.0                                                                                                      |
+| `PUBLIC_DOMAIN`            | Public domain, Public Domain Mark, PDM                                                                            |
+| `CC_BY`                    | CC BY 2.0, 2.5, 3.0, 4.0, CC BY 3.0 DEED, or unversioned                                                          |
+| `CC_BY_SA`                 | CC BY-SA 2.0, 2.5, 3.0, 4.0, or CC BY-SA without a version                                                        |
+| `CC_BY_ND`                 | CC BY-ND 2.0, 2.5, 3.0, 4.0, or CC BY-ND without a version                                                        |
+| `CC_BY_NC`                 | CC BY-NC with or without a supported version                                                                      |
+| `CC_BY_NC_SA`              | CC BY-NC-SA with or without a supported version                                                                   |
+| `CC_BY_NC_ND`              | CC BY-NC-ND with or without a supported version                                                                   |
+| `EU_COMMISSION_REUSE_2011` | Eurostat reuse policy under Commission Decision 2011/833/EU, only when recorded by the reviewed Eurostat manifest |
+| `ALL_RIGHTS_RESERVED`      | All rights reserved                                                                                               |
+| `CUSTOM_OR_UNKNOWN`        | Every other value, including a missing value                                                                      |
 
 A license URL does not replace a license name. A generic Creative Commons homepage
 is insufficient evidence for a non-unknown decision.
@@ -100,6 +101,7 @@ computed separately.
 | `CC_BY_NC`                 |          false |         true |        true |     true |       false | restricted  |
 | `CC_BY_NC_SA`              |          false |         true |        true |     true |        true | restricted  |
 | `CC_BY_NC_ND`              |          false |        false |        true |     true |       false | restricted  |
+| `EU_COMMISSION_REUSE_2011` |           true |         true |        true |     true |       false | safe        |
 | `ALL_RIGHTS_RESERVED`      |          false |        false |        null |     null |        null | blocked     |
 | `CUSTOM_OR_UNKNOWN`        |           null |         null |        null |     null |        null | unknown     |
 
@@ -213,6 +215,15 @@ B4 must provide at least these deterministic cases:
 
 Every supported license/status combination must be represented by a fixture, and the
 classifier result must include a stable reason code suitable for `rights_reviews`.
+
+## Reviewed citation-only dataset exception
+
+`EU_COMMISSION_REUSE_2011` is not a general-purpose inference rule and is not a
+Creative Commons licence. It is accepted only when the source-specific review
+manifest records the exact canonical asset URL, policy evidence URL, reviewed
+query scope, and `manual_review_completed: true`. The Eurostat pilot uses this
+code for a bounded EU27 data table, sets `embed_available` to false, and keeps
+the source-hosted values visible as a citation-only presentation.
 
 ## Seed evidence observation
 

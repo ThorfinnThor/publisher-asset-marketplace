@@ -18,6 +18,7 @@ export type PublishedAssetDetail = {
   license_code: string | null;
   rights_status: "safe" | "restricted";
   rights_json: string | null;
+  metadata_json: string | null;
   source_name: string;
   source_base_url: string | null;
   source_policy_url: string | null;
@@ -54,6 +55,7 @@ const detailSql = `
     a.license_code,
     a.rights_status,
     a.rights_json,
+    a.metadata_json,
     COALESCE(s.name, a.attribution_name, '') AS source_name,
     s.base_url AS source_base_url,
     s.policy_url AS source_policy_url,

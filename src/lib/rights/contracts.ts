@@ -11,6 +11,7 @@ export type SupportedLicense =
   | "CC_BY_NC"
   | "CC_BY_NC_SA"
   | "CC_BY_NC_ND"
+  | "EU_COMMISSION_REUSE_2011"
   | "ALL_RIGHTS_RESERVED"
   | "CUSTOM_OR_UNKNOWN";
 

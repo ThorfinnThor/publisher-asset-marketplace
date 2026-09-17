@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import manifestJson from "../data/rights/owid-seed-rights-review-v1.json";
+import eurostatManifestJson from "../data/rights/eurostat-pilot-rights-review-v1.json";
 import {
   buildRightsReviewQueries,
   buildRightsReviewSql,
@@ -57,6 +58,60 @@ function row(
 }
 
 describe("rights evidence review", () => {
+  it("parses and classifies the reviewed Eurostat pilot scope", () => {
+    const manifest = parseRightsReviewManifest(eurostatManifestJson);
+    const rows = manifest.assets.map((asset) => ({
+      id: `asset_${asset.slug}`,
+      slug: asset.slug,
+      canonical_url: asset.canonical_url,
+      citation_text: "Source: Eurostat.",
+      attribution_name: "Eurostat",
+      attribution_url: asset.attribution_url,
+      rights_status: "unknown" as const,
+      status: "draft" as const,
+      metadata_json: JSON.stringify({
+        source: "eurostat",
+        rights_evidence: {
+          chart_owner: "third_party",
+          chart_license_code: "CUSTOM_OR_UNKNOWN",
+          chart_license_raw: "Eurostat general reuse policy; item-level exceptions apply",
+          chart_license_url: "https://ec.europa.eu/eurostat/help/copyright-notice",
+          chart_license_explicit: false,
+          manual_review_completed: false,
+          embed_available: null,
+          citation_only_allowed: true,
+          chart_reuse_prohibited: null,
+          evidence_conflict: false,
+          citation_available: true,
+          indicator_evidence: [
+            {
+              indicator_url:
+                "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tps00001",
+              non_redistributable: null,
+              origins: [{ license_code: null, license_raw: null, license_url: null }],
+            },
+          ],
+          evidence_url: asset.canonical_url,
+          evidence_checked_at: "2026-09-17T00:00:00.000Z",
+        },
+      }),
+    }));
+    const plan = prepareRightsReview(rows, manifest);
+
+    expect(plan.counts).toEqual({
+      reviewed: 3,
+      safe: 3,
+      restricted: 0,
+      unknown: 0,
+      blocked: 0,
+      raw_data_enabled: 3,
+      raw_data_unverified: 0,
+    });
+    expect(plan.updates.every((update) => update.license_code === "EU_COMMISSION_REUSE_2011")).toBe(
+      true,
+    );
+  });
+
   it("parses ten unique, asset-specific OWID decisions", () => {
     const manifest = parseRightsReviewManifest(manifestJson);
 

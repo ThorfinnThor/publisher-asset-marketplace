@@ -94,6 +94,7 @@ const supportedLicenses = new Set<SupportedLicense>([
   "CC_BY_NC",
   "CC_BY_NC_SA",
   "CC_BY_NC_ND",
+  "EU_COMMISSION_REUSE_2011",
   "ALL_RIGHTS_RESERVED",
   "CUSTOM_OR_UNKNOWN",
 ]);
@@ -303,6 +304,28 @@ export function prepareRightsReview(
     if (!Array.isArray(previousEvidence.indicator_evidence)) {
       throw new Error(`Asset ${review.slug} has no indicator rights evidence`);
     }
+    const reviewedIndicatorEvidence =
+      review.chart_license_code === "EU_COMMISSION_REUSE_2011" && metadata.source === "eurostat"
+        ? previousEvidence.indicator_evidence.map((indicator) => ({
+            ...indicator,
+            non_redistributable: false as const,
+            origins:
+              indicator.origins.length > 0
+                ? indicator.origins.map((origin) => ({
+                    ...origin,
+                    license_code: review.chart_license_code,
+                    license_raw: review.chart_license_raw,
+                    license_url: review.chart_license_url,
+                  }))
+                : [
+                    {
+                      license_code: review.chart_license_code,
+                      license_raw: review.chart_license_raw,
+                      license_url: review.chart_license_url,
+                    },
+                  ],
+          }))
+        : previousEvidence.indicator_evidence;
     const evidence: RightsEvidence = {
       ...previousEvidence,
       chart_owner: review.chart_owner,
@@ -316,6 +339,7 @@ export function prepareRightsReview(
       chart_reuse_prohibited: review.chart_reuse_prohibited,
       evidence_conflict: review.evidence_conflict,
       citation_available: Boolean((review.citation_text ?? row.citation_text)?.trim()),
+      indicator_evidence: reviewedIndicatorEvidence,
       evidence_url: review.evidence_url,
       evidence_checked_at: manifest.reviewed_at,
     };

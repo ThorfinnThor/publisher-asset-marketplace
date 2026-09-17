@@ -66,6 +66,7 @@ const permissiveRawDataLicenses = new Set<SupportedLicense>([
   "PUBLIC_DOMAIN",
   "CC_BY",
   "CC_BY_SA",
+  "EU_COMMISSION_REUSE_2011",
 ]);
 
 const licensePermissions: Record<SupportedLicense, LicensePermissions> = {
@@ -141,6 +142,15 @@ const licensePermissions: Record<SupportedLicense, LicensePermissions> = {
     base_status: "restricted",
     restricted_reason: "noncommercial_no_derivatives",
   },
+  EU_COMMISSION_REUSE_2011: {
+    commercial_use: true,
+    modification_allowed: true,
+    attribution_required: true,
+    citation_required: true,
+    share_alike: false,
+    base_status: "safe",
+    restricted_reason: null,
+  },
   ALL_RIGHTS_RESERVED: {
     commercial_use: false,
     modification_allowed: false,
@@ -199,6 +209,9 @@ export function normalizeSupportedLicense(value: string | null | undefined): Sup
   }
   if (/^CC BY-NC-ND(?: (?:2\.0|2\.5|3\.0|4\.0)(?: INTERNATIONAL)?)?$/.test(label)) {
     return "CC_BY_NC_ND";
+  }
+  if (label === "EU_COMMISSION_REUSE_2011" || label === "EU COMMISSION REUSE 2011") {
+    return "EU_COMMISSION_REUSE_2011";
   }
   if (label === "ALL RIGHTS RESERVED") {
     return "ALL_RIGHTS_RESERVED";

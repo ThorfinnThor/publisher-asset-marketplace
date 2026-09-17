@@ -1,6 +1,6 @@
 # Eurostat pilot rights review
 
-Status: **approved for the reviewed EU27 data slices; not yet imported or published**
+Status: **approved and implemented for the reviewed EU27 data slices; production import is the final release action**
 
 Review owner: **SOL**  
 Review date: **2026-09-17**  
@@ -120,7 +120,9 @@ update the failed refresh audit.
 
 ## Release gate
 
-The next LUNA task must add the dedicated rights code, encode this review as a
-machine-readable manifest, render the real data sample, run the live API dry
-run in CI, import the three records as drafts, apply the review manifest, and
-publish only after the production pages pass the release smoke test.
+The LUNA implementation has added the dedicated rights code, encoded this review
+as `data/rights/eurostat-pilot-rights-review-v1.json`, and replaced the generic
+placeholder preview with the retained observations rendered as a real table. The
+GitHub release workflow now performs the live API fetch, imports the three records,
+applies this manifest, and publishes only the reviewed records. Production import
+remains a release action, not part of the source-code review itself.

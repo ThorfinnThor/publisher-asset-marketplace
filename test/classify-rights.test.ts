@@ -41,6 +41,7 @@ describe("normalizeSupportedLicense", () => {
     ["CC BY-NC-SA 4.0", "CC_BY_NC_SA"],
     ["CC BY-NC-ND 4.0", "CC_BY_NC_ND"],
     ["All rights reserved", "ALL_RIGHTS_RESERVED"],
+    ["EU_COMMISSION_REUSE_2011", "EU_COMMISSION_REUSE_2011"],
     ["copyright 2001, 2023 named provider", "CUSTOM_OR_UNKNOWN"],
   ] as const)("normalizes only supported exact labels: %s", (raw, expected) => {
     expect(normalizeSupportedLicense(raw)).toBe(expected);
@@ -160,6 +161,46 @@ describe("classifyRights", () => {
     });
   });
 
+  it("classifies the reviewed Eurostat reuse policy as safe without enabling embeds", () => {
+    const result = classify({
+      chart_owner: "third_party",
+      chart_license_code: "EU_COMMISSION_REUSE_2011",
+      chart_license_raw: "Eurostat reuse policy under Commission Decision 2011/833/EU",
+      chart_license_explicit: true,
+      manual_review_completed: true,
+      embed_available: false,
+      citation_only_allowed: true,
+      indicator_evidence: [
+        {
+          indicator_url:
+            "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tps00001",
+          non_redistributable: false,
+          origins: [
+            {
+              license_code: "EU_COMMISSION_REUSE_2011",
+              license_raw: "Eurostat reuse policy",
+              license_url: "https://ec.europa.eu/eurostat/help/copyright-notice",
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(result).toMatchObject({
+      rights_status: "safe",
+      reason_code: "manually_verified_third_party",
+      chart_license: "EU_COMMISSION_REUSE_2011",
+      raw_data_redistribution: true,
+    });
+    expect(result.rights).toMatchObject({
+      commercial_use: true,
+      modification_allowed: true,
+      embed_allowed: false,
+      citation_required: true,
+      attribution_required: true,
+    });
+  });
+
   it("blocks a missing embed unless citation-only use was explicitly reviewed", () => {
     const result = classify({ embed_available: false });
     expect(result).toMatchObject({
@@ -257,6 +298,7 @@ describe("classifyRights", () => {
     ["CC_BY_NC_SA", "restricted"],
     ["CC_BY_NC_ND", "restricted"],
     ["ALL_RIGHTS_RESERVED", "blocked"],
+    ["EU_COMMISSION_REUSE_2011", "safe"],
     ["CUSTOM_OR_UNKNOWN", "unknown"],
   ] as const)("covers the status mapping for %s", (license, status) => {
     const result = classify({

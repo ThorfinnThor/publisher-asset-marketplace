@@ -519,7 +519,7 @@ export class EurostatSourceClient {
           origins: [{ license_code: null, license_raw: null, license_url: EUROSTAT_POLICY_URL }],
         },
       ],
-      evidence_url: EUROSTAT_POLICY_URL,
+      evidence_url: urls.canonicalUrl,
       evidence_checked_at: null,
     };
     const description = `Eurostat dataset ${datasetCode}; ${parsed.title}; updated ${parsed.updated}.`;
