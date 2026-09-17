@@ -306,7 +306,7 @@ export function selectEurostatCatalogueCandidates(
 ): EurostatCatalogueEntry[] {
   const start = Math.max(0, Math.floor(options.start ?? 0));
   const limit = Math.max(0, Math.floor(options.limit ?? 1_500));
-  return [...entries]
+  const selected = [...entries]
     .filter((entry) => entry.type === "table")
     .filter((entry) => DATASET_PATTERN.test(entry.code))
     .filter((entry) => !entry.code.startsWith("ds_"))
@@ -317,7 +317,11 @@ export function selectEurostatCatalogueCandidates(
         (left.values ?? Number.MAX_SAFE_INTEGER) - (right.values ?? Number.MAX_SAFE_INTEGER) ||
         left.code.localeCompare(right.code),
     )
-    .slice(start, start + limit);
+    .filter(
+      (entry, index, all) =>
+        all.findIndex((candidate) => candidate.code === entry.code) === index,
+    );
+  return selected.slice(start, start + limit);
 }
 
 function policyFingerprint(): string {
