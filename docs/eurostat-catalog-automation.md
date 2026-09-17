@@ -6,7 +6,9 @@ when that many candidates pass the gates.
 
 ## Automated gates
 
-The workflow considers catalogue entries of type `table` or `dataset`. It excludes
+The workflow considers catalogue entries of type `table` or `dataset`. It uses
+Eurostat's metabase to keep only codes that expose both `geo=EU27_2020` and a
+`time` dimension, then excludes
 catalogue categories that may contain third-party material or separate reuse
 conditions, including Comext, Prodcom, microdata, confidential material, logos,
 trademarks, photographs and images. Each candidate is then fetched through the

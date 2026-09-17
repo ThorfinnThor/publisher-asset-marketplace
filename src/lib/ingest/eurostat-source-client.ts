@@ -6,6 +6,8 @@ const EUROSTAT_API_PATH = "/eurostat/api/dissemination/statistics/1.0/data/";
 const EUROSTAT_BROWSER_PATH = "/eurostat/databrowser/view/";
 export const EUROSTAT_CATALOGUE_URL =
   "https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en";
+export const EUROSTAT_METABASE_URL =
+  "https://ec.europa.eu/eurostat/api/dissemination/catalogue/metabase.txt.gz";
 export const EUROSTAT_POLICY_URL = "https://ec.europa.eu/eurostat/help/copyright-notice";
 const EUROSTAT_API_DOCS_URL =
   "https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started";

@@ -3,6 +3,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { promisify } from "node:util";
+import { gunzipSync } from "node:zlib";
 
 import {
   buildEurostatImportPlan,
@@ -10,6 +11,7 @@ import {
 } from "../src/lib/ingest/eurostat-import-runner";
 import {
   EUROSTAT_POLICY_URL,
+  EUROSTAT_METABASE_URL,
   EurostatSourceClient,
   fetchEurostatCatalogue,
   selectEurostatCatalogueCandidates,
@@ -24,6 +26,8 @@ const DEFAULT_MAX_CANDIDATES = 1_500;
 const DEFAULT_BATCH_SIZE = 50;
 const AUTOMATED_REVIEW_VERSION = "eurostat-automated-policy-v1";
 const EMBED_REVIEW_VERSION = "eurostat-marketplace-embed-v2";
+const MAX_METABASE_BYTES = 8 * 1024 * 1024;
+const MAX_METABASE_DECOMPRESSED_BYTES = 64 * 1024 * 1024;
 
 function optionValue(args: string[], name: string): string | undefined {
   const index = args.indexOf(name);
@@ -68,6 +72,42 @@ function chunks<T>(values: readonly T[], size: number): T[][] {
     result.push(values.slice(index, index + size));
   }
   return result;
+}
+
+async function fetchMetabaseEligibleCodes(): Promise<Set<string>> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20_000);
+  try {
+    const response = await fetch(EUROSTAT_METABASE_URL, {
+      headers: { accept: "application/gzip", "user-agent": "publisher-asset-marketplace/0.1" },
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`Eurostat metabase request returned HTTP ${response.status}`);
+    const compressed = Buffer.from(await response.arrayBuffer());
+    if (compressed.byteLength > MAX_METABASE_BYTES) {
+      throw new Error("Eurostat metabase response exceeded the bounded size");
+    }
+    const decompressed = gunzipSync(compressed);
+    if (decompressed.byteLength > MAX_METABASE_DECOMPRESSED_BYTES) {
+      throw new Error("Eurostat metabase decompressed response exceeded the bounded size");
+    }
+    const dimensions = new Map<string, { geo: boolean; time: boolean }>();
+    for (const line of decompressed.toString("utf8").split(/\r?\n/u)) {
+      const [code, dimension, position] = line.split("\t");
+      if (!code || !dimension) continue;
+      const state = dimensions.get(code) ?? { geo: false, time: false };
+      if (dimension === "geo" && position === "EU27_2020") state.geo = true;
+      if (dimension === "time") state.time = true;
+      dimensions.set(code, state);
+    }
+    return new Set(
+      [...dimensions.entries()]
+        .filter(([, state]) => state.geo && state.time)
+        .map(([code]) => code),
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function buildAutomatedManifest(
@@ -141,10 +181,11 @@ async function main(): Promise<void> {
   }
 
   const catalogue = await fetchEurostatCatalogue();
+  const metabaseEligibleCodes = await fetchMetabaseEligibleCodes();
   const candidates = selectEurostatCatalogueCandidates(catalogue, {
     start,
     limit: maxCandidates,
-  });
+  }).filter((entry) => metabaseEligibleCodes.has(entry.code));
   if (candidates.length === 0)
     throw new Error("Eurostat catalogue produced no eligible candidates");
 
@@ -192,6 +233,7 @@ async function main(): Promise<void> {
     event: "eurostat_catalog_plan",
     runId: plan.run_id,
     catalogueEntries: catalogue.length,
+    metabaseEligibleCodes: metabaseEligibleCodes.size,
     candidates: candidates.length,
     requested: target,
     accepted: plan.assets.length,
