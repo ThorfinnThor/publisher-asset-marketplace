@@ -26,7 +26,6 @@ const DEFAULT_MAX_CANDIDATES = 1_500;
 const DEFAULT_BATCH_SIZE = 50;
 const AUTOMATED_REVIEW_VERSION = "eurostat-automated-policy-v1";
 const EMBED_REVIEW_VERSION = "eurostat-marketplace-embed-v2";
-const MAX_METABASE_BYTES = 8 * 1024 * 1024;
 const MAX_METABASE_DECOMPRESSED_BYTES = 64 * 1024 * 1024;
 
 function optionValue(args: string[], name: string): string | undefined {
@@ -79,15 +78,20 @@ async function fetchMetabaseEligibleCodes(): Promise<Set<string>> {
   const timeout = setTimeout(() => controller.abort(), 20_000);
   try {
     const response = await fetch(EUROSTAT_METABASE_URL, {
-      headers: { accept: "application/gzip", "user-agent": "publisher-asset-marketplace/0.1" },
+      headers: {
+        accept: "application/octet-stream",
+        "accept-encoding": "identity",
+        "user-agent": "publisher-asset-marketplace/0.1",
+      },
       signal: controller.signal,
     });
     if (!response.ok) throw new Error(`Eurostat metabase request returned HTTP ${response.status}`);
     const compressed = Buffer.from(await response.arrayBuffer());
-    if (compressed.byteLength > MAX_METABASE_BYTES) {
+    if (compressed.byteLength > MAX_METABASE_DECOMPRESSED_BYTES) {
       throw new Error("Eurostat metabase response exceeded the bounded size");
     }
-    const decompressed = gunzipSync(compressed);
+    const isGzip = compressed.byteLength >= 2 && compressed[0] === 0x1f && compressed[1] === 0x8b;
+    const decompressed = isGzip ? gunzipSync(compressed) : compressed;
     if (decompressed.byteLength > MAX_METABASE_DECOMPRESSED_BYTES) {
       throw new Error("Eurostat metabase decompressed response exceeded the bounded size");
     }
