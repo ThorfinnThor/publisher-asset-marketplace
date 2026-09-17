@@ -5,6 +5,7 @@ import {
   reviewWorldBankIndicatorMetadata,
   selectWorldBankCatalogCandidates,
 } from "../src/lib/ingest/worldbank-catalog";
+import { rebuildSelectedAssetSearchTrigramsSql } from "../src/lib/search/search-index";
 
 describe("World Bank catalogue", () => {
   it("parses catalogue entries and removes ambiguous indicator ids", () => {
@@ -112,5 +113,15 @@ describe("World Bank catalogue", () => {
     };
 
     expect(reviewWorldBankIndicatorMetadata("SP.POP.TOTL", metadata)).toBeNull();
+  });
+
+  it("builds a bounded search-index refresh for only the imported assets", () => {
+    const sql = rebuildSelectedAssetSearchTrigramsSql(["asset_worldbank_one", "asset_'two"]);
+
+    expect(sql).toContain(
+      "DELETE FROM asset_search_trigrams WHERE asset_id IN ('asset_worldbank_one', 'asset_''two')",
+    );
+    expect(sql).toContain("WHERE id IN ('asset_worldbank_one', 'asset_''two')");
+    expect(sql).not.toContain("DELETE FROM asset_search_trigrams;");
   });
 });

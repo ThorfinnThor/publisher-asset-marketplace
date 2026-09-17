@@ -38,6 +38,33 @@ export const rebuildAssetSearchTrigramsSql = `
   WHERE length(substr(value, position, 3)) = 3
 `;
 
+function sqlString(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+export function rebuildSelectedAssetSearchTrigramsSql(assetIds: readonly string[]): string {
+  if (assetIds.length === 0) {
+    throw new Error("at least one asset id is required to rebuild selected search trigrams");
+  }
+  const ids = assetIds.map(sqlString).join(", ");
+  return `DELETE FROM asset_search_trigrams WHERE asset_id IN (${ids});
+WITH RECURSIVE normalized(asset_id, value) AS (
+  SELECT id, lower('  ' || title || ' ' || asset_type || '  ')
+  FROM assets
+  WHERE id IN (${ids})
+), positions(asset_id, value, position) AS (
+  SELECT asset_id, value, 1 FROM normalized
+  UNION ALL
+  SELECT asset_id, value, position + 1
+  FROM positions
+  WHERE position + 3 <= length(value)
+)
+INSERT INTO asset_search_trigrams (asset_id, trigram)
+SELECT DISTINCT asset_id, substr(value, position, 3)
+FROM positions
+WHERE length(substr(value, position, 3)) = 3;`;
+}
+
 export async function rebuildAssetSearchTrigrams(db: D1Database): Promise<void> {
   await db.prepare("DELETE FROM asset_search_trigrams").bind().run();
   await db.prepare(rebuildAssetSearchTrigramsSql).bind().run();

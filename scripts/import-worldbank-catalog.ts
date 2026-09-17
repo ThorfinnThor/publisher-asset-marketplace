@@ -17,6 +17,7 @@ import {
   type ImportAssetRecord,
   type ImportPlan,
 } from "../src/lib/ingest/import-runner";
+import { rebuildSelectedAssetSearchTrigramsSql } from "../src/lib/search/search-index";
 import type {
   RightsReviewManifest,
   RightsReviewManifestAsset,
@@ -321,7 +322,9 @@ async function main(): Promise<void> {
         },
       };
       await applySql(
-        buildImportSql(plan, { rebuildSearchIndex: index === assetChunks.length - 1 }),
+        `${buildImportSql(plan, { rebuildSearchIndex: false })}\n${rebuildSelectedAssetSearchTrigramsSql(
+          assetChunk.map((item) => item.asset.id),
+        )}\n`,
         `batch-${index + 1}`,
       );
       process.stdout.write(
