@@ -318,8 +318,7 @@ export function selectEurostatCatalogueCandidates(
         left.code.localeCompare(right.code),
     )
     .filter(
-      (entry, index, all) =>
-        all.findIndex((candidate) => candidate.code === entry.code) === index,
+      (entry, index, all) => all.findIndex((candidate) => candidate.code === entry.code) === index,
     );
   return selected.slice(start, start + limit);
 }
