@@ -1,6 +1,6 @@
 # F3 source connector contract
 
-Status: **F4 parser implemented; no production records onboarded**
+Status: **World Bank F4 implemented; Eurostat F3 approved; no Eurostat production records onboarded**
 
 Design owner: **SOL**  
 Implementation owner: **LUNA (F4)**
@@ -174,3 +174,153 @@ been imported by this change.
 The first item-level citation-only review is documented in
 [`docs/worldbank-population-total-rights-review.md`](worldbank-population-total-rights-review.md).
 It does not authorize an embed or raw-data redistribution.
+
+## Source candidate: Eurostat
+
+This section is the SOL-owned F3 contract for the next connector. Parser and
+fixture implementation belong to LUNA under F4. Eurostat is an official data
+source candidate, not a partnership or endorsement.
+
+| Field                | Contract decision                                                                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Registry key         | `eurostat`                                                                                                                                                                |
+| D1 source id         | `source_eurostat`                                                                                                                                                         |
+| Display name         | `Eurostat`                                                                                                                                                                |
+| Base URL             | `https://ec.europa.eu/eurostat`                                                                                                                                           |
+| Policy evidence      | [Eurostat copyright notice and free re-use policy](https://ec.europa.eu/eurostat/help/copyright-notice)                                                                   |
+| Candidate API        | `https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/{datasetCode}`                                                                                       |
+| API documentation    | [Eurostat dissemination API guide](https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started)                                        |
+| Candidate asset type | `dataset`; do not label a Data Browser table as a chart or create an embed URL unless Eurostat documents a stable iframe contract and the marketplace sandbox test passes |
+| Initial pilot        | `tps00001`, `nama_10_gdp`, and `une_rt_a`, subject to the item-level checks below                                                                                         |
+
+Eurostat authorizes commercial and non-commercial reuse of its statistical
+data and metadata when the source is acknowledged, but its policy has material
+exceptions. Third-party material, some data for countries outside the EU,
+EFTA, and candidate-country scope, and specified detailed trade data are not
+covered by the general commercial-reuse permission. Individual notices may
+also override the general rule. The connector must therefore treat the policy
+as evidence to review, not as an unconditional dataset-level CC BY grant.
+
+### What may be indexed
+
+F4 may fetch only dataset codes present in a reviewed seed manifest. A dataset
+is eligible for a draft record when all of these conditions hold:
+
+- the dataset code matches `^[a-z0-9][a-z0-9_]{1,63}$` and appears in the
+  reviewed manifest;
+- the response is a JSON-stat `dataset` with a non-empty title, dimensions,
+  update timestamp, and at least one observation;
+- the canonical URL remains on `ec.europa.eu/eurostat/databrowser` and the API
+  URL remains on `ec.europa.eu/eurostat/api/dissemination`;
+- the reviewed query is restricted to EU, EFTA, or official candidate-country
+  geography when commercial reuse is intended;
+- neither the dataset metadata nor the review manifest identifies a third-party
+  owner, restrictive notice, confidential/microdata content, or a trade-data
+  exception;
+- the response and the persisted sample stay within the bounds below.
+
+The connector must reject arbitrary URLs, `DS-`/Comext/Prodcom identifiers,
+unreviewed query parameters, malformed JSON-stat shapes, empty datasets, and
+responses that exceed the byte or observation limit. Rejected items create a
+structured import failure and no asset record.
+
+### Preview, embed, and reuse boundaries
+
+| Capability              | Eurostat F4 default              | Reason                                                                                                   |
+| ----------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Search/index metadata   | Yes, as a draft after validation | Dataset code, title, update time, and canonical Data Browser URL are stable evidence                     |
+| Preview                 | `null`                           | Do not screenshot, copy, or re-host a Eurostat visualization by default                                  |
+| Embed                   | `null`                           | The Statistics API is a data endpoint, not a documented iframe contract                                  |
+| Commercial reuse        | `null` until item review         | Source-level permission has third-party, geography, trade, and individual-notice exceptions              |
+| Raw-data redistribution | `null` until item review         | The connector stores only a bounded audit sample; public redistribution needs dataset-level confirmation |
+| Citation copy           | Yes after validation             | Use Eurostat, the dataset title/code, canonical URL, and access date                                     |
+| Initial publication     | No; import as `draft`            | Dataset discovery must not bypass the existing rights audit                                              |
+
+The initial parser records `CUSTOM_OR_UNKNOWN` rather than converting the
+general Eurostat policy to `CC_BY`. A later item review may confirm commercial
+reuse for a specific reviewed query while retaining attribution and
+modification-disclosure requirements.
+
+### Stable identifiers, queries, and bounded responses
+
+The lowercase Eurostat dataset code is the `external_id`. The canonical public
+URL is:
+
+```text
+https://ec.europa.eu/eurostat/databrowser/view/{datasetCode}/default/table?lang=en
+```
+
+The API query is evidence, not the canonical URL. The pilot manifest supplies
+an explicit, normalized selector per dataset. The first manifest uses
+`lang=en`, `geo=EU27_2020`, and `sinceTimePeriod=2020`; F4 must not accept
+caller-controlled parameter names or values. A manifest entry can add a
+dataset-specific selector only after review.
+
+Operational limits:
+
+- HTTPS allow-list for `ec.europa.eu` with the exact API and Data Browser path
+  prefixes above;
+- maximum compressed or decoded response size: 512 KiB;
+- maximum persisted observations: 50, selected deterministically from the
+  response while retaining dimension labels and status flags;
+- request timeout: 10 seconds;
+- at most three attempts, retrying only network errors, timeouts, 408, 425,
+  429, and transient 5xx responses;
+- capped exponential backoff and maximum concurrency of three requests;
+- bounded streaming read before JSON parsing; never call `response.json()` on
+  an unbounded body;
+- structured logs and failures containing source key, dataset code, endpoint,
+  HTTP status, attempt count, and reason code.
+
+The full JSON-stat response must not be copied into D1. Persist only the title,
+update timestamp, ordered dimension IDs, dimension labels/codes needed to
+interpret the retained sample, observation count, up to 50 sample values, the
+normalized query, and a policy fingerprint.
+
+### Common-pipeline mapping
+
+| Common field                           | Eurostat mapping                                                                 |
+| -------------------------------------- | -------------------------------------------------------------------------------- |
+| `source_id`                            | `source_eurostat`                                                                |
+| `external_id`                          | Lowercase dataset code                                                           |
+| `slug`                                 | `eurostat-{datasetCode}`                                                         |
+| `asset_type`                           | `dataset`                                                                        |
+| `title`                                | JSON-stat top-level `label`                                                      |
+| `description`                          | `Eurostat dataset {code}; updated {updated}.` plus reviewed subject labels       |
+| `canonical_url`                        | Source-hosted Data Browser table                                                 |
+| `embed_url` / `preview_url`            | `null`                                                                           |
+| `citation_text`                        | `Eurostat: {title} ({code}), accessed {YYYY-MM-DD}.`                             |
+| `attribution_name` / `attribution_url` | `Eurostat` and canonical Data Browser URL                                        |
+| `source_updated_at`                    | Valid normalized top-level `updated` timestamp                                   |
+| `license_code`                         | `null` until item-level review                                                   |
+| `rights_json`                          | Unknown-by-default classification plus policy and manifest evidence              |
+| `metadata_json`                        | Bounded JSON-stat structure/sample, normalized query, policy URL and fingerprint |
+| `status`                               | `draft`                                                                          |
+
+Refresh uses the same manifest selector and compares the update timestamp,
+dimension signature, normalized query, and policy fingerprint. A changed
+dimension structure, selector, ownership marker, policy URL, or restriction
+flag forces `review`; a 404 hides the record; transient failures preserve the
+previous record.
+
+### Eurostat F4 acceptance gates
+
+LUNA may implement the parser after encoding these checks:
+
+1. each pilot fixture maps deterministically into the common draft record;
+2. malformed IDs, arbitrary URLs/parameters, oversized responses, invalid
+   JSON-stat, empty data, and `DS-` trade identifiers fail closed;
+3. the client uses bounded streaming reads, timeout, retry, and concurrency
+   limits;
+4. no API response can create an embed or preview URL;
+5. no dataset receives a supported license or commercial-use approval solely
+   from the domain-level policy;
+6. metadata persistence contains at most 50 observations and no full response;
+7. duplicate imports are idempotent and refresh policy drift returns the asset
+   to review;
+8. a dry run of all three pilot codes succeeds before any remote D1 write;
+9. production import remains an explicit separate command after item-level
+   rights review.
+
+No Eurostat production records may be imported by F3. The next task is the
+LUNA-owned F4 parser, fixtures, migration row, CLI dry-run, and refresh adapter.
