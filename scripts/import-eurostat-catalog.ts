@@ -73,6 +73,45 @@ function chunks<T>(values: readonly T[], size: number): T[][] {
   return result;
 }
 
+async function fetchExistingEurostatCodes(): Promise<Set<string>> {
+  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+  const query =
+    "SELECT slug FROM assets WHERE source_id = 'source_eurostat' AND slug LIKE 'eurostat-%'";
+  const { stdout, stderr } = await execFileAsync(
+    npx,
+    [
+      "wrangler",
+      "d1",
+      "execute",
+      "DB",
+      "--remote",
+      "--command",
+      query,
+      "--config",
+      "wrangler.jsonc",
+      "--json",
+    ],
+    { maxBuffer: 20 * 1024 * 1024 },
+  );
+  if (stderr.trim() !== "") process.stderr.write(stderr);
+  const parsed: unknown = JSON.parse(stdout);
+  if (!Array.isArray(parsed)) throw new Error("Wrangler returned an unexpected D1 response");
+  const codes = new Set<string>();
+  for (const entry of parsed) {
+    if (typeof entry !== "object" || entry === null || !("results" in entry)) continue;
+    const results = (entry as { results?: unknown }).results;
+    if (!Array.isArray(results)) continue;
+    for (const row of results) {
+      if (typeof row !== "object" || row === null) continue;
+      const slug = (row as { slug?: unknown }).slug;
+      if (typeof slug === "string" && slug.startsWith("eurostat-")) {
+        codes.add(slug.slice("eurostat-".length));
+      }
+    }
+  }
+  return codes;
+}
+
 async function fetchMetabaseEligibleCodes(): Promise<Set<string>> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20_000);
@@ -162,6 +201,7 @@ async function main(): Promise<void> {
   const remote = args.includes("--remote");
   const local = args.includes("--local");
   const target = integerOption(args, "--target", DEFAULT_TARGET);
+  const additional = args.includes("--additional");
   const start = integerOption(args, "--start", 0);
   const maxCandidates = integerOption(args, "--max-candidates", DEFAULT_MAX_CANDIDATES);
   const batchSize = Math.max(1, integerOption(args, "--batch-size", DEFAULT_BATCH_SIZE));
@@ -179,6 +219,11 @@ async function main(): Promise<void> {
   if (apply && remote === local) {
     throw new Error("--apply requires exactly one target: --remote or --local");
   }
+  if (additional && !(apply && remote)) {
+    throw new Error(
+      "--additional requires --apply --remote so existing Eurostat assets can be excluded",
+    );
+  }
   const marketplaceUrl = new URL(marketplaceOrigin);
   if (marketplaceUrl.protocol !== "https:" || marketplaceUrl.pathname !== "/") {
     throw new Error("MARKETPLACE_ORIGIN must be an HTTPS origin without a path");
@@ -186,10 +231,13 @@ async function main(): Promise<void> {
 
   const catalogue = await fetchEurostatCatalogue();
   const metabaseEligibleCodes = await fetchMetabaseEligibleCodes();
+  const existingCodes = additional ? await fetchExistingEurostatCodes() : new Set<string>();
   const candidates = selectEurostatCatalogueCandidates(catalogue, {
     start,
     limit: maxCandidates,
-  }).filter((entry) => metabaseEligibleCodes.has(entry.code));
+  })
+    .filter((entry) => metabaseEligibleCodes.has(entry.code))
+    .filter((entry) => !existingCodes.has(entry.code));
   if (candidates.length === 0)
     throw new Error("Eurostat catalogue produced no eligible candidates");
 
@@ -238,6 +286,7 @@ async function main(): Promise<void> {
     runId: plan.run_id,
     catalogueEntries: catalogue.length,
     metabaseEligibleCodes: metabaseEligibleCodes.size,
+    existingEurostatAssetsExcluded: existingCodes.size,
     candidates: candidates.length,
     requested: target,
     accepted: plan.assets.length,

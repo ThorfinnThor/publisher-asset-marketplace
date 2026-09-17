@@ -18,6 +18,11 @@ on:
         required: true
         type: number
         default: 1500
+      additional:
+        description: Exclude existing Eurostat assets and add this many new assets
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -44,6 +49,7 @@ jobs:
           --target ${{ inputs.target }}
           --max-candidates ${{ inputs.max_candidates }}
           --batch-size 50
+          ${{ inputs.additional && '--additional' || '' }}
           --manifest-out /tmp/eurostat-catalog-rights.json
           --apply --reviewed-rights --remote
         env:
