@@ -262,7 +262,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
               {asset.source_id === null
                 ? "Creator embeds include visible reviewed source attribution. The exact markup shown above is copied."
                 : marketplaceEmbed
-                  ? "This iframe is rendered by Publisher Asset Marketplace from the reviewed Eurostat sample. It is not an official Eurostat embed."
+                  ? "This iframe is rendered by Cite Supply from the reviewed Eurostat sample. It is not an official Eurostat embed."
                   : "Embeds stay hosted by the source; this marketplace does not proxy or republish the underlying chart."}
             </p>
           </section>

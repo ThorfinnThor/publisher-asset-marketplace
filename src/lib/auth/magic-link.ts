@@ -235,10 +235,10 @@ async function sendMagicLinkEmail(
       },
       body: JSON.stringify({
         to: recipient,
-        from: { address: from, name: "Publisher Asset Marketplace" },
+        from: { address: from, name: "Cite Supply" },
         subject: "Your sign-in link",
         text: `Use this one-time link to sign in:\n\n${link}\n\nIt expires in ${magicLinkLifetimeMinutes} minutes. If you did not request this email, you can ignore it.`,
-        html: `<p>Use this one-time link to sign in:</p><p><a href="${escapeHtml(link)}">Sign in to Publisher Asset Marketplace</a></p><p>This link expires in ${magicLinkLifetimeMinutes} minutes. If you did not request this email, you can ignore it.</p>`,
+        html: `<p>Use this one-time link to sign in:</p><p><a href="${escapeHtml(link)}">Sign in to Cite Supply</a></p><p>This link expires in ${magicLinkLifetimeMinutes} minutes. If you did not request this email, you can ignore it.</p>`,
       }),
     },
   );

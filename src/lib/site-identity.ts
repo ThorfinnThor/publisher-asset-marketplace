@@ -8,5 +8,12 @@ export const siteIdentity = {
   country: "Deutschland",
 } as const;
 
+export const siteBrand = {
+  name: "Cite Supply",
+  mark: "CS",
+  tagline: "Publisher-ready data, charts, and tools.",
+  discoveryLine: "Where publishers find data.",
+} as const;
+
 // The domain mailbox will be added before the legal pages are considered launch-ready.
 export const publicContactEmail: string | null = null;

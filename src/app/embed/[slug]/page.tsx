@@ -102,8 +102,8 @@ export default async function EurostatEmbedPage({ params }: { params: Promise<{ 
         </p>
         <p>
           Custom EU27 selection from 2020; not the complete Eurostat dataset. This is a customised
-          presentation by Publisher Asset Marketplace, not an official Eurostat embed. Eurostat does
-          not endorse and is not responsible for this customised presentation.
+          presentation by Cite Supply, not an official Eurostat embed. Eurostat does not endorse and
+          is not responsible for this customised presentation.
         </p>
         <a href={sourceHref} rel="noreferrer">
           View the canonical Eurostat Data Browser source

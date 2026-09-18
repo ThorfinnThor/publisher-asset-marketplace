@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { siteBrand } from "@/lib/site-identity";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Publisher Asset Marketplace",
-    template: "%s | Publisher Asset Marketplace",
+    default: siteBrand.name,
+    template: `%s | ${siteBrand.name}`,
   },
-  description: "Find source-hosted charts and tools with clear reuse information.",
+  description: siteBrand.tagline,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
@@ -18,11 +20,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body>
         <header className="site-header">
           <div className="site-header__inner">
-            <Link className="brand" href="/" aria-label="Publisher Assets home">
+            <Link className="brand" href="/" aria-label={`${siteBrand.name} home`}>
               <span aria-hidden="true" className="brand__mark">
-                PA
+                {siteBrand.mark}
               </span>
-              <span>Publisher Assets</span>
+              <span>{siteBrand.name}</span>
             </Link>
             <nav aria-label="Primary" className="site-nav">
               <Link href="/search">Browse</Link>
@@ -49,11 +51,14 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           <div className="site-footer__inner">
             <Link className="brand brand--footer" href="/">
               <span aria-hidden="true" className="brand__mark">
-                PA
+                {siteBrand.mark}
               </span>
-              <span>Publisher Assets</span>
+              <span>{siteBrand.name}</span>
             </Link>
-            <p>Source links and rights evidence stay visible. Backlinks are never guaranteed.</p>
+            <p>
+              {siteBrand.tagline} Source links and rights evidence stay visible. Backlinks are never
+              guaranteed.
+            </p>
             <nav aria-label="Footer">
               <Link href="/search">Browse</Link>
               <Link href="/submit">Publish</Link>

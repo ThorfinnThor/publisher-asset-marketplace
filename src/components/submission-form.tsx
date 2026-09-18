@@ -641,12 +641,12 @@ export function SubmissionForm({
         <label className="attestation">
           <input name="commercial_marketplace_acknowledged" required type="checkbox" />
           <span>
-            I understand that Publisher Asset Marketplace is a commercial service that may earn
-            revenue, including through fees, subscriptions, advertising, or similar business models.
-            I agree that this asset may be listed, described, and promoted within that commercial
-            marketplace. I retain ownership of my tool, source code, and data; this acknowledgement
-            grants no rights beyond those needed for the submitted listing, preview, attribution,
-            and embed availability.
+            I understand that Cite Supply is a commercial service that may earn revenue, including
+            through fees, subscriptions, advertising, or similar business models. I agree that this
+            asset may be listed, described, and promoted within that commercial marketplace. I
+            retain ownership of my tool, source code, and data; this acknowledgement grants no
+            rights beyond those needed for the submitted listing, preview, attribution, and embed
+            availability.
           </span>
         </label>
         <label className="attestation">

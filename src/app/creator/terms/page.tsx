@@ -5,10 +5,11 @@ import {
   currentCreatorTermsEffectiveDate,
   currentCreatorTermsVersion,
 } from "@/lib/submissions/creator-terms";
+import { siteBrand } from "@/lib/site-identity";
 
 export const metadata: Metadata = {
   title: "Creator terms",
-  description: "Terms for submitting and publishing assets in Publisher Asset Marketplace.",
+  description: `Terms for submitting and publishing assets in ${siteBrand.name}.`,
 };
 
 export default function CreatorTermsPage() {
@@ -19,7 +20,7 @@ export default function CreatorTermsPage() {
         <h1 className="page-title">Creator Terms</h1>
         <p className="page-intro">
           These terms govern every chart, calculator, table, dataset, benchmark, widget, preview,
-          and related listing information submitted to Publisher Asset Marketplace.
+          and related listing information submitted to {siteBrand.name}.
         </p>
         <div className="creator-terms__version" aria-label="Current terms version">
           <span>Version {currentCreatorTermsVersion}</span>
@@ -54,8 +55,8 @@ export default function CreatorTermsPage() {
 
           <TermsSection number="03" title="Permission granted to the marketplace">
             <p>
-              While the listing is active, you grant Publisher Asset Marketplace a non-exclusive,
-              worldwide, royalty-free permission to store, reproduce, resize, display, make publicly
+              While the listing is active, you grant {siteBrand.name} a non-exclusive, worldwide,
+              royalty-free permission to store, reproduce, resize, display, make publicly
               accessible, index, and promote the submitted metadata and preview image. This
               permission is limited to operating, securing, presenting, and promoting the
               marketplace and its asset listings.
@@ -71,7 +72,7 @@ export default function CreatorTermsPage() {
 
           <TermsSection number="04" title="Commercial operation">
             <p>
-              Publisher Asset Marketplace is a commercial service and may earn revenue through fees,
+              {siteBrand.name} is a commercial service and may earn revenue through fees,
               subscriptions, advertising, partnerships, or similar business models. You agree that
               your listing may appear and be promoted in this commercial environment. Commercial
               operation of the marketplace does not transfer ownership of your asset to the

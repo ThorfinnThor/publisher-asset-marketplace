@@ -14,6 +14,7 @@ import {
 } from "@/lib/search/search-page";
 import { searchAssets, type SearchAsset } from "@/lib/search/search-assets";
 import type { SearchResultContract } from "@/lib/search/ranking-contract";
+import { siteBrand } from "@/lib/site-identity";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -73,7 +74,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <section className="search-results" aria-labelledby="results-heading">
           <div className="search-results__heading">
             <div>
-              <p className="eyebrow">Browse assets</p>
+              <p className="eyebrow">{siteBrand.discoveryLine}</p>
               <h1 id="results-heading">
                 {hasSearch ? `Results for “${parsed.query}”` : "Find publisher-ready assets"}
               </h1>

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { publicContactEmail, siteIdentity } from "@/lib/site-identity";
+import { publicContactEmail, siteBrand, siteIdentity } from "@/lib/site-identity";
 
 export const metadata: Metadata = {
   title: "Impressum",
-  description: "Anbieterkennzeichnung von Publisher Asset Marketplace.",
+  description: `Anbieterkennzeichnung von ${siteBrand.name}.`,
 };
 
 export default function LegalNoticePage() {
@@ -14,7 +14,7 @@ export default function LegalNoticePage() {
       <header className="legal-page__header">
         <p className="eyebrow">Rechtliche Informationen</p>
         <h1 className="page-title">Impressum</h1>
-        <p className="page-intro">Anbieterkennzeichnung für den Publisher Asset Marketplace.</p>
+        <p className="page-intro">Anbieterkennzeichnung für {siteBrand.name}.</p>
       </header>
 
       <div className="legal-page__layout">

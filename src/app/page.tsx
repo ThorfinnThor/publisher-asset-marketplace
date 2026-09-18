@@ -7,6 +7,7 @@ import {
   SearchIcon,
 } from "@/components/design-system";
 import { designAssets } from "@/lib/design-assets";
+import { siteBrand } from "@/lib/site-identity";
 
 const trendingQueries = ["AI adoption", "SaaS churn", "German salary", "Ecommerce benchmarks"];
 const trustedSources = ["Our World in Data", "World Bank", "OECD", "United Nations", "Eurostat"];
@@ -17,7 +18,7 @@ export default function HomePage() {
       <section className="home-hero" id="publishers">
         <div className="page-shell home-hero__grid">
           <div className="home-hero__copy">
-            <p className="eyebrow">Publisher research, made reusable</p>
+            <p className="eyebrow">{siteBrand.tagline}</p>
             <h1>Find data worth citing.</h1>
             <p className="home-hero__intro">
               Search charts, statistics, calculators and datasets you can actually publish in your
