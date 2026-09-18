@@ -70,7 +70,7 @@ export default function HomePage() {
                   <strong>Our World in Data</strong>
                   <span>Checked Sep 2026</span>
                 </div>
-                <RightsBadge state="restricted">Rights review pending</RightsBadge>
+                <RightsBadge>Interface sample</RightsBadge>
               </div>
             </article>
 

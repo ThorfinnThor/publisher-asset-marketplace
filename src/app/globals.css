@@ -3144,6 +3144,7 @@ body:has(.marketplace-embed-shell) > .site-footer {
 
 .creator-guide__overview strong,
 .creator-guide__overview span {
+  grid-column: 2;
   display: block;
 }
 
