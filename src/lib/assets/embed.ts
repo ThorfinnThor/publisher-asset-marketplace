@@ -56,8 +56,8 @@ export function canCopyEmbed(asset: EmbedAsset): boolean {
     isReviewedEmbed(asset.embed_url, asset.embed_origin ?? null);
   const sourceHosted =
     rights.embed_allowed === true &&
-    (asset.embed_origin
-      ? isReviewedEmbed(asset.embed_url, asset.embed_origin)
+    (asset.source_id === null
+      ? isReviewedEmbed(asset.embed_url, asset.embed_origin ?? null)
       : isSourceHostedEmbed(
           asset.embed_url,
           asset.source_base_url ?? sourceOriginForId(asset.source_id),

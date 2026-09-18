@@ -38,6 +38,17 @@ describe("C5 source-hosted embed", () => {
     ).toBe(true);
   });
 
+  it("does not let stale embed metadata override a source-hosted allowlist", () => {
+    expect(
+      canCopyEmbed({
+        ...safeAsset,
+        source_id: "source_owid",
+        source_base_url: "https://ourworldindata.org",
+        embed_origin: "https://publisher-asset-marketplace.shuu9599.workers.dev",
+      }),
+    ).toBe(true);
+  });
+
   it("does not accept insecure or unrelated embed hosts", () => {
     expect(isSourceHostedEmbed("http://ourworldindata.org/embed", safeAsset.source_base_url)).toBe(
       false,
