@@ -1,4 +1,5 @@
 import { normalizeQuery } from "./normalize-query";
+import { deriveSourceHostedEmbedUrl } from "../assets/embed";
 import {
   searchRankingV1,
   type SearchMatchedField,
@@ -141,7 +142,11 @@ function publicAsset(candidate: SearchCandidate): SearchAsset {
     rights_json: candidate.rights_json,
     source_updated_at: candidate.source_updated_at,
     canonical_url: candidate.canonical_url,
-    embed_url: candidate.embed_url,
+    embed_url: deriveSourceHostedEmbedUrl(
+      candidate.source_id ?? null,
+      candidate.canonical_url ?? null,
+      candidate.embed_url ?? null,
+    ),
     embed_origin: candidate.embed_origin,
     preview_url: candidate.preview_url,
     metadata_json: candidate.metadata_json,

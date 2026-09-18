@@ -1,3 +1,5 @@
+import { deriveSourceHostedEmbedUrl } from "./embed";
+
 export type PublishedAssetDetail = {
   id: string;
   source_id: string | null;
@@ -109,5 +111,12 @@ export async function getPublishedAssetBySlug(
     db.prepare(relatedSql).bind(slug, slug, slug, slug),
   ])) as unknown as [{ results: PublishedAssetRow[] }, { results: RelatedAsset[] }];
   const asset = detailResult.results[0];
-  return asset ? { asset, related: relatedResult.results } : null;
+  if (!asset) return null;
+  return {
+    asset: {
+      ...asset,
+      embed_url: deriveSourceHostedEmbedUrl(asset.source_id, asset.canonical_url, asset.embed_url),
+    },
+    related: relatedResult.results,
+  };
 }

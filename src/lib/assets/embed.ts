@@ -10,6 +10,24 @@ type EmbedRights = {
 
 export const MARKETPLACE_IFRAME_STYLE = "width:100%;height:720px;border:0;display:block";
 
+export function deriveSourceHostedEmbedUrl(
+  sourceId: string | null,
+  canonicalUrl: string | null,
+  embedUrl: string | null,
+): string | null {
+  if (embedUrl) return embedUrl;
+  if (sourceId !== "source_owid" || !canonicalUrl) return null;
+  try {
+    const url = new URL(canonicalUrl);
+    if (url.protocol !== "https:" || url.hostname !== "ourworldindata.org") return null;
+    if (!url.pathname.startsWith("/grapher/") || url.pathname === "/grapher/") return null;
+    url.searchParams.set("embed", "1");
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export type EmbedAsset = {
   embed_url: string | null;
   embed_origin?: string | null;

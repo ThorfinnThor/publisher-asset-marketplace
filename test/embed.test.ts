@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildEmbedMarkup,
   canCopyEmbed,
+  deriveSourceHostedEmbedUrl,
   hasReviewedCreatorAttribution,
   isSourceHostedEmbed,
   parseEmbedRights,
@@ -20,6 +21,23 @@ const safeAsset = {
 };
 
 describe("C5 source-hosted embed", () => {
+  it("derives the standard OWID embed URL only from a Grapher canonical URL", () => {
+    expect(
+      deriveSourceHostedEmbedUrl(
+        "source_owid",
+        "https://ourworldindata.org/grapher/covid-contact-tracing",
+        null,
+      ),
+    ).toBe("https://ourworldindata.org/grapher/covid-contact-tracing?embed=1");
+    expect(
+      deriveSourceHostedEmbedUrl(
+        "source_owid",
+        "https://example.com/grapher/covid-contact-tracing",
+        null,
+      ),
+    ).toBeNull();
+  });
+
   it("only permits reviewed embeds on the configured source host", () => {
     expect(canCopyEmbed(safeAsset)).toBe(true);
     expect(canCopyEmbed({ ...safeAsset, embed_url: "https://evil.example/embed" })).toBe(false);
