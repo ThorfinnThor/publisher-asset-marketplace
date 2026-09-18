@@ -58,13 +58,23 @@ export function canCopyEmbed(asset: EmbedAsset): boolean {
     rights.embed_allowed === true &&
     (asset.embed_origin
       ? isReviewedEmbed(asset.embed_url, asset.embed_origin)
-      : isSourceHostedEmbed(asset.embed_url, asset.source_base_url));
+      : isSourceHostedEmbed(
+          asset.embed_url,
+          asset.source_base_url ?? sourceOriginForId(asset.source_id),
+        ));
   return (
     (asset.rights_status === "safe" || asset.rights_status === "restricted") &&
     (marketplaceRendered || sourceHosted) &&
     (asset.source_id !== null ||
       (rights.attribution_required === true && hasReviewedCreatorAttribution(asset)))
   );
+}
+
+function sourceOriginForId(sourceId: string | null): string | null {
+  if (sourceId === "source_owid") return "https://ourworldindata.org";
+  if (sourceId === "source_eurostat") return "https://ec.europa.eu/eurostat";
+  if (sourceId === "source_worldbank") return "https://data.worldbank.org";
+  return null;
 }
 
 export function buildEmbedMarkup(asset: EmbedAsset): string {

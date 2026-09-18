@@ -28,6 +28,16 @@ describe("C5 source-hosted embed", () => {
     ).toBe(false);
   });
 
+  it("uses the allowlisted source origin when a source record is incomplete", () => {
+    expect(
+      canCopyEmbed({
+        ...safeAsset,
+        source_id: "source_owid",
+        source_base_url: null,
+      }),
+    ).toBe(true);
+  });
+
   it("does not accept insecure or unrelated embed hosts", () => {
     expect(isSourceHostedEmbed("http://ourworldindata.org/embed", safeAsset.source_base_url)).toBe(
       false,

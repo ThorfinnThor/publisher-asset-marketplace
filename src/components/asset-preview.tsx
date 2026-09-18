@@ -5,17 +5,28 @@ import { useState } from "react";
 import { ChartPreview } from "@/components/design-system";
 import type { DesignAsset } from "@/lib/design-assets";
 
+import { SourceDataPreview } from "./source-data-preview";
+
 type AssetPreviewProps = {
   compact?: boolean;
   previewUrl?: string | null;
+  metadataJson?: string | null;
   title: string;
   variant: DesignAsset["preview"];
 };
 
-export function AssetPreview({ compact = false, previewUrl, title, variant }: AssetPreviewProps) {
+export function AssetPreview({
+  compact = false,
+  metadataJson = null,
+  previewUrl,
+  title,
+  variant,
+}: AssetPreviewProps) {
   const [failed, setFailed] = useState(false);
 
   if (!previewUrl || failed) {
+    const sourcePreview = <SourceDataPreview compact={compact} metadataJson={metadataJson} />;
+    if (sourcePreview) return sourcePreview;
     return <ChartPreview compact={compact} variant={variant} />;
   }
 

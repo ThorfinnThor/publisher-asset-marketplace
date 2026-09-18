@@ -13,6 +13,7 @@ type RightsJson = {
 
 export type SearchCandidate = {
   id: string;
+  source_id?: string | null;
   slug: string;
   title: string;
   description: string;
@@ -23,8 +24,13 @@ export type SearchCandidate = {
   source_updated_at: string | null;
   canonical_url?: string;
   embed_url?: string | null;
+  embed_origin?: string | null;
   preview_url?: string | null;
+  metadata_json?: string | null;
+  source_base_url?: string | null;
   citation_text?: string | null;
+  attribution_name?: string | null;
+  attribution_url?: string | null;
   fts_rank?: number;
   trigram_similarity?: number;
 };
@@ -125,6 +131,7 @@ function matchedFields(candidate: SearchCandidate, tokens: string[]): SearchMatc
 function publicAsset(candidate: SearchCandidate): SearchAsset {
   return {
     id: candidate.id,
+    source_id: candidate.source_id,
     slug: candidate.slug,
     title: candidate.title,
     description: candidate.description,
@@ -135,8 +142,13 @@ function publicAsset(candidate: SearchCandidate): SearchAsset {
     source_updated_at: candidate.source_updated_at,
     canonical_url: candidate.canonical_url,
     embed_url: candidate.embed_url,
+    embed_origin: candidate.embed_origin,
     preview_url: candidate.preview_url,
+    metadata_json: candidate.metadata_json,
+    source_base_url: candidate.source_base_url,
     citation_text: candidate.citation_text,
+    attribution_name: candidate.attribution_name,
+    attribution_url: candidate.attribution_url,
   };
 }
 
@@ -241,10 +253,11 @@ export function buildPrimarySearchSql(filters: SearchRequest["filters"] = {}): s
   const eligibility = filterSql(filters).sql;
   return `
     WITH ranked AS (
-      SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
+      SELECT a.id, a.source_id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
         a.rights_status, a.rights_json,
         COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
-        a.canonical_url, a.embed_url, a.preview_url,
+        a.canonical_url, a.embed_url, NULL AS embed_origin, a.preview_url, a.metadata_json,
+        sources.base_url AS source_base_url, a.attribution_name, a.attribution_url,
         a.citation_text,
         ROW_NUMBER() OVER (ORDER BY bm25(assets_fts, 0.0, 10.0, 4.0, 6.0, 1.0), a.slug) AS bm25_rank
       FROM assets_fts
@@ -265,10 +278,11 @@ export function buildFallbackSearchSql(
   const eligibility = filterSql(filters).sql;
   const placeholders = Array.from({ length: trigramCount }, () => "?").join(", ");
   return `
-    SELECT a.id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
+    SELECT a.id, a.source_id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
       a.rights_status, a.rights_json,
       COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
-      a.canonical_url, a.embed_url, a.preview_url,
+      a.canonical_url, a.embed_url, NULL AS embed_origin, a.preview_url, a.metadata_json,
+      sources.base_url AS source_base_url, a.attribution_name, a.attribution_url,
       a.citation_text,
       COUNT(DISTINCT index_trigrams.trigram) AS shared_trigrams,
       (SELECT COUNT(*) FROM asset_search_trigrams all_trigrams WHERE all_trigrams.asset_id = a.id) AS asset_trigram_count

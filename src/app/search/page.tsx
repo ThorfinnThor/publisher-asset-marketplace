@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SearchAnalyticsBeacon, TrackedSourceLink } from "@/components/analytics-components";
 import { AssetPreview } from "@/components/asset-preview";
 import { ArrowUpRightIcon, RightsBadge, SearchIcon } from "@/components/design-system";
+import { canCopyEmbed } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
 import {
   assetTypeOptions,
@@ -230,7 +231,15 @@ function FilterFields({ parsed }: { parsed: ReturnType<typeof parseSearchPagePar
 function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset> }) {
   const asset = result.asset;
   const rights = parseRights(asset.rights_json);
-  const embedAllowed = rights.embed_allowed === true && Boolean(asset.embed_url);
+  const embedAllowed = canCopyEmbed({
+    ...asset,
+    embed_url: asset.embed_url ?? null,
+    embed_origin: asset.embed_origin ?? null,
+    source_id: asset.source_id ?? null,
+    source_base_url: asset.source_base_url ?? null,
+    attribution_name: asset.attribution_name ?? null,
+    attribution_url: asset.attribution_url ?? null,
+  });
   const updated = formatUpdatedAt(asset.source_updated_at);
 
   return (
@@ -243,6 +252,7 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
         <AssetPreview
           compact
           previewUrl={asset.preview_url}
+          metadataJson={asset.metadata_json}
           title={asset.title}
           variant={previewVariant(asset.asset_type)}
         />
@@ -281,14 +291,27 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
             <Link className="button button--secondary button--small" href={`/asset/${asset.slug}`}>
               Preview
             </Link>
-            <button
-              className="button button--text button--small"
-              disabled
-              title="Embed actions are enabled in the asset detail view"
-              type="button"
-            >
-              Embed
-            </button>
+            {embedAllowed ? (
+              <Link
+                className="button button--text button--small"
+                href={`/asset/${asset.slug}#embed-heading`}
+              >
+                Embed
+              </Link>
+            ) : (
+              <button
+                className="button button--text button--small"
+                disabled
+                title={
+                  asset.source_name === "World Bank Open Data"
+                    ? "This catalogue asset is citation-only; no reviewed embed is available."
+                    : "No reviewed embed is available for this asset."
+                }
+                type="button"
+              >
+                Embed
+              </button>
+            )}
             <button
               className="button button--text button--small"
               disabled
