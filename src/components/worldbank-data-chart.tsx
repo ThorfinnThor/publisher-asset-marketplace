@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  parseWorldBankApiPoints,
   parseWorldBankMetadataPoints,
+  parseWorldBankPreviewPoints,
   type WorldBankChartPoint,
 } from "@/lib/assets/worldbank-chart";
 
@@ -26,13 +26,7 @@ export function WorldBankDataChart({ indicator, metadataJson, title }: WorldBank
   useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 8_000);
-    const url = new URL(
-      `/v2/country/all/indicator/${encodeURIComponent(indicator)}`,
-      "https://api.worldbank.org",
-    );
-    url.searchParams.set("format", "json");
-    url.searchParams.set("per_page", "400");
-    url.searchParams.set("mrnev", "1");
+    const url = `/api/worldbank-preview/${encodeURIComponent(indicator)}`;
 
     async function loadLatestObservations() {
       try {
@@ -43,7 +37,7 @@ export function WorldBankDataChart({ indicator, metadataJson, title }: WorldBank
         const contentLength = Number(response.headers.get("content-length") ?? "0");
         if (!response.ok || contentLength > MAX_RESPONSE_BYTES) throw new Error("invalid response");
         const value: unknown = await response.json();
-        const latestPoints = parseWorldBankApiPoints(value);
+        const latestPoints = parseWorldBankPreviewPoints(value);
         if (latestPoints.length === 0) throw new Error("empty response");
         setPoints(latestPoints);
         setStatus("ready");

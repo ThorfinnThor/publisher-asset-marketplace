@@ -39,6 +39,22 @@ export function parseWorldBankApiPoints(value: unknown): WorldBankChartPoint[] {
   return selectPoints(value[1]);
 }
 
+export function parseWorldBankPreviewPoints(value: unknown): WorldBankChartPoint[] {
+  if (!isRecord(value) || !Array.isArray(value.points)) return [];
+  return value.points
+    .flatMap((point) => {
+      if (!isRecord(point) || typeof point.value !== "number" || !Number.isFinite(point.value)) {
+        return [];
+      }
+      const country = readString(point.country);
+      const iso3 = readString(point.iso3)?.toUpperCase();
+      const date = readString(point.date);
+      if (!country || !iso3 || !date || !/^[A-Z0-9]{3}$/.test(iso3)) return [];
+      return [{ country, iso3, date, value: point.value }];
+    })
+    .slice(0, MAX_POINTS);
+}
+
 function selectPoints(rows: unknown[]): WorldBankChartPoint[] {
   const parsed = rows.flatMap((row) => {
     if (!isRecord(row) || typeof row.value !== "number" || !Number.isFinite(row.value)) return [];

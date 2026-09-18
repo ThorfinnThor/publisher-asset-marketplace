@@ -4,6 +4,7 @@ import {
   parseWorldBankApiPoints,
   parseWorldBankIndicator,
   parseWorldBankMetadataPoints,
+  parseWorldBankPreviewPoints,
 } from "../src/lib/assets/worldbank-chart";
 
 describe("World Bank chart data", () => {
@@ -46,6 +47,17 @@ describe("World Bank chart data", () => {
       }),
     );
     expect(points).toEqual([{ country: "Japan", iso3: "JPN", date: "2025", value: 42 }]);
+  });
+
+  it("validates the bounded same-origin preview response", () => {
+    expect(
+      parseWorldBankPreviewPoints({
+        points: [
+          { country: "Germany", iso3: "deu", date: "2025", value: 8.2 },
+          { country: "Invalid", iso3: "XX", date: "2025", value: 1 },
+        ],
+      }),
+    ).toEqual([{ country: "Germany", iso3: "DEU", date: "2025", value: 8.2 }]);
   });
 });
 
