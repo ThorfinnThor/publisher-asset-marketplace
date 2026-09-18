@@ -1,4 +1,7 @@
 import { googleAuthIsConfigured } from "@/lib/auth/google";
+import { magicLinkAuthIsConfigured } from "@/lib/auth/magic-link";
+
+import { MagicLinkForm } from "./magic-link-form";
 
 type AuthOptionsProps = {
   context: "create and manage assets" | "submit an asset" | "manage your published assets";
@@ -6,6 +9,7 @@ type AuthOptionsProps = {
 
 export function AuthOptions({ context }: AuthOptionsProps) {
   const googleEnabled = googleAuthIsConfigured();
+  const magicLinkEnabled = magicLinkAuthIsConfigured();
 
   return (
     <>
@@ -19,6 +23,7 @@ export function AuthOptions({ context }: AuthOptionsProps) {
           </a>
         ) : null}
       </div>
+      {magicLinkEnabled ? <MagicLinkForm /> : null}
       <small>
         Sign in to {context}. We use your account profile only to identify your creator account.
       </small>

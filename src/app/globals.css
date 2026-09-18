@@ -2362,6 +2362,80 @@ body:has(.marketplace-embed-shell) > .site-footer {
   margin-top: 7px;
 }
 
+.magic-link-form {
+  display: grid;
+  gap: 8px;
+  max-width: 680px;
+  margin-top: 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.magic-link-form label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.magic-link-form__controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  gap: 10px;
+}
+
+.magic-link-form input {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.magic-link-form__error {
+  color: #8a2f2f;
+  font-size: 12px;
+}
+
+.magic-link-status,
+.magic-link-redeemer {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.magic-link-status strong,
+.magic-link-redeemer strong {
+  color: var(--ink);
+}
+
+.magic-link-status .text-link {
+  width: fit-content;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.magic-link-redeemer .button {
+  width: fit-content;
+  margin-top: 6px;
+}
+
+.auth-callback-page {
+  max-width: 760px;
+  padding-top: 64px;
+}
+
+@media (max-width: 680px) {
+  .magic-link-form__controls {
+    grid-template-columns: 1fr;
+  }
+}
+
 .creator-auth-card small {
   color: var(--muted);
   font-size: 11px;

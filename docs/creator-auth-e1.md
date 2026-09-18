@@ -4,6 +4,9 @@ Creators can sign in with GitHub and, once configured, Google. Publishers remain
 successful callback resolves a provider identity to one marketplace profile, then issues an opaque,
 hashed D1 session token for the creator dashboard. Provider tokens are never stored.
 
+Email magic-link sign-in is also implemented and activates after Cloudflare Email Service is
+configured. See `docs/magic-link-auth.md` for security behavior and activation.
+
 ## Required Cloudflare secrets
 
 Configure these Worker secrets before enabling sign-in:
