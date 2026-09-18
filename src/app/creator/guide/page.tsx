@@ -133,10 +133,10 @@ export default function CreatorGuidePage() {
 
           <GuideStep number="05" title="Run the checks and publish">
             <p>
-              Sign in with GitHub and paste the four URLs plus your metadata and declarations. The
-              marketplace checks URL safety, host relationships, the preview, attribution, declared
-              reuse rights and sandbox confirmation. If every check passes, the asset is published
-              immediately. Otherwise, correct the reported fields and submit again.
+              Sign in and paste the four URLs plus your metadata and declarations. The marketplace
+              checks URL safety, host relationships, the preview, attribution, declared reuse rights
+              and sandbox confirmation. If every check passes, the asset is published immediately.
+              Otherwise, correct the reported fields and submit again.
             </p>
             <p>
               The marketplace is a commercial service and may earn revenue through fees,

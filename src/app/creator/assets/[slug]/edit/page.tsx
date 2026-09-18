@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { SubmissionForm, type SubmissionInitialValues } from "@/components/submission-form";
+import { AuthOptions } from "@/components/auth-options";
 import { csrfTokenForRequest, getAuthenticatedProfile } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
 
@@ -42,14 +43,12 @@ export default async function EditAssetPage({ params }: EditAssetPageProps) {
         <header className="submission-page__header">
           <p className="eyebrow">Creator workspace</p>
           <h1 className="page-title">Edit your asset.</h1>
-          <p className="page-intro">Sign in with GitHub to manage your published assets.</p>
+          <p className="page-intro">Sign in to manage your published assets.</p>
         </header>
         <section className="creator-auth-card" aria-labelledby="edit-sign-in-heading">
           <p className="eyebrow">Creator access</p>
           <h2 id="edit-sign-in-heading">Sign in to continue</h2>
-          <a className="button button--primary" href="/api/auth/github">
-            Continue with GitHub
-          </a>
+          <AuthOptions context="manage your published assets" />
         </section>
       </main>
     );

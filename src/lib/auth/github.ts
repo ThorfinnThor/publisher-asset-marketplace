@@ -1,16 +1,20 @@
 import { env } from "cloudflare:workers";
 
+import {
+  authSessionLifetimeSeconds,
+  createAuthSession,
+  hashAuthToken,
+  resolveProviderProfile,
+  type AuthProfile,
+} from "./identity";
+
+export type { AuthProfile } from "./identity";
+
 export const sessionCookieName = "publisher_asset_session";
 export const oauthStateCookieName = "publisher_asset_oauth_state";
-const sessionLifetimeSeconds = 60 * 60 * 24 * 30;
+export const oauthNonceCookieName = "publisher_asset_oauth_nonce";
+const sessionLifetimeSeconds = authSessionLifetimeSeconds();
 const oauthStateLifetimeSeconds = 60 * 10;
-
-export type AuthProfile = {
-  id: string;
-  role: "creator" | "admin";
-  display_name: string;
-  website_url: string | null;
-};
 
 type AuthBindings = {
   DB: D1Database;
@@ -94,37 +98,17 @@ export async function completeGithubLogin(
   const login = typeof user.login === "string" ? user.login.trim() : "";
   if (!githubId || !login) throw new Error("GitHub profile is incomplete.");
 
-  const profile: AuthProfile = {
-    id: `github:${githubId}`,
-    role: "creator",
-    display_name:
-      typeof user.name === "string" && user.name.trim().length > 0 ? user.name.trim() : login,
-    website_url: normalizeWebsite(user.blog),
-  };
-  const now = new Date().toISOString();
-  await config.DB.prepare(
-    `
-      INSERT INTO profiles (id, role, display_name, website_url, created_at)
-      VALUES (?, 'creator', ?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET
-        display_name = excluded.display_name,
-        website_url = COALESCE(excluded.website_url, profiles.website_url)
-    `,
-  )
-    .bind(profile.id, profile.display_name, profile.website_url, now)
-    .run();
-
-  const sessionToken = crypto.randomUUID() + crypto.randomUUID();
-  const tokenHash = await hashToken(sessionToken);
-  const expiresAt = new Date(Date.now() + sessionLifetimeSeconds * 1_000).toISOString();
-  await config.DB.prepare(
-    `
-      INSERT INTO auth_sessions (id, profile_id, token_hash, expires_at, created_at)
-      VALUES (?, ?, ?, ?, ?)
-    `,
-  )
-    .bind(crypto.randomUUID(), profile.id, tokenHash, expiresAt, now)
-    .run();
+  const displayName =
+    typeof user.name === "string" && user.name.trim().length > 0 ? user.name.trim() : login;
+  const profile = await resolveProviderProfile(config.DB, {
+    provider: "github",
+    subject: githubId,
+    displayName,
+    websiteUrl: normalizeWebsite(user.blog),
+    email: null,
+    emailVerified: false,
+  });
+  const sessionToken = await createAuthSession(config.DB, profile.id);
   return { profile, sessionToken };
 }
 
@@ -134,7 +118,7 @@ export async function getAuthenticatedProfile(
 ): Promise<AuthProfile | null> {
   const token = parseCookies(request.headers.get("cookie"))[sessionCookieName];
   if (!token) return null;
-  const tokenHash = await hashToken(token);
+  const tokenHash = await hashAuthToken(token);
   const now = new Date().toISOString();
   const row = await db
     .prepare(
@@ -156,12 +140,16 @@ export async function deleteAuthSession(request: Request, db: D1Database): Promi
   if (!token) return;
   await db
     .prepare("DELETE FROM auth_sessions WHERE token_hash = ?")
-    .bind(await hashToken(token))
+    .bind(await hashAuthToken(token))
     .run();
 }
 
 export function stateCookie(state: string): string {
   return serializeCookie(oauthStateCookieName, state, oauthStateLifetimeSeconds);
+}
+
+export function nonceCookie(nonce: string): string {
+  return serializeCookie(oauthNonceCookieName, nonce, oauthStateLifetimeSeconds);
 }
 
 export async function signOAuthState(state: string): Promise<string> {
@@ -230,6 +218,10 @@ export function clearStateCookie(): string {
   return serializeCookie(oauthStateCookieName, "", 0);
 }
 
+export function clearNonceCookie(): string {
+  return serializeCookie(oauthNonceCookieName, "", 0);
+}
+
 export function sessionCookie(token: string): string {
   return serializeCookie(sessionCookieName, token, sessionLifetimeSeconds);
 }
@@ -246,13 +238,12 @@ export function readState(request: Request): string | null {
   return parseCookies(request.headers.get("cookie"))[oauthStateCookieName] ?? null;
 }
 
-export function oauthStateLifetime(): number {
-  return oauthStateLifetimeSeconds;
+export function readNonce(request: Request): string | null {
+  return parseCookies(request.headers.get("cookie"))[oauthNonceCookieName] ?? null;
 }
 
-async function hashToken(value: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return bytesToBase64Url(new Uint8Array(digest));
+export function oauthStateLifetime(): number {
+  return oauthStateLifetimeSeconds;
 }
 
 async function importHmacKey(secret: string): Promise<CryptoKey> {

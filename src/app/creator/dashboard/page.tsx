@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { AssetPreview } from "@/components/asset-preview";
+import { AuthOptions } from "@/components/auth-options";
 import { DeleteCreatorAssetButton } from "@/components/delete-creator-asset-button";
 import {
   getCreatorDashboard,
@@ -34,7 +35,7 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
             <p className="eyebrow">For creators</p>
             <h1 className="page-title">Publish useful assets.</h1>
             <p className="page-intro">
-              Sign in with GitHub to create your creator profile and prepare assets for review.
+              Sign in to create your creator profile and publish assets after automated checks.
             </p>
           </div>
         </header>
@@ -47,10 +48,7 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
           <p className="eyebrow">Creator access</p>
           <h2 id="creator-sign-in-heading">Sign in to continue</h2>
           <p>Your publisher-facing browsing experience remains available without an account.</p>
-          <a className="button button--primary" href="/api/auth/github">
-            Continue with GitHub
-          </a>
-          <small>We use your GitHub profile only to identify your creator account.</small>
+          <AuthOptions context="create and manage assets" />
         </section>
       </main>
     );

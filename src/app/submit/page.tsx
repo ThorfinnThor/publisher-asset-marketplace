@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { SubmissionForm, SubmissionRequirements } from "@/components/submission-form";
+import { AuthOptions } from "@/components/auth-options";
 import { UrlScanForm } from "@/components/url-scan-form";
 import { csrfTokenForRequest, getAuthenticatedProfile } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
@@ -47,10 +48,8 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
         <section className="creator-auth-card" aria-labelledby="submit-sign-in-heading">
           <p className="eyebrow">Creator access</p>
           <h2 id="submit-sign-in-heading">Sign in to submit</h2>
-          <p>Sign in with GitHub first. Publishers can browse without an account.</p>
-          <a className="button button--primary" href="/api/auth/github">
-            Continue with GitHub
-          </a>
+          <p>Publishers can browse without an account.</p>
+          <AuthOptions context="submit an asset" />
         </section>
       ) : auth.csrfToken ? (
         <>

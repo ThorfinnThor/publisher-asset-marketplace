@@ -2353,6 +2353,12 @@ body:has(.marketplace-embed-shell) > .site-footer {
 
 .creator-auth-card .button {
   width: fit-content;
+}
+
+.auth-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 7px;
 }
 
