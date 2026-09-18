@@ -3115,8 +3115,9 @@ body:has(.marketplace-embed-shell) > .site-footer {
 }
 
 .creator-guide__overview ol {
+  min-width: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
   gap: 18px 26px;
   margin: 0;
   padding: 0;
@@ -3125,8 +3126,9 @@ body:has(.marketplace-embed-shell) > .site-footer {
 }
 
 .creator-guide__overview li {
+  min-width: 0;
   display: grid;
-  grid-template-columns: 27px 1fr;
+  grid-template-columns: 27px minmax(0, 1fr);
   gap: 10px;
   align-items: start;
   counter-increment: resources;

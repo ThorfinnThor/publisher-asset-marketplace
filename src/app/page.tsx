@@ -138,15 +138,15 @@ export default function HomePage() {
                   </h3>
                   <div className="featured-card__meta">
                     <span>{asset.source}</span>
-                    <RightsBadge>Review pending</RightsBadge>
+                    <RightsBadge>Interface sample</RightsBadge>
                   </div>
                 </div>
               </article>
             ))}
           </div>
           <p className="validation-note">
-            These records demonstrate the interface only. Reuse actions remain unavailable until
-            asset-level rights evidence passes review.
+            These cards are interface samples. Browse the marketplace for published assets with
+            asset-level rights evidence and reuse actions.
           </p>
         </div>
       </section>
