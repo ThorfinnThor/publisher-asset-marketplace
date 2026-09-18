@@ -15,9 +15,11 @@ import {
 import {
   createAuthSession,
   hashAuthToken,
+  linkProviderIdentity,
   resolveProviderProfile,
   type AuthProfile,
 } from "./identity";
+import { sessionTokenForRequest } from "./github";
 
 const cloudflareEmailEndpoint = "https://api.cloudflare.com/client/v4/accounts";
 
@@ -39,7 +41,19 @@ type MagicLinkEmailResponse = {
 
 type MagicLinkRow = {
   email_normalized: string;
+  link_profile_id: string | null;
 };
+
+export type MagicLinkRequestPurpose = {
+  profileId: string;
+  sessionTokenHash: string;
+};
+
+export type MagicLinkConsumption =
+  | { kind: "signed_in"; profile: AuthProfile; sessionToken: string }
+  | { kind: "linked"; profile: AuthProfile }
+  | { kind: "link_conflict" }
+  | { kind: "invalid" };
 
 function bindings(): MagicLinkBindings {
   return env as MagicLinkBindings;
@@ -59,6 +73,7 @@ export function magicLinkAuthIsConfigured(): boolean {
 export async function requestMagicLink(
   request: Request,
   emailInput: unknown,
+  purpose: MagicLinkRequestPurpose | null = null,
 ): Promise<"sent" | "ignored"> {
   const config = bindings();
   const email = normalizeMagicLinkEmail(emailInput);
@@ -92,11 +107,21 @@ export async function requestMagicLink(
     `
       INSERT INTO auth_magic_links (
         id, email_normalized, token_hash, request_ip_hash,
-        delivery_status, expires_at, consumed_at, created_at
-      ) VALUES (?, ?, ?, ?, 'pending', ?, NULL, ?)
+        delivery_status, expires_at, consumed_at, created_at,
+        link_profile_id, link_session_hash
+      ) VALUES (?, ?, ?, ?, 'pending', ?, NULL, ?, ?, ?)
     `,
   )
-    .bind(id, email, tokenHash, ipHash, expiresAt, nowIso)
+    .bind(
+      id,
+      email,
+      tokenHash,
+      ipHash,
+      expiresAt,
+      nowIso,
+      purpose?.profileId ?? null,
+      purpose?.sessionTokenHash ?? null,
+    )
     .run();
 
   try {
@@ -129,14 +154,17 @@ export async function requestMagicLink(
 }
 
 export async function consumeMagicLink(
+  request: Request,
   tokenInput: unknown,
-): Promise<{ profile: AuthProfile; sessionToken: string } | null> {
-  if (!validMagicLinkToken(tokenInput)) return null;
+): Promise<MagicLinkConsumption> {
+  if (!validMagicLinkToken(tokenInput)) return { kind: "invalid" };
   const config = bindings();
   if (!config.AUTH_SECRET) throw new Error("Authentication is not configured.");
   const now = new Date();
   const nowIso = now.toISOString();
   const tokenHash = await hashAuthToken(tokenInput);
+  const sessionToken = sessionTokenForRequest(request);
+  const sessionHash = sessionToken ? await hashAuthToken(sessionToken) : "";
   const link = await config.DB.prepare(
     `
       UPDATE auth_magic_links
@@ -145,14 +173,32 @@ export async function consumeMagicLink(
         AND delivery_status = 'sent'
         AND consumed_at IS NULL
         AND expires_at > ?
+        AND (link_profile_id IS NULL OR link_session_hash = ?)
       RETURNING email_normalized
+        , link_profile_id
     `,
   )
-    .bind(nowIso, tokenHash, nowIso)
+    .bind(nowIso, tokenHash, nowIso, sessionHash)
     .first<MagicLinkRow>();
-  if (!link) return null;
+  if (!link) return { kind: "invalid" };
 
   const subject = await hashAuthToken(magicLinkIdentitySeed(link.email_normalized));
+  if (link.link_profile_id) {
+    const result = await linkProviderIdentity(
+      config.DB,
+      link.link_profile_id,
+      {
+        provider: "email",
+        subject,
+        displayName: magicLinkDisplayName(link.email_normalized),
+        websiteUrl: null,
+        email: link.email_normalized,
+        emailVerified: true,
+      },
+      nowIso,
+    );
+    return result.ok ? { kind: "linked", profile: result.profile } : { kind: "link_conflict" };
+  }
   const profile = await resolveProviderProfile(
     config.DB,
     {
@@ -165,8 +211,8 @@ export async function consumeMagicLink(
     },
     nowIso,
   );
-  const sessionToken = await createAuthSession(config.DB, profile.id, now);
-  return { profile, sessionToken };
+  const authSessionToken = await createAuthSession(config.DB, profile.id, now);
+  return { kind: "signed_in", profile, sessionToken: authSessionToken };
 }
 
 async function sendMagicLinkEmail(

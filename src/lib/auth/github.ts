@@ -13,6 +13,7 @@ export type { AuthProfile } from "./identity";
 export const sessionCookieName = "publisher_asset_session";
 export const oauthStateCookieName = "publisher_asset_oauth_state";
 export const oauthNonceCookieName = "publisher_asset_oauth_nonce";
+export const oauthLinkIntentCookieName = "publisher_asset_oauth_link_intent";
 const sessionLifetimeSeconds = authSessionLifetimeSeconds();
 const oauthStateLifetimeSeconds = 60 * 10;
 
@@ -152,6 +153,10 @@ export function nonceCookie(nonce: string): string {
   return serializeCookie(oauthNonceCookieName, nonce, oauthStateLifetimeSeconds);
 }
 
+export function linkIntentCookie(intent: string): string {
+  return serializeCookie(oauthLinkIntentCookieName, intent, oauthStateLifetimeSeconds);
+}
+
 export async function signOAuthState(state: string): Promise<string> {
   const secret = bindings().AUTH_SECRET;
   if (!secret) throw new Error("Auth secret is not configured.");
@@ -222,6 +227,10 @@ export function clearNonceCookie(): string {
   return serializeCookie(oauthNonceCookieName, "", 0);
 }
 
+export function clearLinkIntentCookie(): string {
+  return serializeCookie(oauthLinkIntentCookieName, "", 0);
+}
+
 export function sessionCookie(token: string): string {
   return serializeCookie(sessionCookieName, token, sessionLifetimeSeconds);
 }
@@ -240,6 +249,14 @@ export function readState(request: Request): string | null {
 
 export function readNonce(request: Request): string | null {
   return parseCookies(request.headers.get("cookie"))[oauthNonceCookieName] ?? null;
+}
+
+export function readLinkIntent(request: Request): string | null {
+  return parseCookies(request.headers.get("cookie"))[oauthLinkIntentCookieName] ?? null;
+}
+
+export function sessionTokenForRequest(request: Request): string | null {
+  return sessionTokenFromRequest(request);
 }
 
 export function oauthStateLifetime(): number {

@@ -4,12 +4,15 @@ import { headers } from "next/headers";
 import { AssetPreview } from "@/components/asset-preview";
 import { AuthOptions } from "@/components/auth-options";
 import { DeleteCreatorAssetButton } from "@/components/delete-creator-asset-button";
+import { MagicLinkForm } from "@/components/magic-link-form";
 import {
   getCreatorDashboard,
   type CreatorAssetAnalytics,
   type CreatorDashboardData,
 } from "@/lib/analytics/creator-dashboard";
 import { csrfTokenForRequest, getAuthenticatedProfile } from "@/lib/auth/github";
+import { googleAuthIsConfigured } from "@/lib/auth/google";
+import { magicLinkAuthIsConfigured } from "@/lib/auth/magic-link";
 import { getDatabase } from "@/lib/db/client";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +81,17 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
           <strong>Signed in.</strong> Your creator profile has been created or refreshed.
         </div>
       ) : null}
+      {params.auth === "linked" ? (
+        <div className="notice dashboard-notice" role="status">
+          <strong>Sign-in method linked.</strong> You can now use it for this creator profile.
+        </div>
+      ) : null}
+      {params.auth === "link_error" ? (
+        <div className="notice notice--error dashboard-notice" role="alert">
+          <strong>Sign-in method could not be linked.</strong> It may already belong to another
+          creator profile.
+        </div>
+      ) : null}
 
       <section className="creator-profile-card" aria-labelledby="creator-profile-heading">
         <div>
@@ -87,6 +101,8 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
         </div>
         <span className="profile-role">{profile.role}</span>
       </section>
+
+      <CreatorAuthMethods profileId={profile.id} />
 
       <CreatorAnalyticsSection csrfToken={csrfToken ?? ""} data={analytics} />
 
@@ -117,6 +133,74 @@ export default async function CreatorDashboardPage({ searchParams }: CreatorDash
       </section>
     </main>
   );
+}
+
+async function CreatorAuthMethods({ profileId }: { profileId: string }) {
+  const identities = await loadAuthIdentities(profileId);
+  const providers = new Set(identities.map((identity) => identity.provider));
+  return (
+    <section className="creator-auth-methods" aria-labelledby="creator-auth-methods-heading">
+      <div>
+        <p className="eyebrow">Account security</p>
+        <h2 id="creator-auth-methods-heading">Sign-in methods</h2>
+        <p>
+          Link another method to this profile. Existing profiles are never merged automatically.
+        </p>
+      </div>
+      <ul className="creator-auth-methods__list">
+        {(["github", "google", "email"] as const).map((provider) => (
+          <li key={provider}>
+            <div>
+              <strong>{providerLabel(provider)}</strong>
+              <span>{providers.has(provider) ? "Linked to this profile" : "Not linked"}</span>
+            </div>
+            {provider === "google" && !providers.has("google") && googleAuthIsConfigured() ? (
+              <a
+                className="button button--secondary button--small"
+                href="/api/auth/google?mode=link"
+              >
+                Link Google
+              </a>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+      {magicLinkAuthIsConfigured() && !providers.has("email") ? (
+        <MagicLinkForm mode="link" />
+      ) : null}
+    </section>
+  );
+}
+
+async function loadAuthIdentities(profileId: string): Promise<ProviderIdentityRow[]> {
+  try {
+    return await getDatabase()
+      .prepare(
+        `
+          SELECT provider, email_normalized, email_verified
+          FROM auth_identities
+          WHERE profile_id = ?
+          ORDER BY provider
+        `,
+      )
+      .bind(profileId)
+      .all<ProviderIdentityRow>()
+      .then((result) => result.results);
+  } catch {
+    return [];
+  }
+}
+
+type ProviderIdentityRow = {
+  provider: "github" | "google" | "email";
+  email_normalized: string | null;
+  email_verified: number;
+};
+
+function providerLabel(provider: ProviderIdentityRow["provider"]): string {
+  if (provider === "github") return "GitHub";
+  if (provider === "google") return "Google";
+  return "Email magic link";
 }
 
 function CreatorAnalyticsSection({

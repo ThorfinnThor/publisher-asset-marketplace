@@ -12,8 +12,16 @@ export async function POST(request: Request): Promise<Response> {
 
   const payload = (await request.json().catch(() => null)) as { token?: unknown } | null;
   try {
-    const result = await consumeMagicLink(payload?.token);
-    if (!result) return json({ error: "This sign-in link is invalid or has expired." }, 401);
+    const result = await consumeMagicLink(request, payload?.token);
+    if (result.kind === "invalid") {
+      return json({ error: "This sign-in link is invalid or has expired." }, 401);
+    }
+    if (result.kind === "link_conflict") {
+      return json({ error: "That email is already linked to another creator profile." }, 409);
+    }
+    if (result.kind === "linked") {
+      return json({ ok: true, redirect: "/creator/dashboard?auth=linked" }, 200);
+    }
     const response = json({ ok: true, redirect: "/creator/dashboard?auth=signed_in" }, 200);
     response.headers.append("set-cookie", sessionCookie(result.sessionToken));
     return response;

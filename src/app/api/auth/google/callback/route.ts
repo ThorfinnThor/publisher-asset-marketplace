@@ -1,12 +1,16 @@
 import {
+  clearLinkIntentCookie,
   clearNonceCookie,
   clearStateCookie,
+  getAuthenticatedProfile,
+  readLinkIntent,
   readNonce,
   readState,
   sessionCookie,
   verifyOAuthState,
 } from "@/lib/auth/github";
-import { completeGoogleLogin } from "@/lib/auth/google";
+import { completeGoogleLink, completeGoogleLogin } from "@/lib/auth/google";
+import { getDatabase } from "@/lib/db/client";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -24,6 +28,15 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
+    const linkIntent = readLinkIntent(request);
+    if (linkIntent) {
+      const profile = await getAuthenticatedProfile(request, getDatabase());
+      if (!profile || !(await verifyOAuthState(`${state}|${profile.id}`, linkIntent))) {
+        return redirectToDashboard(request, "auth_error");
+      }
+      const result = await completeGoogleLink(request, code, readNonce(request), profile.id);
+      return redirectToDashboard(request, result.ok ? "linked" : "link_error");
+    }
     const result = await completeGoogleLogin(request, code, readNonce(request));
     const response = redirectToDashboard(request, "signed_in");
     response.headers.append("set-cookie", sessionCookie(result.sessionToken));
@@ -39,5 +52,6 @@ function redirectToDashboard(request: Request, status: string): Response {
   const headers = new Headers({ location: target.toString(), "cache-control": "no-store" });
   headers.append("set-cookie", clearStateCookie());
   headers.append("set-cookie", clearNonceCookie());
+  headers.append("set-cookie", clearLinkIntentCookie());
   return new Response(null, { status: 302, headers });
 }

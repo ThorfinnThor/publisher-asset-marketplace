@@ -7,6 +7,10 @@ hashed D1 session token for the creator dashboard. Provider tokens are never sto
 Email magic-link sign-in is also implemented and activates after Cloudflare Email Service is
 configured. See `docs/magic-link-auth.md` for security behavior and activation.
 
+After sign-in, the creator dashboard shows linked methods. Google linking uses a signed OAuth intent
+bound to the current session. Email linking uses a single-use link bound to the current session; a
+link opened on another device cannot attach an address to the profile.
+
 ## Required Cloudflare secrets
 
 Configure these Worker secrets before enabling sign-in:

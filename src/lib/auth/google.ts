@@ -1,7 +1,13 @@
 import { env } from "cloudflare:workers";
 
 import { validatedGoogleClaims, type GoogleIdClaims } from "./google-claims";
-import { createAuthSession, resolveProviderProfile, type AuthProfile } from "./identity";
+import {
+  createAuthSession,
+  linkProviderIdentity,
+  resolveProviderProfile,
+  type AuthProfile,
+  type LinkIdentityResult,
+} from "./identity";
 import { verifyOAuthState } from "./github";
 
 const GOOGLE_AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -59,6 +65,32 @@ export async function completeGoogleLogin(
   signedNonce: string | null,
 ): Promise<{ profile: AuthProfile; sessionToken: string }> {
   const config = bindings();
+  const identity = await googleIdentity(request, code, signedNonce);
+  const profile = await resolveProviderProfile(config.DB, identity);
+  const sessionToken = await createAuthSession(config.DB, profile.id);
+  return { profile, sessionToken };
+}
+
+export async function completeGoogleLink(
+  request: Request,
+  code: string,
+  signedNonce: string | null,
+  profileId: string,
+): Promise<LinkIdentityResult> {
+  const config = bindings();
+  return linkProviderIdentity(
+    config.DB,
+    profileId,
+    await googleIdentity(request, code, signedNonce),
+  );
+}
+
+export function googleCallbackUrl(request: Request): string {
+  return new URL("/api/auth/google/callback", request.url).toString();
+}
+
+async function googleIdentity(request: Request, code: string, signedNonce: string | null) {
+  const config = bindings();
   if (!config.GOOGLE_OAUTH_CLIENT_ID || !config.GOOGLE_OAUTH_CLIENT_SECRET) {
     throw new Error("Google OAuth is not configured.");
   }
@@ -84,20 +116,14 @@ export async function completeGoogleLogin(
     throw new Error("Google identity token nonce is invalid.");
   }
   const normalized = validatedGoogleClaims(claims, config.GOOGLE_OAUTH_CLIENT_ID);
-  const profile = await resolveProviderProfile(config.DB, {
-    provider: "google",
+  return {
+    provider: "google" as const,
     subject: normalized.subject,
     displayName: normalized.displayName,
     websiteUrl: null,
     email: normalized.email,
     emailVerified: true,
-  });
-  const sessionToken = await createAuthSession(config.DB, profile.id);
-  return { profile, sessionToken };
-}
-
-export function googleCallbackUrl(request: Request): string {
-  return new URL("/api/auth/google/callback", request.url).toString();
+  };
 }
 
 async function verifyGoogleIdToken(idToken: string, audience: string): Promise<GoogleIdClaims> {

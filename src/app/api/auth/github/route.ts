@@ -1,5 +1,6 @@
 import {
   authIsConfigured,
+  clearLinkIntentCookie,
   githubAuthorizationUrl,
   signOAuthState,
   stateCookie,
@@ -11,12 +12,14 @@ export async function GET(request: Request): Promise<Response> {
   }
   const state = crypto.randomUUID();
   const signedState = await signOAuthState(state);
+  const headers = new Headers({
+    location: githubAuthorizationUrl(request, state),
+    "set-cookie": stateCookie(signedState),
+    "cache-control": "no-store",
+  });
+  headers.append("set-cookie", clearLinkIntentCookie());
   return new Response(null, {
     status: 302,
-    headers: {
-      location: githubAuthorizationUrl(request, state),
-      "set-cookie": stateCookie(signedState),
-      "cache-control": "no-store",
-    },
+    headers,
   });
 }

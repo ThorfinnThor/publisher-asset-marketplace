@@ -1,4 +1,5 @@
 import {
+  clearLinkIntentCookie,
   clearStateCookie,
   completeGithubLogin,
   sessionCookie,
@@ -34,12 +35,8 @@ export async function GET(request: Request): Promise<Response> {
 function redirectToDashboard(request: Request, status: string): Response {
   const target = new URL("/creator/dashboard", request.url);
   target.searchParams.set("auth", status);
-  return new Response(null, {
-    status: 302,
-    headers: {
-      location: target.toString(),
-      "set-cookie": clearStateCookie(),
-      "cache-control": "no-store",
-    },
-  });
+  const headers = new Headers({ location: target.toString(), "cache-control": "no-store" });
+  headers.append("set-cookie", clearStateCookie());
+  headers.append("set-cookie", clearLinkIntentCookie());
+  return new Response(null, { status: 302, headers });
 }

@@ -16,6 +16,9 @@ export type ProviderIdentity = {
   emailVerified: boolean;
 };
 
+export type LinkIdentityResult =
+  { ok: true; profile: AuthProfile } | { ok: false; reason: "identity_in_use" };
+
 const sessionLifetimeSeconds = 60 * 60 * 24 * 30;
 
 export async function resolveProviderProfile(
@@ -114,6 +117,57 @@ export async function resolveProviderProfile(
     .first<AuthProfile>();
   if (!profile) throw new Error("Authentication profile could not be created.");
   return profile;
+}
+
+export async function linkProviderIdentity(
+  db: D1Database,
+  profileId: string,
+  identity: ProviderIdentity,
+  now = new Date().toISOString(),
+): Promise<LinkIdentityResult> {
+  await db
+    .prepare(
+      `
+        INSERT INTO auth_identities (
+          id, profile_id, provider, provider_subject, email_normalized,
+          email_verified, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(provider, provider_subject) DO NOTHING
+      `,
+    )
+    .bind(
+      `${identity.provider}:${identity.subject}`,
+      profileId,
+      identity.provider,
+      identity.subject,
+      normalizeEmail(identity.email),
+      identity.emailVerified ? 1 : 0,
+      now,
+      now,
+    )
+    .run();
+
+  const owner = await db
+    .prepare(
+      `
+        SELECT profile_id
+        FROM auth_identities
+        WHERE provider = ? AND provider_subject = ?
+        LIMIT 1
+      `,
+    )
+    .bind(identity.provider, identity.subject)
+    .first<{ profile_id: string }>();
+  if (!owner || owner.profile_id !== profileId) {
+    return { ok: false, reason: "identity_in_use" };
+  }
+
+  const profile = await db
+    .prepare("SELECT id, role, display_name, website_url FROM profiles WHERE id = ? LIMIT 1")
+    .bind(profileId)
+    .first<AuthProfile>();
+  if (!profile) throw new Error("Authentication profile could not be linked.");
+  return { ok: true, profile };
 }
 
 export async function createAuthSession(

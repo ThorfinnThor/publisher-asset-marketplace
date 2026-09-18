@@ -2446,6 +2446,57 @@ body:has(.marketplace-embed-shell) > .site-footer {
   align-items: center;
 }
 
+.creator-auth-methods {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+.creator-auth-methods h2 {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: -0.03em;
+}
+
+.creator-auth-methods p:not(.eyebrow) {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.creator-auth-methods__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.creator-auth-methods__list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.creator-auth-methods__list li > div {
+  display: grid;
+  gap: 3px;
+}
+
+.creator-auth-methods__list span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .profile-role {
   border: 1px solid var(--border);
   border-radius: 999px;
