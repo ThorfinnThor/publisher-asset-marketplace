@@ -7,10 +7,12 @@ import { ArrowUpRightIcon, ChartPreview, RightsBadge } from "@/components/design
 import { CopyCitationButton } from "@/components/copy-citation-button";
 import { CopyEmbedButton } from "@/components/copy-embed-button";
 import { SourceDataPreview } from "@/components/source-data-preview";
+import { WorldBankDataChart } from "@/components/worldbank-data-chart";
 import { buildEmbedMarkup, canCopyEmbed, parseEmbedRights } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import { parseSourcePreview } from "@/lib/assets/source-data-preview";
+import { parseWorldBankIndicator } from "@/lib/assets/worldbank-chart";
 import {
   getPublishedAssetBySlug,
   type PublishedAssetDetail,
@@ -64,6 +66,10 @@ export default async function AssetPage({ params }: AssetPageProps) {
   const previewUrl = normalizedPreview.ok ? normalizedPreview.value : null;
   const eurostatSample = parseEurostatSample(asset.metadata_json);
   const sourceDataPreview = parseSourcePreview(asset.metadata_json);
+  const worldBankIndicator =
+    asset.source_id === "source_worldbank"
+      ? parseWorldBankIndicator(asset.metadata_json, asset.canonical_url)
+      : null;
   const embedRights = parseEmbedRights(asset.rights_json);
   const marketplaceEmbed =
     embedRights.embed_provenance === "marketplace_rendered" &&
@@ -157,6 +163,12 @@ export default async function AssetPage({ params }: AssetPageProps) {
               alt={`Data visualization: ${asset.title}`}
               loading="eager"
             />
+          ) : worldBankIndicator ? (
+            <WorldBankDataChart
+              indicator={worldBankIndicator}
+              metadataJson={asset.metadata_json}
+              title={asset.title}
+            />
           ) : sourceDataPreview ? (
             <SourceDataPreview metadataJson={asset.metadata_json} />
           ) : (
@@ -167,9 +179,11 @@ export default async function AssetPage({ params }: AssetPageProps) {
               ? "Live values from the reviewed Eurostat selection; this is a customised presentation."
               : previewUrl
                 ? `Data visualization loaded directly from ${asset.source_name || "the source"}.`
-                : sourceDataPreview
-                  ? "Reviewed source observations rendered as a Cite Supply data preview."
-                  : "A source data visualization is not available for this asset."}
+                : worldBankIndicator
+                  ? "Real observations loaded from the official World Bank Indicators API."
+                  : sourceDataPreview
+                    ? "Reviewed source observations rendered as a Cite Supply data preview."
+                    : "A source data visualization is not available for this asset."}
           </p>
         </div>
       </section>

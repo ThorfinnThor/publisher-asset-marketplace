@@ -796,6 +796,17 @@ summary {
   border-radius: 8px;
 }
 
+.hero-preview__source-image {
+  display: block;
+  width: 100%;
+  height: 272px;
+  margin-top: 17px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  object-fit: contain;
+}
+
 .hero-preview__footer {
   align-items: flex-end;
   margin-top: 15px;
@@ -952,6 +963,14 @@ summary {
   height: 188px;
   display: block;
   border-bottom: 1px solid var(--border);
+}
+
+.featured-card__source-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: white;
+  object-fit: contain;
 }
 
 .featured-card__body {
@@ -1605,6 +1624,79 @@ summary {
 .source-data-preview--compact .source-data-preview__note {
   padding: 8px 10px;
   font-size: 9px;
+}
+
+.worldbank-chart {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.worldbank-chart__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.worldbank-chart__plot {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+}
+
+.worldbank-chart__grid {
+  stroke: #e7e5df;
+  stroke-width: 1;
+}
+
+.worldbank-chart__axis {
+  stroke: #aba9a3;
+  stroke-width: 1.2;
+}
+
+.worldbank-chart__bar {
+  fill: var(--accent);
+}
+
+.worldbank-chart__axis-label,
+.worldbank-chart__date {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.worldbank-chart__country,
+.worldbank-chart__value {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.worldbank-chart__status {
+  min-height: 330px;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.worldbank-chart__note {
+  margin: 0;
+  padding: 10px 13px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
 }
 
 body:has(.marketplace-embed-shell) {

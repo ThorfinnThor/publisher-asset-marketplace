@@ -8,6 +8,7 @@ export type DesignAsset = {
   topic: string;
   checkedAt: string;
   preview: "line" | "bars" | "steps";
+  previewUrl: string;
 };
 
 export const designAssets: DesignAsset[] = [
@@ -22,6 +23,8 @@ export const designAssets: DesignAsset[] = [
     topic: "Technology",
     checkedAt: "Checked Sep 12, 2026",
     preview: "steps",
+    previewUrl:
+      "https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome.png?imType=thumbnail&imWidth=900",
   },
   {
     slug: "share-of-individuals-using-the-internet",
@@ -34,6 +37,8 @@ export const designAssets: DesignAsset[] = [
     topic: "Technology",
     checkedAt: "Checked Sep 12, 2026",
     preview: "line",
+    previewUrl:
+      "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet.png?imType=thumbnail&imWidth=900",
   },
   {
     slug: "solar-photovoltaic-module-prices",
@@ -46,6 +51,8 @@ export const designAssets: DesignAsset[] = [
     topic: "Energy",
     checkedAt: "Checked Sep 12, 2026",
     preview: "bars",
+    previewUrl:
+      "https://ourworldindata.org/grapher/solar-pv-prices.png?imType=thumbnail&imWidth=900",
   },
 ];
 

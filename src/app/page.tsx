@@ -1,11 +1,6 @@
 import Link from "next/link";
 
-import {
-  ArrowUpRightIcon,
-  ChartPreview,
-  RightsBadge,
-  SearchIcon,
-} from "@/components/design-system";
+import { ArrowUpRightIcon, RightsBadge, SearchIcon } from "@/components/design-system";
 import { designAssets } from "@/lib/design-assets";
 import { siteBrand } from "@/lib/site-identity";
 
@@ -64,13 +59,18 @@ export default function HomePage() {
                   OWID
                 </span>
               </div>
-              <ChartPreview variant="line" />
+              <img
+                alt="Our World in Data chart showing the share of individuals using the Internet"
+                className="hero-preview__source-image"
+                decoding="async"
+                src={designAssets[1].previewUrl}
+              />
               <div className="hero-preview__footer">
                 <div>
                   <strong>Our World in Data</strong>
                   <span>Checked Sep 2026</span>
                 </div>
-                <RightsBadge>Interface sample</RightsBadge>
+                <RightsBadge state="verified">Source data</RightsBadge>
               </div>
             </article>
 
@@ -127,7 +127,13 @@ export default function HomePage() {
             {designAssets.map((asset) => (
               <article className="featured-card" key={asset.slug}>
                 <Link className="featured-card__preview" href={`/asset/${asset.slug}`}>
-                  <ChartPreview compact variant={asset.preview} />
+                  <img
+                    alt={`Our World in Data chart: ${asset.title}`}
+                    className="featured-card__source-image"
+                    decoding="async"
+                    loading="lazy"
+                    src={asset.previewUrl}
+                  />
                 </Link>
                 <div className="featured-card__body">
                   <p>
@@ -138,15 +144,15 @@ export default function HomePage() {
                   </h3>
                   <div className="featured-card__meta">
                     <span>{asset.source}</span>
-                    <RightsBadge>Interface sample</RightsBadge>
+                    <RightsBadge state="verified">Source data</RightsBadge>
                   </div>
                 </div>
               </article>
             ))}
           </div>
           <p className="validation-note">
-            These cards are interface samples. Browse the marketplace for published assets with
-            asset-level rights evidence and reuse actions.
+            These previews are generated from the cited Our World in Data charts. Open an asset to
+            review its current reuse conditions and publisher actions.
           </p>
         </div>
       </section>
