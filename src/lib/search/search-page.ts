@@ -8,7 +8,13 @@ export const assetTypeOptions = [
   { value: "benchmark", label: "Benchmarks" },
 ] as const;
 
-export const sourceOptions = [{ value: "source_owid", label: "Our World in Data" }] as const;
+export type SearchSourceOption = { value: string; label: string; count?: number };
+
+export const sourceOptions: SearchSourceOption[] = [
+  { value: "source_owid", label: "Our World in Data" },
+  { value: "source_worldbank", label: "World Bank Open Data" },
+  { value: "source_eurostat", label: "Eurostat" },
+];
 
 export const freshnessOptions = [
   { value: "any", label: "Any time" },
@@ -49,8 +55,8 @@ function isAssetType(value: string): boolean {
   return assetTypeOptions.some((option) => option.value === value);
 }
 
-function isSource(value: string): boolean {
-  return sourceOptions.some((option) => option.value === value);
+function isSourceForOptions(value: string, options: readonly SearchSourceOption[]): boolean {
+  return options.some((option) => option.value === value);
 }
 
 function isRights(value: string): value is "safe" | "restricted" {
@@ -67,10 +73,12 @@ export function freshnessDate(value: string, now = new Date()): string | undefin
 export function parseSearchPageParams(
   params: SearchPageParams,
   now = new Date(),
+  availableSources: readonly SearchSourceOption[] = sourceOptions,
 ): ParsedSearchPage {
   const query = first(params.q).trim();
   const selectedAssetTypes = values(params.type).filter(isAssetType);
-  const selectedSource = values(params.source).find(isSource) ?? "";
+  const selectedSource =
+    values(params.source).find((value) => isSourceForOptions(value, availableSources)) ?? "";
   const selectedRights = values(params.rights).filter(isRights);
   const requestedFreshness = first(params.freshness);
   const selectedFreshness = freshnessOptions.some((option) => option.value === requestedFreshness)

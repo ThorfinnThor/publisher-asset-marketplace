@@ -39,7 +39,7 @@ export type SearchQualityCaseResult = {
   grade: SearchQualityGrade;
   rationale: string;
   expected_path: SearchBenchmarkQuery["expectedPath"];
-  observed_paths: Array<"fts" | "trigram">;
+  observed_paths: Array<"fts" | "trigram" | "browse">;
   expected_order_prefix: string[];
   observed_order: string[];
   contract_passed: boolean;
@@ -130,7 +130,7 @@ export async function runSearchQualityReview(
 
 function evaluateContract(
   query: SearchBenchmarkQuery,
-  results: Array<{ asset: SearchAsset; retrieval_path: "fts" | "trigram" }>,
+  results: Array<{ asset: SearchAsset; retrieval_path: "fts" | "trigram" | "browse" }>,
 ): string[] {
   const failures: string[] = [];
   const observedOrder = results.map((result) => result.asset.slug);

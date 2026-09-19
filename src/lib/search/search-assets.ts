@@ -301,6 +301,23 @@ export function buildFallbackSearchSql(
   `;
 }
 
+export function buildBrowseSearchSql(filters: SearchRequest["filters"] = {}): string {
+  const eligibility = filterSql(filters).sql;
+  return `
+    SELECT a.id, a.source_id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
+      a.rights_status, a.rights_json,
+      COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
+      a.canonical_url, a.embed_url, NULL AS embed_origin, a.preview_url, a.metadata_json,
+      sources.base_url AS source_base_url, a.attribution_name, a.attribution_url,
+      a.citation_text
+    FROM assets a
+    LEFT JOIN sources ON sources.id = a.source_id
+    WHERE ${eligibility}
+    ORDER BY COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) DESC, a.title COLLATE NOCASE, a.slug
+    LIMIT ?
+  `;
+}
+
 function fallbackSimilarity(shared: number, assetTrigrams: number, queryTrigrams: number): number {
   const union = queryTrigrams + assetTrigrams - shared;
   return union > 0 ? shared / union : 0;
@@ -313,14 +330,27 @@ export async function searchAssets(
 ): Promise<{ results: Array<SearchResultContract<SearchAsset>>; next_cursor: string | null }> {
   const normalizedQuery = normalizeQuery(request.query);
   const matchExpression = buildFtsMatchExpression(normalizedQuery);
-  if (!matchExpression) {
-    return { results: [], next_cursor: null };
-  }
   const limit = Math.min(
     searchRankingV1.maximum_limit,
     Math.max(1, request.limit ?? searchRankingV1.default_limit),
   );
   const { bindings } = filterSql(request.filters);
+  if (request.query.trim() === "") {
+    const browsed = await db
+      .prepare(buildBrowseSearchSql(request.filters))
+      .bind(...bindings, limit)
+      .all<SearchRow>();
+    return {
+      results: browsed.results.map((candidate) => ({
+        asset: publicAsset(candidate),
+        score: 0,
+        matched_fields: [],
+        retrieval_path: "browse",
+      })),
+      next_cursor: null,
+    };
+  }
+  if (!matchExpression) return { results: [], next_cursor: null };
   const primary = await db
     .prepare(buildPrimarySearchSql(request.filters))
     .bind(matchExpression, ...bindings, searchRankingV1.primary_candidate_limit)

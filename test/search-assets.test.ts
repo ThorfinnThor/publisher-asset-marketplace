@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildFallbackSearchSql,
+  buildBrowseSearchSql,
   buildFtsMatchExpression,
   buildPrimarySearchSql,
   rankSearchCandidates,
@@ -56,6 +57,23 @@ describe("C2 search function", () => {
     expect(sql).toContain("bm25(assets_fts, 0.0, 10.0, 4.0, 6.0, 1.0)");
     expect(fallbackSql).toContain("asset_search_trigrams");
     expect(fallbackSql).toContain("a.rights_status IN ('safe', 'restricted')");
+  });
+
+  it("builds a filtered catalogue browse query without requiring a search term", () => {
+    const sql = buildBrowseSearchSql({
+      asset_types: ["dataset"],
+      source_ids: ["source_eurostat"],
+      rights_statuses: ["safe"],
+      updated_since: "2025-09-14T00:00:00.000Z",
+    });
+    expect(sql).toContain("FROM assets a");
+    expect(sql).toContain("a.asset_type IN (?)");
+    expect(sql).toContain("a.source_id IN (?)");
+    expect(sql).toContain("a.rights_status IN (?)");
+    expect(sql).toContain("COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) >= ?");
+    expect(sql).toContain(
+      "ORDER BY COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) DESC",
+    );
   });
 
   it("puts safe embeddable assets ahead of restricted ties", () => {
@@ -121,5 +139,36 @@ describe("C2 search function", () => {
     expect(result.results).toHaveLength(1);
     expect(result.next_cursor).not.toBeNull();
     expect(calls.some((sql) => sql.includes("asset_search_trigrams"))).toBe(true);
+  });
+
+  it("browses assets using filters alone when the query is blank", async () => {
+    const calls: string[] = [];
+    const eurostat = candidate("eurostat-demo", "Population by age", "safe", {
+      source_id: "source_eurostat",
+      source_name: "Eurostat",
+    });
+    const db = {
+      prepare(sql: string) {
+        calls.push(sql);
+        return {
+          bind: (...values: unknown[]) => ({
+            all: async () => ({ results: [eurostat], success: true, meta: {}, values }),
+          }),
+        };
+      },
+    } as unknown as D1Database;
+
+    const result = await searchAssets(db, {
+      query: "",
+      filters: { source_ids: ["source_eurostat"] },
+      limit: 10,
+    });
+
+    expect(calls[0]).toContain("FROM assets a");
+    expect(result.results[0]).toMatchObject({
+      asset: { source_id: "source_eurostat", source_name: "Eurostat" },
+      retrieval_path: "browse",
+    });
+    expect(result.next_cursor).toBeNull();
   });
 });

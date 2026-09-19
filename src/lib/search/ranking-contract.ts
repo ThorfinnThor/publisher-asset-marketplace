@@ -18,7 +18,7 @@ export type SearchResultContract<TAsset = unknown> = {
   asset: TAsset;
   score: number;
   matched_fields: SearchMatchedField[];
-  retrieval_path: "fts" | "trigram";
+  retrieval_path: "fts" | "trigram" | "browse";
 };
 
 export const searchRankingV1 = {

@@ -11,6 +11,7 @@ import {
   freshnessOptions,
   parseSearchPageParams,
   sourceOptions,
+  type SearchSourceOption,
   type SearchPageParams,
 } from "@/lib/search/search-page";
 import { searchAssets, type SearchAsset } from "@/lib/search/search-assets";
@@ -33,9 +34,16 @@ type SearchLoadResult = {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  const parsed = parseSearchPageParams(params);
-  const loaded = await loadSearchResults(parsed.request);
+  const availableSources = await loadSourceOptions();
+  const parsed = parseSearchPageParams(params, new Date(), availableSources);
   const hasSearch = parsed.query.length > 0;
+  const hasActiveFilters =
+    parsed.selectedAssetTypes.length > 0 ||
+    parsed.selectedSource !== "" ||
+    parsed.selectedRights.length > 0 ||
+    parsed.selectedFreshness !== "any";
+  const shouldLoadResults = hasSearch || hasActiveFilters;
+  const loaded = await loadSearchResults(parsed.request, shouldLoadResults);
 
   return (
     <main className="search-page">
@@ -69,7 +77,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       <div className="page-shell search-layout">
         <aside className="filters filters--desktop" aria-label="Search filters">
-          <FilterFields parsed={parsed} />
+          <FilterFields formId="search-form" parsed={parsed} sourceOptions={availableSources} />
         </aside>
 
         <section className="search-results" aria-labelledby="results-heading">
@@ -77,12 +85,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <div>
               <p className="eyebrow">{siteBrand.discoveryLine}</p>
               <h1 id="results-heading">
-                {hasSearch ? `Results for “${parsed.query}”` : "Find publisher-ready assets"}
+                {hasSearch
+                  ? `Results for “${parsed.query}”`
+                  : hasActiveFilters
+                    ? "Filtered publisher-ready assets"
+                    : "Find publisher-ready assets"}
               </h1>
               <p>
                 {hasSearch
                   ? "Source links, freshness and reuse rights stay visible on every result."
-                  : "Search charts, calculators and datasets with clear reuse information."}
+                  : hasActiveFilters
+                    ? "Showing published assets that match your selected filters."
+                    : "Search charts, calculators and datasets with clear reuse information."}
               </p>
             </div>
             <span className="result-count">
@@ -92,9 +106,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
           <details className="filters filters--mobile">
             <summary>Filters</summary>
-            <div className="filters--mobile__body">
-              <FilterFields parsed={parsed} />
-            </div>
+            <form
+              action="/search"
+              className="filters--mobile__body"
+              id="mobile-filter-form"
+              method="get"
+            >
+              <input name="q" type="hidden" value={parsed.query} />
+              <FilterFields
+                formId="mobile-filter-form"
+                parsed={parsed}
+                sourceOptions={availableSources}
+              />
+            </form>
           </details>
 
           {loaded.unavailable ? (
@@ -104,16 +128,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </div>
           ) : null}
 
-          {!loaded.unavailable && !hasSearch ? (
+          {!loaded.unavailable && !shouldLoadResults ? (
             <div className="empty-state search-empty" role="status">
               <strong>Start with a topic or source.</strong>
               <span>Try “solar”, “internet”, or “population” to find a reusable asset.</span>
             </div>
           ) : null}
 
-          {!loaded.unavailable && hasSearch && loaded.results.length === 0 ? (
+          {!loaded.unavailable && shouldLoadResults && loaded.results.length === 0 ? (
             <div className="empty-state search-empty" role="status">
-              <strong>No published assets matched this search.</strong>
+              <strong>No published assets match this search/filter combination.</strong>
               <span>
                 Try fewer words or remove a filter. Draft and unverified assets stay hidden.
               </span>
@@ -138,8 +162,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
 async function loadSearchResults(
   request: Parameters<typeof searchAssets>[1],
+  shouldLoadResults: boolean,
 ): Promise<SearchLoadResult> {
-  if (!request.query) return { results: [], unavailable: false };
+  if (!shouldLoadResults) return { results: [], unavailable: false };
   try {
     const response = await searchAssets(getDatabase(), request);
     return { results: response.results, unavailable: false };
@@ -148,7 +173,38 @@ async function loadSearchResults(
   }
 }
 
-function FilterFields({ parsed }: { parsed: ReturnType<typeof parseSearchPageParams> }) {
+async function loadSourceOptions(): Promise<SearchSourceOption[]> {
+  try {
+    const response = await getDatabase()
+      .prepare(
+        `SELECT sources.id AS value, sources.name AS label, COUNT(assets.id) AS count
+         FROM sources
+         JOIN assets ON assets.source_id = sources.id
+         WHERE sources.active = 1 AND assets.status = 'published'
+           AND assets.rights_status IN ('safe', 'restricted')
+         GROUP BY sources.id, sources.name
+         ORDER BY sources.name`,
+      )
+      .all<SearchSourceOption>();
+    return response.results.length > 0 ? response.results : sourceOptions;
+  } catch {
+    return sourceOptions;
+  }
+}
+
+function submitFilters(form: HTMLFormElement | null) {
+  form?.requestSubmit();
+}
+
+function FilterFields({
+  formId,
+  parsed,
+  sourceOptions: availableSources,
+}: {
+  formId: string;
+  parsed: ReturnType<typeof parseSearchPageParams>;
+  sourceOptions: SearchSourceOption[];
+}) {
   return (
     <div className="filter-groups">
       <div className="filter-header">
@@ -161,7 +217,8 @@ function FilterFields({ parsed }: { parsed: ReturnType<typeof parseSearchPagePar
           <label className="filter-option" key={option.value}>
             <input
               defaultChecked={parsed.selectedAssetTypes.includes(option.value)}
-              form="search-form"
+              form={formId}
+              onChange={(event) => submitFilters(event.currentTarget.form)}
               name="type"
               type="checkbox"
               value={option.value}
@@ -175,13 +232,14 @@ function FilterFields({ parsed }: { parsed: ReturnType<typeof parseSearchPagePar
         <select
           aria-label="Filter by source"
           defaultValue={parsed.selectedSource}
-          form="search-form"
+          form={formId}
           name="source"
+          onChange={(event) => submitFilters(event.currentTarget.form)}
         >
           <option value="">All sources</option>
-          {sourceOptions.map((option) => (
+          {availableSources.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {option.count ? `${option.label} (${option.count.toLocaleString()})` : option.label}
             </option>
           ))}
         </select>
@@ -191,7 +249,8 @@ function FilterFields({ parsed }: { parsed: ReturnType<typeof parseSearchPagePar
         <label className="filter-option">
           <input
             defaultChecked={parsed.selectedRights.includes("safe")}
-            form="search-form"
+            form={formId}
+            onChange={(event) => submitFilters(event.currentTarget.form)}
             name="rights"
             type="checkbox"
             value="safe"
@@ -201,7 +260,8 @@ function FilterFields({ parsed }: { parsed: ReturnType<typeof parseSearchPagePar
         <label className="filter-option">
           <input
             defaultChecked={parsed.selectedRights.includes("restricted")}
-            form="search-form"
+            form={formId}
+            onChange={(event) => submitFilters(event.currentTarget.form)}
             name="rights"
             type="checkbox"
             value="restricted"
@@ -215,7 +275,8 @@ function FilterFields({ parsed }: { parsed: ReturnType<typeof parseSearchPagePar
           <label className="filter-option" key={option.value}>
             <input
               defaultChecked={parsed.selectedFreshness === option.value}
-              form="search-form"
+              form={formId}
+              onChange={(event) => submitFilters(event.currentTarget.form)}
               name="freshness"
               type="radio"
               value={option.value}
