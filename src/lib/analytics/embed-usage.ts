@@ -3,7 +3,6 @@ import { canCopyEmbed, parseEmbedRights, type EmbedAsset } from "../assets/embed
 const TRACKED_SOURCE_EMBED_PATH = /^\/e\/([a-z0-9][a-z0-9._-]{1,127})\/?$/u;
 const MARKETPLACE_EMBED_PATH =
   /^\/embed\/((?:eurostat|worldbank)-[a-z0-9][a-z0-9._-]{1,63})\/?$/u;
-const TRACKED_EMBED_BASE_URL = "https://citesupply.com/e";
 const HASH_PREFIX = "citesupply:embed-usage:v1:";
 
 export type EmbedAnalyticsDataset = {
@@ -19,11 +18,6 @@ type TrackedEmbedAssetRow = EmbedAsset & {
 };
 
 export type EmbedProvenance = "marketplace_rendered" | "source_hosted" | "creator_hosted";
-
-export function buildTrackedEmbedUrl(slug: string): string | null {
-  if (!/^[a-z0-9][a-z0-9._-]{1,127}$/u.test(slug)) return null;
-  return `${TRACKED_EMBED_BASE_URL}/${slug}`;
-}
 
 export function trackedSourceEmbedSlug(pathname: string): string | null {
   return TRACKED_SOURCE_EMBED_PATH.exec(pathname)?.[1] ?? null;
