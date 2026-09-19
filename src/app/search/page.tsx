@@ -4,11 +4,10 @@ import Link from "next/link";
 import { SearchAnalyticsBeacon, TrackedSourceLink } from "@/components/analytics-components";
 import { AssetPreview } from "@/components/asset-preview";
 import { ArrowUpRightIcon, RightsBadge, SearchIcon } from "@/components/design-system";
+import { SearchFilterFields } from "@/components/search-filter-fields";
 import { canCopyEmbed } from "@/lib/assets/embed";
 import { getDatabase } from "@/lib/db/client";
 import {
-  assetTypeOptions,
-  freshnessOptions,
   parseSearchPageParams,
   sourceOptions,
   type SearchSourceOption,
@@ -77,7 +76,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       <div className="page-shell search-layout">
         <aside className="filters filters--desktop" aria-label="Search filters">
-          <FilterFields formId="search-form" parsed={parsed} sourceOptions={availableSources} />
+          <SearchFilterFields
+            formId="search-form"
+            parsed={parsed}
+            sourceOptions={availableSources}
+          />
         </aside>
 
         <section className="search-results" aria-labelledby="results-heading">
@@ -113,7 +116,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               method="get"
             >
               <input name="q" type="hidden" value={parsed.query} />
-              <FilterFields
+              <SearchFilterFields
                 formId="mobile-filter-form"
                 parsed={parsed}
                 sourceOptions={availableSources}
@@ -190,103 +193,6 @@ async function loadSourceOptions(): Promise<SearchSourceOption[]> {
   } catch {
     return sourceOptions;
   }
-}
-
-function submitFilters(form: HTMLFormElement | null) {
-  form?.requestSubmit();
-}
-
-function FilterFields({
-  formId,
-  parsed,
-  sourceOptions: availableSources,
-}: {
-  formId: string;
-  parsed: ReturnType<typeof parseSearchPageParams>;
-  sourceOptions: SearchSourceOption[];
-}) {
-  return (
-    <div className="filter-groups">
-      <div className="filter-header">
-        <h2>Filters</h2>
-        <Link href="/search">Clear</Link>
-      </div>
-      <fieldset className="filter-group">
-        <legend>Asset type</legend>
-        {assetTypeOptions.map((option) => (
-          <label className="filter-option" key={option.value}>
-            <input
-              defaultChecked={parsed.selectedAssetTypes.includes(option.value)}
-              form={formId}
-              onChange={(event) => submitFilters(event.currentTarget.form)}
-              name="type"
-              type="checkbox"
-              value={option.value}
-            />
-            <span>{option.label}</span>
-          </label>
-        ))}
-      </fieldset>
-      <fieldset className="filter-group">
-        <legend>Source</legend>
-        <select
-          aria-label="Filter by source"
-          defaultValue={parsed.selectedSource}
-          form={formId}
-          name="source"
-          onChange={(event) => submitFilters(event.currentTarget.form)}
-        >
-          <option value="">All sources</option>
-          {availableSources.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.count ? `${option.label} (${option.count.toLocaleString()})` : option.label}
-            </option>
-          ))}
-        </select>
-      </fieldset>
-      <fieldset className="filter-group">
-        <legend>Rights status</legend>
-        <label className="filter-option">
-          <input
-            defaultChecked={parsed.selectedRights.includes("safe")}
-            form={formId}
-            onChange={(event) => submitFilters(event.currentTarget.form)}
-            name="rights"
-            type="checkbox"
-            value="safe"
-          />
-          <span>Commercial use allowed</span>
-        </label>
-        <label className="filter-option">
-          <input
-            defaultChecked={parsed.selectedRights.includes("restricted")}
-            form={formId}
-            onChange={(event) => submitFilters(event.currentTarget.form)}
-            name="rights"
-            type="checkbox"
-            value="restricted"
-          />
-          <span>Restricted use</span>
-        </label>
-      </fieldset>
-      <fieldset className="filter-group">
-        <legend>Freshness</legend>
-        {freshnessOptions.map((option) => (
-          <label className="filter-option" key={option.value}>
-            <input
-              defaultChecked={parsed.selectedFreshness === option.value}
-              form={formId}
-              onChange={(event) => submitFilters(event.currentTarget.form)}
-              name="freshness"
-              type="radio"
-              value={option.value}
-            />
-            <span>{option.label}</span>
-          </label>
-        ))}
-      </fieldset>
-    </div>
-  );
 }
 
 function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset> }) {
