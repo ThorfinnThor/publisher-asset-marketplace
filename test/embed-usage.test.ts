@@ -4,6 +4,7 @@ import {
   isIframeEmbedRequest,
   marketplaceEmbedSlug,
   publisherOriginFromRequest,
+  resolveTrackedEmbedTarget,
   trackedSourceEmbedSlug,
 } from "../src/lib/analytics/embed-usage";
 
@@ -37,6 +38,38 @@ describe("embed usage analytics", () => {
         }),
       ),
     ).toBe(false);
+  });
+
+  it("resolves a derived OWID Grapher embed through the tracked delivery path", async () => {
+    const row = {
+      slug: "solar-pv-prices",
+      source_id: "source_owid",
+      canonical_url: "https://ourworldindata.org/grapher/solar-pv-prices",
+      embed_url: null,
+      embed_origin: null,
+      rights_json: JSON.stringify({ embed_allowed: true, attribution_required: true }),
+      rights_status: "safe",
+      title: "Solar PV prices",
+      attribution_name: "Our World in Data",
+      attribution_url: "https://ourworldindata.org/",
+      source_base_url: "https://ourworldindata.org",
+    };
+    const db = {
+      prepare() {
+        return {
+          bind() {
+            return {
+              first: async () => row,
+            };
+          },
+        };
+      },
+    } as unknown as D1Database;
+
+    await expect(resolveTrackedEmbedTarget(db, row.slug)).resolves.toEqual({
+      target: "https://ourworldindata.org/grapher/solar-pv-prices?embed=1",
+      provenance: "source_hosted",
+    });
   });
 
   it("reduces external referrers to an origin and suppresses Cite Supply self-referrers", () => {
