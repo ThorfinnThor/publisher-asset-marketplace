@@ -15,8 +15,8 @@ binds it to both D1 reads.
 | Search impressions    | `asset_events.event_type = 'impression'` joined to a search event | The asset appeared in a tracked result set.                                      |
 | Detail views          | `detail_view`                                                     | A publisher opened the public asset page.                                        |
 | Embed copies (intent) | `embed_copy`                                                      | A publisher requested reviewed embed markup; this does not confirm publication.  |
-| Embed loads (actual)  | Approved iframe requests aggregated in `embed_usage_daily`          | The reviewed embed delivery path was actually requested as an iframe.             |
-| Publisher sites       | Distinct hashed referring origins in `embed_publisher_daily`        | Lower-bound count of sites loading the embed; suppressed referrers are excluded.  |
+| Embed loads (actual)  | Approved iframe requests aggregated in `embed_usage_daily`        | The reviewed embed delivery path was actually requested as an iframe.            |
+| Publisher sites       | Distinct hashed referring origins in `embed_publisher_daily`      | Lower-bound count of sites loading the embed; suppressed referrers are excluded. |
 | Citation copies       | `citation_copy`                                                   | A publisher requested the reviewed citation text.                                |
 | Source clicks         | `source_click`                                                    | A publisher clicked the reviewed source/attribution URL; this is not a backlink. |
 
