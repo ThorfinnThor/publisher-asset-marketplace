@@ -9,6 +9,21 @@ export type SourcePreview = {
   note: string;
 };
 
+export type SourcePreviewSource = SourcePreview["source"];
+
+export function parseSourcePreviewSource(metadataJson: string | null): SourcePreviewSource | null {
+  if (!metadataJson) return null;
+  try {
+    const parsed: unknown = JSON.parse(metadataJson);
+    if (!isRecord(parsed) || (parsed.source !== "eurostat" && parsed.source !== "worldbank")) {
+      return null;
+    }
+    return parsed.source;
+  } catch {
+    return null;
+  }
+}
+
 export function parseSourcePreview(metadataJson: string | null): SourcePreview | null {
   if (!metadataJson) return null;
   try {

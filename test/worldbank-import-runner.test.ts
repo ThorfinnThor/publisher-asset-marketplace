@@ -11,7 +11,8 @@ const sampleAsset: WorldBankAssetFetch = {
   indicator: "SP.SAMPLE",
   urls: {
     canonicalUrl: "https://data.worldbank.org/indicator/SP.SAMPLE",
-    apiUrl: "https://api.worldbank.org/v2/country/all/indicator/SP.SAMPLE?format=json&per_page=1",
+    apiUrl:
+      "https://api.worldbank.org/v2/country/all/indicator/SP.SAMPLE?format=json&per_page=400&mrnev=1",
     previewUrl: "https://data.worldbank.org/indicator/SP.SAMPLE",
   },
   header: { license: "CC BY 4.0" },
@@ -45,7 +46,7 @@ const sampleAsset: WorldBankAssetFetch = {
     indicator_evidence: [
       {
         indicator_url:
-          "https://api.worldbank.org/v2/country/all/indicator/SP.SAMPLE?format=json&per_page=1",
+          "https://api.worldbank.org/v2/country/all/indicator/SP.SAMPLE?format=json&per_page=400&mrnev=1",
         non_redistributable: null,
         origins: [
           {

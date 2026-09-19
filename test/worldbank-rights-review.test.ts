@@ -34,7 +34,7 @@ const row: RightsReviewAssetRow = {
       indicator_evidence: [
         {
           indicator_url:
-            "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=1",
+            "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=400&mrnev=1",
           non_redistributable: null,
           origins: [
             {

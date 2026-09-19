@@ -1,15 +1,29 @@
 "use client";
 
-import { parseSourcePreview } from "@/lib/assets/source-data-preview";
+import type { ReactNode } from "react";
+
+import {
+  parseSourcePreview,
+  parseSourcePreviewSource,
+  type SourcePreviewSource,
+} from "@/lib/assets/source-data-preview";
 
 type SourceDataPreviewProps = {
   compact?: boolean;
+  fallback?: ReactNode;
   metadataJson: string | null;
 };
 
-export function SourceDataPreview({ compact = false, metadataJson }: SourceDataPreviewProps) {
+export function SourceDataPreview({
+  compact = false,
+  fallback = null,
+  metadataJson,
+}: SourceDataPreviewProps) {
   const preview = parseSourcePreview(metadataJson);
-  if (!preview) return null;
+  if (!preview) {
+    const source = parseSourcePreviewSource(metadataJson);
+    return source ? <SourceDataPreviewUnavailable compact={compact} source={source} /> : fallback;
+  }
 
   const rows = preview.rows.slice(0, compact ? 4 : 12);
   return (
@@ -51,6 +65,28 @@ export function SourceDataPreview({ compact = false, metadataJson }: SourceDataP
           ? ` Showing ${rows.length} of ${preview.rows.length}.`
           : ""}
       </p>
+    </div>
+  );
+}
+
+function SourceDataPreviewUnavailable({
+  compact,
+  source,
+}: {
+  compact: boolean;
+  source: SourcePreviewSource;
+}) {
+  const sourceLabel = source === "worldbank" ? "World Bank" : "Eurostat";
+  return (
+    <div className={`source-data-preview${compact ? " source-data-preview--compact" : ""}`}>
+      <div className="source-data-preview__header">
+        <span>Data preview</span>
+        <span>{sourceLabel}</span>
+      </div>
+      <div className="source-data-preview__empty">
+        <strong>Preview unavailable</strong>
+        <span>No non-empty source observations are available for this asset.</span>
+      </div>
     </div>
   );
 }

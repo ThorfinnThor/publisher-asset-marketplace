@@ -17,7 +17,8 @@ describe("World Bank source client", () => {
   it("builds allow-listed indicator URLs", () => {
     expect(buildWorldBankSourceUrls("sp.sample")).toEqual({
       canonicalUrl: "https://data.worldbank.org/indicator/SP.SAMPLE",
-      apiUrl: "https://api.worldbank.org/v2/country/all/indicator/SP.SAMPLE?format=json&per_page=1",
+      apiUrl:
+        "https://api.worldbank.org/v2/country/all/indicator/SP.SAMPLE?format=json&per_page=400&mrnev=1",
       previewUrl: "https://data.worldbank.org/indicator/SP.SAMPLE",
     });
   });

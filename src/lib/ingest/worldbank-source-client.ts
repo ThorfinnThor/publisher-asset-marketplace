@@ -151,7 +151,7 @@ export function buildWorldBankSourceUrls(input: string): WorldBankSourceUrls {
   const indicator = normalizeIndicator(input);
   const encodedIndicator = encodeURIComponent(indicator);
   const canonicalUrl = `https://${WORLD_BANK_WEB_HOST}/indicator/${encodedIndicator}`;
-  const apiUrl = `https://${WORLD_BANK_API_HOST}/v2/country/all/indicator/${encodedIndicator}?format=json&per_page=1`;
+  const apiUrl = `https://${WORLD_BANK_API_HOST}/v2/country/all/indicator/${encodedIndicator}?format=json&per_page=400&mrnev=1`;
   return { canonicalUrl, apiUrl, previewUrl: canonicalUrl };
 }
 

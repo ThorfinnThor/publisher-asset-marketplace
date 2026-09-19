@@ -3,6 +3,9 @@
 import { useState } from "react";
 
 import { ChartPreview } from "@/components/design-system";
+import { WorldBankDataChart } from "@/components/worldbank-data-chart";
+import { parseSourcePreviewSource } from "@/lib/assets/source-data-preview";
+import { parseWorldBankIndicator } from "@/lib/assets/worldbank-chart";
 import type { DesignAsset } from "@/lib/design-assets";
 
 import { SourceDataPreview } from "./source-data-preview";
@@ -25,9 +28,26 @@ export function AssetPreview({
   const [failed, setFailed] = useState(false);
 
   if (!previewUrl || failed) {
-    const sourcePreview = <SourceDataPreview compact={compact} metadataJson={metadataJson} />;
-    if (sourcePreview) return sourcePreview;
-    return <ChartPreview compact={compact} variant={variant} />;
+    if (parseSourcePreviewSource(metadataJson) === "worldbank") {
+      const indicator = parseWorldBankIndicator(metadataJson, "");
+      if (indicator) {
+        return (
+          <WorldBankDataChart
+            compact={compact}
+            indicator={indicator}
+            metadataJson={metadataJson}
+            title={title}
+          />
+        );
+      }
+    }
+    return (
+      <SourceDataPreview
+        compact={compact}
+        fallback={<ChartPreview compact={compact} variant={variant} />}
+        metadataJson={metadataJson}
+      />
+    );
   }
 
   return (

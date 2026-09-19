@@ -1602,6 +1602,29 @@ summary {
   line-height: 1.45;
 }
 
+.source-data-preview__empty {
+  display: grid;
+  min-height: 250px;
+  place-content: center;
+  gap: 6px;
+  padding: 28px;
+  background: var(--warm);
+  color: var(--muted);
+  text-align: center;
+}
+
+.source-data-preview__empty strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.source-data-preview__empty span {
+  max-width: 32ch;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .source-data-preview--compact .source-data-preview__header {
   padding: 12px 14px 9px;
   background: var(--surface);
@@ -1624,6 +1647,11 @@ summary {
 .source-data-preview--compact .source-data-preview__note {
   padding: 8px 10px;
   font-size: 9px;
+}
+
+.source-data-preview--compact .source-data-preview__empty {
+  min-height: 174px;
+  padding: 18px;
 }
 
 .worldbank-chart {
@@ -1697,6 +1725,27 @@ summary {
   color: var(--muted);
   font-size: 10px;
   line-height: 1.45;
+}
+
+.worldbank-chart--compact {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.worldbank-chart--compact .worldbank-chart__header {
+  padding: 12px 14px 9px;
+  background: var(--surface);
+}
+
+.worldbank-chart--compact .worldbank-chart__plot {
+  height: 174px;
+}
+
+.worldbank-chart--compact .worldbank-chart__status {
+  min-height: 174px;
+  padding: 18px;
+  font-size: 11px;
 }
 
 body:has(.marketplace-embed-shell) {

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseSourcePreview } from "../src/lib/assets/source-data-preview";
+import {
+  parseSourcePreview,
+  parseSourcePreviewSource,
+} from "../src/lib/assets/source-data-preview";
 
 describe("source data previews", () => {
   it("parses reviewed Eurostat observations", () => {
@@ -36,5 +39,15 @@ describe("source data previews", () => {
   it("fails closed for unrelated metadata", () => {
     expect(parseSourcePreview(JSON.stringify({ source: "owid" }))).toBeNull();
     expect(parseSourcePreview(null)).toBeNull();
+  });
+
+  it("retains a recognized source when every observation is empty", () => {
+    const metadata = JSON.stringify({
+      source: "worldbank",
+      indicator: "FB.BNK.CAPA.ZS",
+      rows: [{ date: "2025", country: { value: "World" }, value: null }],
+    });
+    expect(parseSourcePreview(metadata)).toBeNull();
+    expect(parseSourcePreviewSource(metadata)).toBe("worldbank");
   });
 });

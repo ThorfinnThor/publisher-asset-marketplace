@@ -9,7 +9,7 @@ import type { WorldBankAssetFetch } from "../src/lib/ingest/worldbank-source-cli
 
 const canonicalUrl = "https://data.worldbank.org/indicator/SP.POP.TOTL";
 const apiUrl =
-  "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=1";
+  "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=400&mrnev=1";
 
 function evidence(manual: boolean) {
   return {

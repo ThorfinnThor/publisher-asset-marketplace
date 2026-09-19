@@ -12,6 +12,7 @@ import { WorldBankBarChart } from "@/components/worldbank-bar-chart";
 const MAX_RESPONSE_BYTES = 512_000;
 
 type WorldBankDataChartProps = {
+  compact?: boolean;
   indicator: string;
   metadataJson: string | null;
   title: string;
@@ -19,6 +20,7 @@ type WorldBankDataChartProps = {
 };
 
 export function WorldBankDataChart({
+  compact = false,
   indicator,
   metadataJson,
   title,
@@ -63,7 +65,7 @@ export function WorldBankDataChart({
   }, [indicator, initialPoints.length]);
 
   return (
-    <div className="worldbank-chart">
+    <div className={`worldbank-chart${compact ? " worldbank-chart--compact" : ""}`}>
       <div className="worldbank-chart__header">
         <span>Data preview</span>
         <span>{indicator}</span>
@@ -79,11 +81,13 @@ export function WorldBankDataChart({
       ) : (
         <WorldBankBarChart points={points} title={title} />
       )}
-      <p className="worldbank-chart__note">
-        {marketplaceEmbedAvailable
-          ? "Latest non-empty World Bank API observations. Cite Supply presentation, not an official World Bank embed."
-          : "Latest non-empty World Bank API observations. Citation-only preview; no reusable embed is approved for this asset."}
-      </p>
+      {compact ? null : (
+        <p className="worldbank-chart__note">
+          {marketplaceEmbedAvailable
+            ? "Latest non-empty World Bank API observations. Cite Supply presentation, not an official World Bank embed."
+            : "Latest non-empty World Bank API observations. Citation-only preview; no reusable embed is approved for this asset."}
+        </p>
+      )}
     </div>
   );
 }
