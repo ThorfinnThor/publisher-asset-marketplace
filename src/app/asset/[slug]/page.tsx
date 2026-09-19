@@ -131,6 +131,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
               assetSlug={asset.slug}
               disabled={!embedAllowed}
               embedMarkup={buildEmbedMarkup(asset)}
+              label={embedButtonLabel(marketplaceEmbed)}
             />
             <CopyCitationButton
               assetSlug={asset.slug}
@@ -273,6 +274,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
                 compact
                 disabled={!embedAllowed}
                 embedMarkup={buildEmbedMarkup(asset)}
+                label={embedButtonLabel(marketplaceEmbed)}
               />
             </div>
             <p className="code-preview">
@@ -347,6 +349,10 @@ function PermissionRow({ label, value }: { label: string; value: boolean | null 
       <dd className={`permission permission--${state}`}>{permissionLabel(value)}</dd>
     </div>
   );
+}
+
+function embedButtonLabel(marketplaceEmbed: boolean): string {
+  return marketplaceEmbed ? "Copy Cite Supply embed" : "Copy source embed";
 }
 
 function parseRights(value: string | null): AssetRights {

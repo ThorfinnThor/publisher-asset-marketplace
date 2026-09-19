@@ -8,6 +8,7 @@ import { CopyIcon } from "./design-system";
 type CopyEmbedButtonProps = {
   assetSlug: string;
   embedMarkup: string;
+  label?: string;
   disabled?: boolean;
   compact?: boolean;
 };
@@ -16,6 +17,7 @@ export type CopyActionButtonProps = {
   assetSlug: string;
   copyText: string;
   action: "embed" | "citation";
+  idleLabel?: string;
   disabled?: boolean;
   compact?: boolean;
 };
@@ -25,6 +27,7 @@ type CopyState = "ready" | "copying" | "copied" | "failed";
 export function CopyEmbedButton({
   assetSlug,
   embedMarkup,
+  label = "Copy embed",
   disabled = false,
   compact = false,
 }: CopyEmbedButtonProps) {
@@ -35,6 +38,7 @@ export function CopyEmbedButton({
       compact={compact}
       copyText={embedMarkup}
       disabled={disabled}
+      idleLabel={label}
     />
   );
 }
@@ -43,6 +47,7 @@ export function CopyActionButton({
   assetSlug,
   copyText,
   action,
+  idleLabel,
   disabled = false,
   compact = false,
 }: CopyActionButtonProps) {
@@ -77,14 +82,14 @@ export function CopyActionButton({
       }
       type="button"
     >
-      <CopyIcon /> {copyLabel(state, action)}
+      <CopyIcon /> {copyLabel(state, action, idleLabel)}
     </button>
   );
 }
 
-function copyLabel(state: CopyState, action: "embed" | "citation"): string {
+function copyLabel(state: CopyState, action: "embed" | "citation", idleLabel?: string): string {
   if (state === "copying") return "Copying…";
   if (state === "copied") return "Copied";
   if (state === "failed") return "Copy failed";
-  return action === "embed" ? "Copy embed" : "Copy citation";
+  return idleLabel ?? (action === "embed" ? "Copy embed" : "Copy citation");
 }

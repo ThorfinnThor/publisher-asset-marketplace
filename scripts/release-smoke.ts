@@ -23,7 +23,7 @@ const checks: SmokeCheck[] = [
     includes: [
       "Solar photovoltaic panel prices",
       "Copy citation",
-      "Copy embed",
+      "Copy source embed",
       'src="https://ourworldindata.org/grapher/solar-pv-prices.png?imType=thumbnail&amp;imWidth=640"',
       "Data visualization loaded directly from Our World in Data.",
     ],
@@ -32,14 +32,14 @@ const checks: SmokeCheck[] = [
   {
     path: "/asset/absolute-number-of-deaths-from-outdoor-air-pollution",
     expectedStatus: 200,
-    includes: ["Copy citation", "Copy embed", "Commercial use"],
+    includes: ["Copy citation", "Copy source embed", "Commercial use"],
   },
   {
     path: "/asset/worldbank-fb.bnk.capa.zs",
     expectedStatus: 200,
     includes: [
       "Copy citation",
-      "Copy embed",
+      "Copy Cite Supply embed",
       "https://citesupply.com/embed/worldbank-fb.bnk.capa.zs",
       "reviewed World Bank observations under CC BY 4.0",
     ],
