@@ -37,7 +37,9 @@ const worker = {
             message: error instanceof Error ? error.message : "unknown_error",
           }),
         );
-        return withSecurityHeaders(new Response("Embed temporarily unavailable.", { status: 503 }));
+        return withSecurityHeaders(
+          new Response("Embed temporarily unavailable.", { status: 503 }),
+        );
       }
 
       if (!target) {
@@ -170,7 +172,6 @@ const worker = {
 };
 
 export default worker;
-
 
 function scheduleEmbedUsage(
   context: ExecutionContext,
