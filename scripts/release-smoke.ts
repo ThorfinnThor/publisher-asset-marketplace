@@ -55,6 +55,17 @@ const checks: SmokeCheck[] = [
     ],
   },
   {
+    path: "/asset/worldbank-sp.pop.totl",
+    expectedStatus: 200,
+    includes: ["World Bank catalogue assets are citation-only"],
+    excludes: ["https://citesupply.com/embed/worldbank-sp.pop.totl"],
+  },
+  {
+    path: "/embed/worldbank-sp.pop.totl",
+    expectedStatus: 404,
+    includes: ["Not found"],
+  },
+  {
     path: "/embed/eurostat-tps00001",
     expectedStatus: 200,
     includes: [

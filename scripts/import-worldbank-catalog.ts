@@ -35,6 +35,7 @@ const MAX_CATALOGUE_RESPONSE_BYTES = 8 * 1024 * 1024;
 const REVIEW_VERSION = "worldbank-indicator-metadata-cc-by-v1";
 const EMBED_REVIEW_VERSION = "worldbank-marketplace-chart-cc-by-v1";
 const MARKETPLACE_ORIGIN = "https://citesupply.com";
+const MARKETPLACE_EMBED_EXCLUDED_INDICATORS = new Set(["SP.POP.TOTL"]);
 const USER_AGENT =
   "publisher-asset-marketplace/0.1 (World Bank indicator catalogue review; contact: maintainers)";
 const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
@@ -169,6 +170,9 @@ function manifestAsset(
   entry: WorldBankCatalogEntry,
   review: WorldBankMetadataReview,
 ): RightsReviewManifestAsset {
+  const marketplaceEmbedAllowed = !MARKETPLACE_EMBED_EXCLUDED_INDICATORS.has(
+    entry.indicator.toLocaleUpperCase("en"),
+  );
   return {
     slug: asset.slug,
     canonical_url: asset.canonical_url,
@@ -182,10 +186,14 @@ function manifestAsset(
     automated_review_version: REVIEW_VERSION,
     embed_available: false,
     citation_only_allowed: true,
-    marketplace_rendered_embed_allowed: true,
-    marketplace_embed_url: `${MARKETPLACE_ORIGIN}/embed/${asset.slug}`,
-    marketplace_embed_origin: MARKETPLACE_ORIGIN,
-    embed_review_version: EMBED_REVIEW_VERSION,
+    marketplace_rendered_embed_allowed: marketplaceEmbedAllowed,
+    ...(marketplaceEmbedAllowed
+      ? {
+          marketplace_embed_url: `${MARKETPLACE_ORIGIN}/embed/${asset.slug}`,
+          marketplace_embed_origin: MARKETPLACE_ORIGIN,
+          embed_review_version: EMBED_REVIEW_VERSION,
+        }
+      : {}),
     chart_reuse_prohibited: false,
     evidence_conflict: false,
     evidence_url: asset.canonical_url,
@@ -194,8 +202,9 @@ function manifestAsset(
     citation_text: `World Bank Open Data: ${entry.title} (${entry.indicator}). Source database: ${entry.sourceName}. License: CC BY-4.0.`,
     attribution_name: "World Bank Open Data",
     attribution_url: asset.canonical_url,
-    review_note:
-      "The official indicator-specific World Bank metadata API explicitly reports CC BY-4.0 and an HTTPS license URL. Automated restriction-keyword screening passed. This approval enables a Cite Supply-rendered chart of selected public API observations with visible attribution; it does not claim an official World Bank embed or raw-data download approval, and no World Bank endorsement is implied.",
+    review_note: marketplaceEmbedAllowed
+      ? "The official indicator-specific World Bank metadata API explicitly reports CC BY-4.0 and an HTTPS license URL. Automated restriction-keyword screening passed. This approval enables a Cite Supply-rendered chart of selected public API observations with visible attribution; it does not claim an official World Bank embed or raw-data download approval, and no World Bank endorsement is implied."
+      : "The official indicator-specific World Bank metadata API reports CC BY-4.0, but this indicator remains citation-only because the existing asset review records additional provider-specific attribution concerns. No embed or raw-data download is approved.",
   };
 }
 
@@ -291,7 +300,7 @@ async function main(): Promise<void> {
     review_version: `${REVIEW_VERSION}-${reviewedAt.slice(0, 10)}`,
     reviewed_at: reviewedAt,
     review_scope:
-      "Automated indicator-level World Bank metadata review: exact CC BY-4.0 license, HTTPS license URL, no explicit restriction keywords, successful public data API response, and a Cite Supply-rendered attributed chart. No official World Bank embed, endorsement, or raw-data download approval is claimed.",
+      "Automated indicator-level World Bank metadata review: exact CC BY-4.0 license, HTTPS license URL, no explicit restriction keywords, successful public data API response, and a Cite Supply-rendered attributed chart. Provider-specific exceptions remain citation-only. No official World Bank embed, endorsement, or raw-data download approval is claimed.",
     assets: selected.map((item) => item.review),
   };
   if (manifestOutput) {

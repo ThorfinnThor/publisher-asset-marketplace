@@ -19,6 +19,7 @@ SELECT
   '2026-09-19T00:30:00.000Z'
 FROM assets
 WHERE source_id = 'source_worldbank'
+  AND slug <> 'worldbank-sp.pop.totl'
   AND status = 'published'
   AND rights_status = 'safe'
   AND license_code = 'CC_BY'
@@ -50,6 +51,7 @@ SET
   ),
   updated_at = '2026-09-19T00:30:00.000Z'
 WHERE source_id = 'source_worldbank'
+  AND slug <> 'worldbank-sp.pop.totl'
   AND status = 'published'
   AND rights_status = 'safe'
   AND license_code = 'CC_BY'
