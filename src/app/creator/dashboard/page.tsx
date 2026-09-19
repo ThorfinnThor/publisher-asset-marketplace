@@ -322,8 +322,8 @@ function CreatorAssetCard({
       </div>
       <p className="creator-asset-card__note">
         Embed loads count approved iframe requests. Publisher sites count distinct referring
-        origins; suppressed referrers still count as loads but not as sites. Copies and source clicks
-        remain intent signals, not citations or backlinks.
+        origins; suppressed referrers still count as loads but not as sites. Copies and source
+        clicks remain intent signals, not citations or backlinks.
       </p>
     </article>
   );
