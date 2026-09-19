@@ -291,7 +291,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
                     : "This iframe is rendered by Cite Supply from the reviewed Eurostat sample. It is not an official Eurostat embed."
                   : asset.source_id === "source_worldbank"
                     ? "World Bank catalogue assets are citation-only. No official or marketplace-rendered embed has been approved."
-                    : "Embeds stay hosted by the source; this marketplace does not proxy or republish the underlying chart."}
+                    : "Embeds stay hosted by the source. Cite Supply records an aggregate iframe-load signal before redirecting to the reviewed source embed; it does not proxy or republish the chart."}
             </p>
           </section>
         </div>
