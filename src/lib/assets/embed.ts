@@ -95,12 +95,24 @@ function sourceOriginForId(sourceId: string | null): string | null {
   return null;
 }
 
-export function buildEmbedMarkup(asset: EmbedAsset): string {
+export type EmbedMarkupAsset = EmbedAsset & {
+  slug: string;
+};
+
+export function buildTrackedEmbedUrl(slug: string): string | null {
+  if (!/^[a-z0-9][a-z0-9._-]{1,127}$/u.test(slug)) return null;
+  return `https://citesupply.com/e/${slug}`;
+}
+
+export function buildEmbedMarkup(asset: EmbedMarkupAsset): string {
   if (!canCopyEmbed(asset) || !asset.embed_url) return "";
   const rights = parseEmbedRights(asset.rights_json);
-  const sandbox =
-    rights.embed_provenance === "marketplace_rendered" ? 'sandbox=""' : 'sandbox="allow-scripts"';
-  const iframe = `<iframe src="${escapeAttribute(asset.embed_url)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" ${sandbox} style="${MARKETPLACE_IFRAME_STYLE}"></iframe>`;
+  const marketplaceRendered = rights.embed_provenance === "marketplace_rendered";
+  const deliveryUrl = marketplaceRendered
+    ? asset.embed_url
+    : (buildTrackedEmbedUrl(asset.slug) ?? asset.embed_url);
+  const sandbox = marketplaceRendered ? 'sandbox=""' : 'sandbox="allow-scripts"';
+  const iframe = `<iframe src="${escapeAttribute(deliveryUrl)}" title="${escapeAttribute(asset.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" ${sandbox} style="${MARKETPLACE_IFRAME_STYLE}"></iframe>`;
   if (asset.source_id !== null) return iframe;
 
   return `<figure>${iframe}<figcaption>Source: <a href="${escapeAttribute(asset.attribution_url ?? "")}">${escapeText(asset.attribution_name ?? "")}</a></figcaption></figure>`;

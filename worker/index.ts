@@ -1,6 +1,14 @@
 import handler from "vinext/server/fetch-handler";
 
 import { runDemandAggregation } from "../src/lib/analytics/demand-aggregation";
+import {
+  marketplaceEmbedSlug,
+  recordEmbedUsage,
+  resolveTrackedEmbedTarget,
+  trackedSourceEmbedSlug,
+  type EmbedAnalyticsDataset,
+  type EmbedProvenance,
+} from "../src/lib/analytics/embed-usage";
 import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
 import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner";
@@ -8,14 +16,55 @@ import { isEmbeddableMarketplacePath, withSecurityHeaders } from "../src/lib/sec
 import { expireUrlScanJobs } from "../src/lib/submissions/url-scan-jobs";
 import { consumeUrlScanResults } from "./url-scan-results";
 
+type EmbedUsageEnv = Env & {
+  EMBED_ANALYTICS?: EmbedAnalyticsDataset;
+};
+
 const worker = {
-  fetch(request: Request, env: Env, context: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env, context: ExecutionContext): Promise<Response> {
     const pathname = new URL(request.url).pathname;
-    return handler.fetch(request, env, context).then((response: Response) =>
-      withSecurityHeaders(response, {
-        allowEmbedding: response.ok && isEmbeddableMarketplacePath(pathname),
-      }),
-    );
+    const trackedSlug = trackedSourceEmbedSlug(pathname);
+
+    if (trackedSlug && (request.method === "GET" || request.method === "HEAD")) {
+      let target: Awaited<ReturnType<typeof resolveTrackedEmbedTarget>>;
+      try {
+        target = await resolveTrackedEmbedTarget(env.DB, trackedSlug);
+      } catch (error: unknown) {
+        console.error(
+          JSON.stringify({
+            event: "embed_redirect_resolution_failed",
+            slug: trackedSlug,
+            message: error instanceof Error ? error.message : "unknown_error",
+          }),
+        );
+        return withSecurityHeaders(new Response("Embed temporarily unavailable.", { status: 503 }));
+      }
+
+      if (!target) {
+        return withSecurityHeaders(new Response("Embed not found.", { status: 404 }));
+      }
+
+      scheduleEmbedUsage(context, env, trackedSlug, request, target.provenance);
+      return withSecurityHeaders(
+        new Response(null, {
+          status: 302,
+          headers: {
+            location: target.target,
+            "cache-control": "private, no-store",
+          },
+        }),
+        { allowEmbedding: true },
+      );
+    }
+
+    const response = await handler.fetch(request, env, context);
+    const allowEmbedding = response.ok && isEmbeddableMarketplacePath(pathname);
+    const secured = withSecurityHeaders(response, { allowEmbedding });
+    const marketplaceSlug = allowEmbedding ? marketplaceEmbedSlug(pathname) : null;
+    if (marketplaceSlug) {
+      scheduleEmbedUsage(context, env, marketplaceSlug, request, "marketplace_rendered");
+    }
+    return secured;
   },
   async scheduled(
     controller: ScheduledController,
@@ -121,3 +170,25 @@ const worker = {
 };
 
 export default worker;
+
+function scheduleEmbedUsage(
+  context: ExecutionContext,
+  env: Env,
+  slug: string,
+  request: Request,
+  provenance: EmbedProvenance,
+): void {
+  const analytics = (env as EmbedUsageEnv).EMBED_ANALYTICS;
+  context.waitUntil(
+    recordEmbedUsage(env.DB, analytics, slug, request, provenance).catch((error: unknown) => {
+      console.error(
+        JSON.stringify({
+          event: "embed_usage_record_failed",
+          slug,
+          provenance,
+          message: error instanceof Error ? error.message : "unknown_error",
+        }),
+      );
+    }),
+  );
+}

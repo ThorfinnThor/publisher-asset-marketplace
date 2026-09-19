@@ -15,6 +15,8 @@ binds it to both D1 reads.
 | Search impressions    | `asset_events.event_type = 'impression'` joined to a search event | The asset appeared in a tracked result set.                                      |
 | Detail views          | `detail_view`                                                     | A publisher opened the public asset page.                                        |
 | Embed copies (intent) | `embed_copy`                                                      | A publisher requested reviewed embed markup; this does not confirm publication.  |
+| Embed loads (actual)  | Approved iframe requests aggregated in `embed_usage_daily`        | The reviewed embed delivery path was actually requested as an iframe.            |
+| Publisher sites       | Distinct hashed referring origins in `embed_publisher_daily`      | Lower-bound count of sites loading the embed; suppressed referrers are excluded. |
 | Citation copies       | `citation_copy`                                                   | A publisher requested the reviewed citation text.                                |
 | Source clicks         | `source_click`                                                    | A publisher clicked the reviewed source/attribution URL; this is not a backlink. |
 
@@ -28,8 +30,9 @@ text, never as HTML.
 - Asset rows require `creator_id = authenticated profile id` and `status = 'published'`.
 - Query rows repeat the same creator and published-status boundary, so one creator cannot inspect
   another creator's assets by changing a URL or request parameter.
-- Counts are read from the existing append-only event tables; no new migration or materialized
-  analytics table is required for E7.
+- Intent counts are read from the existing append-only event tables. Actual embed loads and
+  publisher-site counts use compact daily aggregates populated by the Worker; raw high-volume
+  requests are also written to Workers Analytics Engine for operational analysis.
 - If D1 is unavailable, the dashboard keeps the profile and shows a temporary analytics notice.
 
 The signals are directional product analytics. They are not a promise of traffic, citation,

@@ -26,7 +26,7 @@ describe("production security headers", () => {
     const response = withSecurityHeaders(new Response("embed"), { allowEmbedding: true });
     expect(response.headers.get("x-frame-options")).toBeNull();
     expect(response.headers.get("cross-origin-resource-policy")).toBe("cross-origin");
-    expect(response.headers.get("cache-control")).toContain("max-age=300");
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("content-security-policy")).toContain("frame-ancestors *");
     expect(response.headers.get("content-security-policy")).toContain("script-src 'none'");
   });

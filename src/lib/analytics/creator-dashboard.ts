@@ -15,6 +15,8 @@ type CreatorAssetSqlRow = {
   impressions: number | string | null;
   detail_views: number | string | null;
   embed_copies: number | string | null;
+  embed_loads: number | string | null;
+  publisher_sites: number | string | null;
   citation_copies: number | string | null;
   source_clicks: number | string | null;
 };
@@ -40,6 +42,8 @@ export type CreatorAssetAnalytics = {
   impressions: number;
   detail_views: number;
   embed_copies: number;
+  embed_loads: number;
+  publisher_sites: number;
   citation_copies: number;
   source_clicks: number;
   top_discovery_queries: Array<{ query: string; impressions: number }>;
@@ -51,20 +55,40 @@ export type CreatorDashboardData = {
 };
 
 export const creatorAssetAnalyticsSql = `
+  WITH embed_usage AS (
+    SELECT asset_slug, SUM(load_count) AS embed_loads
+    FROM embed_usage_daily
+    WHERE usage_date >= ?
+      AND usage_date < ?
+    GROUP BY asset_slug
+  ),
+  publisher_usage AS (
+    SELECT asset_slug, COUNT(DISTINCT publisher_hash) AS publisher_sites
+    FROM embed_publisher_daily
+    WHERE usage_date >= ?
+      AND usage_date < ?
+    GROUP BY asset_slug
+  )
   SELECT a.id, a.slug, a.title, a.asset_type, a.preview_url, a.status,
     SUM(CASE WHEN ae.event_type = 'impression' THEN 1 ELSE 0 END) AS impressions,
     SUM(CASE WHEN ae.event_type = 'detail_view' THEN 1 ELSE 0 END) AS detail_views,
     SUM(CASE WHEN ae.event_type = 'embed_copy' THEN 1 ELSE 0 END) AS embed_copies,
+    COALESCE(eu.embed_loads, 0) AS embed_loads,
+    COALESCE(pu.publisher_sites, 0) AS publisher_sites,
     SUM(CASE WHEN ae.event_type = 'citation_copy' THEN 1 ELSE 0 END) AS citation_copies,
     SUM(CASE WHEN ae.event_type = 'source_click' THEN 1 ELSE 0 END) AS source_clicks
   FROM assets a
+  LEFT JOIN embed_usage eu ON eu.asset_slug = a.slug
+  LEFT JOIN publisher_usage pu ON pu.asset_slug = a.slug
   LEFT JOIN asset_events ae
     ON ae.asset_id = a.id
     AND ae.created_at >= ?
     AND ae.created_at < ?
   WHERE a.creator_id = ?
     AND a.status = 'published'
-  GROUP BY a.id, a.slug, a.title, a.asset_type, a.preview_url, a.status, a.updated_at
+  GROUP BY
+    a.id, a.slug, a.title, a.asset_type, a.preview_url, a.status, a.updated_at,
+    eu.embed_loads, pu.publisher_sites
   ORDER BY a.updated_at DESC, a.slug ASC
   LIMIT ?
 `;
@@ -139,6 +163,8 @@ export function normalizeCreatorAssetAnalytics(
     impressions: asInteger(row.impressions),
     detail_views: asInteger(row.detail_views),
     embed_copies: asInteger(row.embed_copies),
+    embed_loads: asInteger(row.embed_loads),
+    publisher_sites: asInteger(row.publisher_sites),
     citation_copies: asInteger(row.citation_copies),
     source_clicks: asInteger(row.source_clicks),
     top_discovery_queries: [...(queriesByAsset.get(row.id) ?? new Map()).entries()]
@@ -161,7 +187,18 @@ export async function getCreatorDashboard(
   const start = `${window.start}T00:00:00.000Z`;
   const end = `${window.end}T00:00:00.000Z`;
   const reads = await db.batch([
-    db.prepare(creatorAssetAnalyticsSql).bind(start, end, creatorId, creatorAssetLimit),
+    db
+      .prepare(creatorAssetAnalyticsSql)
+      .bind(
+        window.start,
+        window.end,
+        window.start,
+        window.end,
+        start,
+        end,
+        creatorId,
+        creatorAssetLimit,
+      ),
     db.prepare(creatorDiscoveryQueriesSql).bind(start, end, creatorId, creatorQueryLimit),
   ]);
   return {
