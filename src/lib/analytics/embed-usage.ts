@@ -1,4 +1,9 @@
-import { canCopyEmbed, parseEmbedRights, type EmbedAsset } from "../assets/embed";
+import {
+  canCopyEmbed,
+  deriveSourceHostedEmbedUrl,
+  parseEmbedRights,
+  type EmbedAsset,
+} from "../assets/embed";
 
 const TRACKED_SOURCE_EMBED_PATH = /^\/e\/([a-z0-9][a-z0-9._-]{1,127})\/?$/u;
 const MARKETPLACE_EMBED_PATH =
@@ -11,6 +16,7 @@ export type EmbedAnalyticsDataset = {
 
 type TrackedEmbedAssetRow = EmbedAsset & {
   slug: string;
+  canonical_url: string;
 };
 
 export type EmbedProvenance = "marketplace_rendered" | "source_hosted" | "creator_hosted";
@@ -63,6 +69,7 @@ export async function resolveTrackedEmbedTarget(
         SELECT
           a.slug,
           a.source_id,
+          a.canonical_url,
           a.embed_url,
           a.embed_origin,
           a.rights_json,
@@ -82,7 +89,14 @@ export async function resolveTrackedEmbedTarget(
     .bind(slug)
     .first<TrackedEmbedAssetRow>();
 
-  if (!asset || !asset.embed_url || !canCopyEmbed(asset)) return null;
+  if (!asset) return null;
+  const embedUrl = deriveSourceHostedEmbedUrl(
+    asset.source_id,
+    asset.canonical_url,
+    asset.embed_url,
+  );
+  const resolvedAsset = { ...asset, embed_url: embedUrl };
+  if (!embedUrl || !canCopyEmbed(resolvedAsset)) return null;
   const rights = parseEmbedRights(asset.rights_json);
   if (
     rights.marketplace_rendered_embed_allowed === true &&
@@ -92,7 +106,7 @@ export async function resolveTrackedEmbedTarget(
   }
 
   return {
-    target: asset.embed_url,
+    target: embedUrl,
     provenance: asset.source_id === null ? "creator_hosted" : "source_hosted",
   };
 }
