@@ -6,8 +6,7 @@ import {
 } from "../assets/embed";
 
 const TRACKED_SOURCE_EMBED_PATH = /^\/e\/([a-z0-9][a-z0-9._-]{1,127})\/?$/u;
-const MARKETPLACE_EMBED_PATH =
-  /^\/embed\/((?:eurostat|worldbank)-[a-z0-9][a-z0-9._-]{1,63})\/?$/u;
+const MARKETPLACE_EMBED_PATH = /^\/embed\/((?:eurostat|worldbank)-[a-z0-9][a-z0-9._-]{1,63})\/?$/u;
 const HASH_PREFIX = "citesupply:embed-usage:v1:";
 
 export type EmbedAnalyticsDataset = {
@@ -182,7 +181,5 @@ async function stableHash(value: string): Promise<string> {
     "SHA-256",
     new TextEncoder().encode(`${HASH_PREFIX}${value}`),
   );
-  return [...new Uint8Array(digest)]
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
