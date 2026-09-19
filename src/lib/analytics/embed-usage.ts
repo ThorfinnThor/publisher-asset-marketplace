@@ -6,11 +6,7 @@ const MARKETPLACE_EMBED_PATH =
 const HASH_PREFIX = "citesupply:embed-usage:v1:";
 
 export type EmbedAnalyticsDataset = {
-  writeDataPoint(point: {
-    blobs?: string[];
-    doubles?: number[];
-    indexes?: string[];
-  }): void;
+  writeDataPoint(point: { blobs?: string[]; doubles?: number[]; indexes?: string[] }): void;
 };
 
 type TrackedEmbedAssetRow = EmbedAsset & {
@@ -57,7 +53,10 @@ export function publisherOriginFromRequest(request: Request): string | null {
 export async function resolveTrackedEmbedTarget(
   db: D1Database,
   slug: string,
-): Promise<{ target: string; provenance: Exclude<EmbedProvenance, "marketplace_rendered"> } | null> {
+): Promise<{
+  target: string;
+  provenance: Exclude<EmbedProvenance, "marketplace_rendered">;
+} | null> {
   const asset = await db
     .prepare(
       `
@@ -169,5 +168,7 @@ async function stableHash(value: string): Promise<string> {
     "SHA-256",
     new TextEncoder().encode(`${HASH_PREFIX}${value}`),
   );
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  return [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
