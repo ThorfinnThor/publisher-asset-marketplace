@@ -297,6 +297,8 @@ function CreatorAssetCard({
         <Metric label="Search impressions" value={asset.impressions} />
         <Metric label="Detail views" value={asset.detail_views} />
         <Metric label="Embed copies (intent)" value={asset.embed_copies} />
+        <Metric label="Embed loads (actual)" value={asset.embed_loads} />
+        <Metric label="Publisher sites" value={asset.publisher_sites} />
         <Metric label="Citation copies" value={asset.citation_copies} />
         <Metric label="Source clicks" value={asset.source_clicks} />
       </div>
@@ -319,8 +321,9 @@ function CreatorAssetCard({
         )}
       </div>
       <p className="creator-asset-card__note">
-        Embed copies and source clicks are publisher intent signals, not confirmed embeds, citations
-        or backlinks.
+        Embed loads count approved iframe requests. Publisher sites count distinct referring origins;
+        suppressed referrers still count as loads but not as sites. Copies and source clicks remain
+        intent signals, not citations or backlinks.
       </p>
     </article>
   );
