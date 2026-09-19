@@ -24,6 +24,12 @@
       "migrations_dir": "migrations",
     },
   ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "EMBED_ANALYTICS",
+      "dataset": "citesupply_embed_usage",
+    },
+  ],
   "r2_buckets": [
     {
       "binding": "PREVIEW_UPLOADS",
