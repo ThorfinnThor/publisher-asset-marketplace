@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildEmbedMarkup,
+  buildTrackedEmbedUrl,
   canCopyEmbed,
   deriveSourceHostedEmbedUrl,
   hasReviewedCreatorAttribution,
@@ -10,6 +11,7 @@ import {
 } from "../src/lib/assets/embed";
 
 const safeAsset = {
+  slug: "solar-pv-prices",
   embed_url: "https://ourworldindata.org/grapher/solar-pv-prices?embed=1",
   rights_json: JSON.stringify({ embed_allowed: true, attribution_required: true }),
   rights_status: "safe" as const,
@@ -81,9 +83,13 @@ describe("C5 source-hosted embed", () => {
 
   it("builds escaped iframe markup for clipboard copy", () => {
     expect(buildEmbedMarkup(safeAsset)).toBe(
-      '<iframe src="https://ourworldindata.org/grapher/solar-pv-prices?embed=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts" style="width:100%;height:720px;border:0;display:block"></iframe>',
+      '<iframe src="https://citesupply.com/e/solar-pv-prices" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts" style="width:100%;height:720px;border:0;display:block"></iframe>',
     );
     expect(parseEmbedRights(null)).toEqual({});
+    expect(buildTrackedEmbedUrl("solar-pv-prices")).toBe(
+      "https://citesupply.com/e/solar-pv-prices",
+    );
+    expect(buildTrackedEmbedUrl("Not a slug")).toBeNull();
   });
 
   it("permits a creator asset only against its reviewed embed origin", () => {
@@ -102,7 +108,7 @@ describe("C5 source-hosted embed", () => {
     ).toBe(false);
     const markup = buildEmbedMarkup(creatorAsset);
     expect(markup).toBe(
-      '<figure><iframe src="https://tools.example/embed/chart?id=1" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts" style="width:100%;height:720px;border:0;display:block"></iframe><figcaption>Source: <a href="https://tools.example/">Example Tools</a></figcaption></figure>',
+      '<figure><iframe src="https://citesupply.com/e/solar-pv-prices" title="Solar prices &quot;overview&quot;" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts" style="width:100%;height:720px;border:0;display:block"></iframe><figcaption>Source: <a href="https://tools.example/">Example Tools</a></figcaption></figure>',
     );
     expect(markup).not.toContain(">Solar prices");
     expect(markup).not.toContain("target=");
