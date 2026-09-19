@@ -3,6 +3,7 @@
   "name": "publisher-asset-marketplace",
   "compatibility_date": "2026-09-16",
   "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
   "main": "worker/index.ts",
   "triggers": {
     "crons": ["0 3 * * *"],

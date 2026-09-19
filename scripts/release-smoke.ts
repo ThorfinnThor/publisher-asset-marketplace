@@ -98,7 +98,7 @@ const checks: SmokeCheck[] = [
   {
     path: "/creator/dashboard",
     expectedStatus: 200,
-    includes: ["Sign in to continue"],
+    includes: ["Sign in to continue", "Continue with Google"],
   },
   {
     path: "/submit?topic=saas%20churn",
