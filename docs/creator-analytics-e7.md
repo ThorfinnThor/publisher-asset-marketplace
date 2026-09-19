@@ -4,7 +4,8 @@ Status: implemented and deployed
 Model allocation: LUNA implementation
 
 The creator dashboard now shows first-party publisher signals for every published asset owned by
-the authenticated creator. The dashboard uses the latest complete UTC 28-day window and never
+the authenticated creator. The dashboard uses the current rolling UTC 28-day window, including
+today, and never
 accepts a creator id from the browser: the server derives it from the GitHub-backed session and
 binds it to both D1 reads.
 
@@ -37,3 +38,6 @@ text, never as HTML.
 
 The signals are directional product analytics. They are not a promise of traffic, citation,
 embed publication, source credit or backlink acquisition.
+
+Actual embed-load tracking started on 19 September 2026. Earlier loads cannot be reconstructed,
+and newly recorded loads appear in the creator dashboard without waiting for the UTC day to close.

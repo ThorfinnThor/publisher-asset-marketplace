@@ -39,7 +39,7 @@ Workers Analytics Engine receives one non-blocking data point per counted iframe
 D1 stores compact daily aggregates in `embed_usage_daily` and one row per
 asset/publisher/day in `embed_publisher_daily`. This keeps raw request events out of D1 while
 allowing creator dashboards to show exact load totals and distinct publisher-site counts for the
-existing complete 28-day window.
+current rolling 28-day window, including the current UTC day.
 
 Analytics Engine retains raw data for three months. D1 daily aggregates are the durable product
 metric.

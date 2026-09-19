@@ -121,10 +121,10 @@ export const creatorDiscoveryQueriesSql = `
   ORDER BY asset_id ASC, query_rank ASC
 `;
 
-export function completeCreatorAnalyticsWindow(now = new Date()): CreatorAnalyticsWindow {
+export function currentCreatorAnalyticsWindow(now = new Date()): CreatorAnalyticsWindow {
   if (Number.isNaN(now.getTime())) throw new Error("A valid date is required.");
   const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const start = new Date(end.getTime() - creatorWindowDays * millisecondsPerDay);
+  const start = new Date(end.getTime() - (creatorWindowDays - 1) * millisecondsPerDay);
   return { start: dateOnly(start), end: dateOnly(end) };
 }
 
@@ -183,23 +183,27 @@ export async function getCreatorDashboard(
   now = new Date(),
 ): Promise<CreatorDashboardData> {
   if (!creatorId.trim()) throw new Error("A creator id is required.");
-  const window = completeCreatorAnalyticsWindow(now);
+  const window = currentCreatorAnalyticsWindow(now);
   const start = `${window.start}T00:00:00.000Z`;
-  const end = `${window.end}T00:00:00.000Z`;
+  const endExclusiveDate = new Date(
+    new Date(`${window.end}T00:00:00.000Z`).getTime() + millisecondsPerDay,
+  );
+  const endExclusiveDay = dateOnly(endExclusiveDate);
+  const endExclusive = endExclusiveDate.toISOString();
   const reads = await db.batch([
     db
       .prepare(creatorAssetAnalyticsSql)
       .bind(
         window.start,
-        window.end,
+        endExclusiveDay,
         window.start,
-        window.end,
+        endExclusiveDay,
         start,
-        end,
+        endExclusive,
         creatorId,
         creatorAssetLimit,
       ),
-    db.prepare(creatorDiscoveryQueriesSql).bind(start, end, creatorId, creatorQueryLimit),
+    db.prepare(creatorDiscoveryQueriesSql).bind(start, endExclusive, creatorId, creatorQueryLimit),
   ]);
   return {
     window,

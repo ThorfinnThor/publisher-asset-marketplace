@@ -226,8 +226,13 @@ function CreatorAnalyticsSection({
           <p className="eyebrow">Publisher signals</p>
           <h2 id="creator-analytics-heading">Published assets</h2>
           <p>
-            Activity from the latest complete 28-day window ({data.window.start} to{" "}
-            {data.window.end}) for assets published under your creator profile.
+            Activity from the current rolling 28-day UTC window ({data.window.start} to{" "}
+            {data.window.end}, including today) for assets published under your creator profile.
+          </p>
+          <p>
+            <strong>To see how often an asset was embedded, use Embed loads (actual).</strong>{" "}
+            Publisher sites shows the number of distinct referring website origins. Actual-load
+            tracking started on 19 September 2026 and is not retroactive.
           </p>
         </div>
       </div>

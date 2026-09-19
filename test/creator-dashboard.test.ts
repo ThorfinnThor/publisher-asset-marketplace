@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  completeCreatorAnalyticsWindow,
   creatorAssetAnalyticsSql,
   creatorDiscoveryQueriesSql,
+  currentCreatorAnalyticsWindow,
   getCreatorDashboard,
   normalizeCreatorAssetAnalytics,
 } from "../src/lib/analytics/creator-dashboard";
 
 describe("creator dashboard analytics", () => {
-  it("uses the latest complete 28-day UTC window", () => {
-    expect(completeCreatorAnalyticsWindow(new Date("2026-09-14T16:30:00.000Z"))).toEqual({
-      start: "2026-08-17",
+  it("uses the current rolling 28-day UTC window including today", () => {
+    expect(currentCreatorAnalyticsWindow(new Date("2026-09-14T16:30:00.000Z"))).toEqual({
+      start: "2026-08-18",
       end: "2026-09-14",
     });
   });
@@ -105,18 +105,18 @@ describe("creator dashboard analytics", () => {
     expect(result.assets).toHaveLength(1);
     expect(prepared).toHaveLength(2);
     expect(prepared[0]?.values).toEqual([
-      "2026-08-17",
-      "2026-09-14",
-      "2026-08-17",
-      "2026-09-14",
-      "2026-08-17T00:00:00.000Z",
-      "2026-09-14T00:00:00.000Z",
+      "2026-08-18",
+      "2026-09-15",
+      "2026-08-18",
+      "2026-09-15",
+      "2026-08-18T00:00:00.000Z",
+      "2026-09-15T00:00:00.000Z",
       "github:123",
       100,
     ]);
     expect(prepared[1]?.values).toEqual([
-      "2026-08-17T00:00:00.000Z",
-      "2026-09-14T00:00:00.000Z",
+      "2026-08-18T00:00:00.000Z",
+      "2026-09-15T00:00:00.000Z",
       "github:123",
       3,
     ]);
