@@ -1,3 +1,9 @@
+const MARKETPLACE_EMBED_PATH = /^\/embed\/(?:eurostat|worldbank)-[a-z0-9][a-z0-9._-]{1,63}\/?$/u;
+
+export function isEmbeddableMarketplacePath(pathname: string): boolean {
+  return MARKETPLACE_EMBED_PATH.test(pathname);
+}
+
 export function withSecurityHeaders(
   response: Response,
   options: { allowEmbedding?: boolean } = {},

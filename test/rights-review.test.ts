@@ -237,7 +237,101 @@ describe("rights evidence review", () => {
     );
 
     expect(() => prepareRightsReview(rows, manifest)).toThrow(
-      "Marketplace-rendered embed review is limited to Eurostat assets",
+      "Marketplace-rendered embed review is limited to reviewed Eurostat or CC BY-4.0 World Bank assets",
+    );
+  });
+
+  it("permits a Cite Supply chart only for the exact automated World Bank CC BY review", () => {
+    const asset = {
+      slug: "worldbank-fb.bnk.capa.zs",
+      canonical_url: "https://data.worldbank.org/indicator/FB.BNK.CAPA.ZS",
+      chart_owner: "third_party" as const,
+      chart_license_code: "CC_BY" as const,
+      chart_license_raw: "CC BY-4.0",
+      chart_license_url: "https://creativecommons.org/licenses/by/4.0/",
+      chart_license_explicit: true as const,
+      manual_review_completed: false,
+      embed_available: false,
+      citation_only_allowed: true,
+      marketplace_rendered_embed_allowed: true,
+      marketplace_embed_url: "https://citesupply.com/embed/worldbank-fb.bnk.capa.zs",
+      marketplace_embed_origin: "https://citesupply.com",
+      embed_review_version: "worldbank-marketplace-chart-cc-by-v1",
+      automated_review_completed: true,
+      automated_review_version: "worldbank-indicator-metadata-cc-by-v1",
+      chart_reuse_prohibited: false,
+      evidence_conflict: false,
+      evidence_url: "https://data.worldbank.org/indicator/FB.BNK.CAPA.ZS",
+      expected_rights_status: "safe" as const,
+      expected_raw_data_redistribution: null,
+      review_note: "Indicator metadata passed the exact CC BY-4.0 policy review.",
+    };
+    const manifest = parseRightsReviewManifest({
+      review_version: "worldbank-marketplace-chart-cc-by-v1",
+      reviewed_at: "2026-09-19T00:30:00.000Z",
+      review_scope: "World Bank CC BY chart review.",
+      assets: [asset],
+    });
+    const rows: RightsReviewAssetRow[] = [
+      {
+        id: "asset_worldbank_fb.bnk.capa.zs",
+        slug: asset.slug,
+        canonical_url: asset.canonical_url,
+        citation_text: "World Bank Open Data: Bank capital to assets ratio (%).",
+        attribution_name: "World Bank Open Data",
+        attribution_url: asset.canonical_url,
+        rights_status: "safe",
+        status: "published",
+        metadata_json: JSON.stringify({
+          source: "worldbank",
+          indicator: "FB.BNK.CAPA.ZS",
+          rights_evidence: {
+            chart_owner: "third_party",
+            chart_license_code: "CC_BY",
+            chart_license_raw: "CC BY-4.0",
+            chart_license_url: "https://creativecommons.org/licenses/by/4.0/",
+            chart_license_explicit: true,
+            manual_review_completed: false,
+            automated_review_completed: true,
+            automated_review_version: "worldbank-indicator-metadata-cc-by-v1",
+            embed_available: false,
+            citation_only_allowed: true,
+            chart_reuse_prohibited: false,
+            evidence_conflict: false,
+            citation_available: true,
+            indicator_evidence: [
+              {
+                indicator_url: "https://api.worldbank.org/v2/country/all/indicator/FB.BNK.CAPA.ZS",
+                non_redistributable: null,
+                origins: [],
+              },
+            ],
+            evidence_url: asset.canonical_url,
+            evidence_checked_at: "2026-09-17T00:00:00.000Z",
+          },
+        }),
+      },
+    ];
+
+    const plan = prepareRightsReview(rows, manifest);
+    expect(plan.updates[0]).toMatchObject({
+      embed_url: "https://citesupply.com/embed/worldbank-fb.bnk.capa.zs",
+      embed_origin: "https://citesupply.com",
+      rights_status: "safe",
+    });
+    expect(JSON.parse(plan.updates[0]!.rights_json)).toMatchObject({
+      marketplace_rendered_embed_allowed: true,
+      embed_provenance: "marketplace_rendered",
+      embed_review_version: "worldbank-marketplace-chart-cc-by-v1",
+      raw_data_redistribution: null,
+    });
+
+    const wrongVersion = {
+      ...manifest,
+      assets: [{ ...manifest.assets[0]!, automated_review_version: "unreviewed-v1" }],
+    };
+    expect(() => prepareRightsReview(rows, wrongVersion)).toThrow(
+      "Marketplace-rendered embed review is limited",
     );
   });
 });

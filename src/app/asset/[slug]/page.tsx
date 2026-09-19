@@ -168,6 +168,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
               indicator={worldBankIndicator}
               metadataJson={asset.metadata_json}
               title={asset.title}
+              marketplaceEmbedAvailable={marketplaceEmbed}
             />
           ) : sourceDataPreview ? (
             <SourceDataPreview metadataJson={asset.metadata_json} />
@@ -283,7 +284,9 @@ export default async function AssetPage({ params }: AssetPageProps) {
               {asset.source_id === null
                 ? "Creator embeds include visible reviewed source attribution. The exact markup shown above is copied."
                 : marketplaceEmbed
-                  ? "This iframe is rendered by Cite Supply from the reviewed Eurostat sample. It is not an official Eurostat embed."
+                  ? asset.source_id === "source_worldbank"
+                    ? "This iframe is rendered by Cite Supply from reviewed World Bank observations under CC BY 4.0. It is not an official World Bank embed."
+                    : "This iframe is rendered by Cite Supply from the reviewed Eurostat sample. It is not an official Eurostat embed."
                   : asset.source_id === "source_worldbank"
                     ? "World Bank catalogue assets are citation-only. No official or marketplace-rendered embed has been approved."
                     : "Embeds stay hosted by the source; this marketplace does not proxy or republish the underlying chart."}

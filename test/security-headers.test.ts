@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { withSecurityHeaders } from "../src/lib/security-headers";
+import { isEmbeddableMarketplacePath, withSecurityHeaders } from "../src/lib/security-headers";
 
 describe("production security headers", () => {
+  it("allows framing only on reviewed marketplace embed route families", () => {
+    expect(isEmbeddableMarketplacePath("/embed/eurostat-tps00001")).toBe(true);
+    expect(isEmbeddableMarketplacePath("/embed/worldbank-fb.bnk.capa.zs")).toBe(true);
+    expect(isEmbeddableMarketplacePath("/embed/creator-unreviewed")).toBe(false);
+    expect(isEmbeddableMarketplacePath("/embed/worldbank-x/extra")).toBe(false);
+  });
+
   it("adds browser isolation and framing protections without dropping response headers", async () => {
     const response = withSecurityHeaders(
       new Response("ok", { headers: { "cache-control": "no-store" } }),

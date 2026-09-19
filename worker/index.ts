@@ -4,7 +4,7 @@ import { runDemandAggregation } from "../src/lib/analytics/demand-aggregation";
 import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
 import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner";
-import { withSecurityHeaders } from "../src/lib/security-headers";
+import { isEmbeddableMarketplacePath, withSecurityHeaders } from "../src/lib/security-headers";
 import { expireUrlScanJobs } from "../src/lib/submissions/url-scan-jobs";
 import { consumeUrlScanResults } from "./url-scan-results";
 
@@ -13,7 +13,7 @@ const worker = {
     const pathname = new URL(request.url).pathname;
     return handler.fetch(request, env, context).then((response: Response) =>
       withSecurityHeaders(response, {
-        allowEmbedding: response.ok && pathname.startsWith("/embed/eurostat-"),
+        allowEmbedding: response.ok && isEmbeddableMarketplacePath(pathname),
       }),
     );
   },

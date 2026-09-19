@@ -138,6 +138,29 @@ describe("C5 source-hosted embed", () => {
     ).toBe(false);
   });
 
+  it("copies a sandboxed Cite Supply embed for an approved World Bank chart", () => {
+    const worldBankAsset = {
+      ...safeAsset,
+      embed_url: "https://citesupply.com/embed/worldbank-fb.bnk.capa.zs",
+      embed_origin: "https://citesupply.com",
+      source_id: "source_worldbank",
+      source_base_url: "https://data.worldbank.org",
+      rights_json: JSON.stringify({
+        embed_allowed: false,
+        marketplace_rendered_embed_allowed: true,
+        embed_provenance: "marketplace_rendered",
+        attribution_required: true,
+      }),
+    };
+
+    expect(canCopyEmbed(worldBankAsset)).toBe(true);
+    expect(buildEmbedMarkup(worldBankAsset)).toContain(
+      'src="https://citesupply.com/embed/worldbank-fb.bnk.capa.zs"',
+    );
+    expect(buildEmbedMarkup(worldBankAsset)).toContain('sandbox=""');
+    expect(buildEmbedMarkup(worldBankAsset)).not.toContain("allow-scripts");
+  });
+
   it("fails closed without reviewed brand attribution and escapes visible anchor text", () => {
     const creatorAsset = {
       ...safeAsset,

@@ -35,6 +35,26 @@ const checks: SmokeCheck[] = [
     includes: ["Copy citation", "Copy embed", "Commercial use"],
   },
   {
+    path: "/asset/worldbank-fb.bnk.capa.zs",
+    expectedStatus: 200,
+    includes: [
+      "Copy citation",
+      "Copy embed",
+      "https://citesupply.com/embed/worldbank-fb.bnk.capa.zs",
+      "reviewed World Bank observations under CC BY 4.0",
+    ],
+  },
+  {
+    path: "/embed/worldbank-fb.bnk.capa.zs",
+    expectedStatus: 200,
+    includes: [
+      "Latest non-empty observations",
+      "Source: World Bank Open Data",
+      "Licensed under CC BY 4.0",
+      "not an official World Bank embed",
+    ],
+  },
+  {
     path: "/embed/eurostat-tps00001",
     expectedStatus: 200,
     includes: [
@@ -120,7 +140,7 @@ async function run(): Promise<void> {
     for (const unexpected of check.excludes ?? []) {
       if (body.includes(unexpected)) failures.push(`${check.path}: unexpected text ${unexpected}`);
     }
-    if (check.path.startsWith("/embed/eurostat-")) {
+    if (check.path.startsWith("/embed/")) {
       if (response.headers.get("x-frame-options") !== null) {
         failures.push(`${check.path}: embed must not send x-frame-options`);
       }

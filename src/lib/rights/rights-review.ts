@@ -110,6 +110,8 @@ const supportedLicenses = new Set<SupportedLicense>([
 ]);
 
 const rightsStatuses = new Set<RightsStatus>(["safe", "restricted", "unknown", "blocked"]);
+const WORLD_BANK_AUTOMATED_REVIEW_VERSION = "worldbank-indicator-metadata-cc-by-v1";
+const WORLD_BANK_EMBED_REVIEW_VERSION = "worldbank-marketplace-chart-cc-by-v1";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -352,13 +354,23 @@ export function prepareRightsReview(
       throw new Error(`Reviewed asset is hidden and cannot be published: ${review.slug}`);
     }
     const metadata = parseMetadata(row.metadata_json, row.slug);
-    if (
-      review.marketplace_rendered_embed_allowed &&
-      (metadata.source !== "eurostat" || !review.slug.startsWith("eurostat-"))
-    ) {
-      throw new Error(
-        `Marketplace-rendered embed review is limited to Eurostat assets: ${review.slug}`,
-      );
+    if (review.marketplace_rendered_embed_allowed) {
+      const reviewedEurostat =
+        metadata.source === "eurostat" && review.slug.startsWith("eurostat-");
+      const reviewedWorldBank =
+        metadata.source === "worldbank" &&
+        review.slug.startsWith("worldbank-") &&
+        review.chart_license_code === "CC_BY" &&
+        review.chart_license_raw === "CC BY-4.0" &&
+        review.automated_review_completed === true &&
+        review.automated_review_version === WORLD_BANK_AUTOMATED_REVIEW_VERSION &&
+        review.embed_review_version === WORLD_BANK_EMBED_REVIEW_VERSION &&
+        review.marketplace_embed_origin === "https://citesupply.com";
+      if (!reviewedEurostat && !reviewedWorldBank) {
+        throw new Error(
+          `Marketplace-rendered embed review is limited to reviewed Eurostat or CC BY-4.0 World Bank assets: ${review.slug}`,
+        );
+      }
     }
     const previousEvidence = metadata.rights_evidence as unknown as RightsEvidence;
     if (!Array.isArray(previousEvidence.indicator_evidence)) {
