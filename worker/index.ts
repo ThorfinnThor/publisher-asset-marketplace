@@ -53,6 +53,7 @@ const worker = {
             "cache-control": "private, no-store",
           },
         }),
+        { allowEmbedding: true },
       );
     }
 
