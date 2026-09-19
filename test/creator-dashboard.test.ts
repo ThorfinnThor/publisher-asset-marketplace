@@ -29,6 +29,8 @@ describe("creator dashboard analytics", () => {
           impressions: "4",
           detail_views: 2,
           embed_copies: null,
+          embed_loads: "12",
+          publisher_sites: 3,
           citation_copies: "1",
           source_clicks: 0,
         },
@@ -44,6 +46,8 @@ describe("creator dashboard analytics", () => {
       impressions: 4,
       detail_views: 2,
       embed_copies: 0,
+      embed_loads: 12,
+      publisher_sites: 3,
       citation_copies: 1,
       source_clicks: 0,
       preview_url: "https://example.test/solar.png",
@@ -52,6 +56,8 @@ describe("creator dashboard analytics", () => {
   });
 
   it("keeps every analytics query scoped to the authenticated creator", () => {
+    expect(creatorAssetAnalyticsSql).toContain("embed_usage_daily");
+    expect(creatorAssetAnalyticsSql).toContain("embed_publisher_daily");
     expect(creatorAssetAnalyticsSql).toContain("WHERE a.creator_id = ?");
     expect(creatorAssetAnalyticsSql).toContain("a.status = 'published'");
     expect(creatorDiscoveryQueriesSql).toContain("WHERE creator_id = ?");
@@ -84,6 +90,8 @@ describe("creator dashboard analytics", () => {
               impressions: 1,
               detail_views: 1,
               embed_copies: 0,
+              embed_loads: 8,
+              publisher_sites: 2,
               citation_copies: 0,
               source_clicks: 0,
             },
@@ -97,6 +105,10 @@ describe("creator dashboard analytics", () => {
     expect(result.assets).toHaveLength(1);
     expect(prepared).toHaveLength(2);
     expect(prepared[0]?.values).toEqual([
+      "2026-08-17",
+      "2026-09-14",
+      "2026-08-17",
+      "2026-09-14",
       "2026-08-17T00:00:00.000Z",
       "2026-09-14T00:00:00.000Z",
       "github:123",
