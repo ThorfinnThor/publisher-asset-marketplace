@@ -131,7 +131,8 @@ before moderation can publish them.
 
 Creator-owned published assets expose bounded first-party publisher signals in the dashboard.
 See [docs/creator-analytics-e7.md](docs/creator-analytics-e7.md) for the E7 metric definitions,
-privacy handling and ownership boundaries.
+privacy handling and ownership boundaries. Actual iframe loads and distinct publisher sites are
+tracked through the privacy-bounded [embed usage analytics](docs/embed-usage-analytics.md) path.
 
 URL-first creator onboarding is specified in
 [docs/url-first-onboarding-g1.md](docs/url-first-onboarding-g1.md). It permits one URL to start a
