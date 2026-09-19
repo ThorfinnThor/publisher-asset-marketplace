@@ -22,10 +22,6 @@ jobs:
       - run: npm run cf:typegen
       - run: npm run cf:typegen:scanner
       - run: npm run db:migrate:local
-      - name: Temporary Prettier preview
-        run: |
-          npm run format
-          git diff -- src/app/creator/dashboard/page.tsx src/lib/analytics/embed-usage.ts worker/index.ts
       - run: npm run check
       - name: URL scan conversion E2E
         run: |
