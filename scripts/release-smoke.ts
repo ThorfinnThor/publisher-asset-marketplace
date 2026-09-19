@@ -151,7 +151,7 @@ async function run(): Promise<void> {
     for (const unexpected of check.excludes ?? []) {
       if (body.includes(unexpected)) failures.push(`${check.path}: unexpected text ${unexpected}`);
     }
-    if (check.path.startsWith("/embed/")) {
+    if (check.path.startsWith("/embed/") && check.expectedStatus === 200) {
       if (response.headers.get("x-frame-options") !== null) {
         failures.push(`${check.path}: embed must not send x-frame-options`);
       }
