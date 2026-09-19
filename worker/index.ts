@@ -6,7 +6,6 @@ import {
   recordEmbedUsage,
   resolveTrackedEmbedTarget,
   trackedSourceEmbedSlug,
-  type EmbedAnalyticsDataset,
   type EmbedProvenance,
 } from "../src/lib/analytics/embed-usage";
 import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
@@ -15,10 +14,6 @@ import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner"
 import { isEmbeddableMarketplacePath, withSecurityHeaders } from "../src/lib/security-headers";
 import { expireUrlScanJobs } from "../src/lib/submissions/url-scan-jobs";
 import { consumeUrlScanResults } from "./url-scan-results";
-
-type EmbedUsageEnv = Env & {
-  EMBED_ANALYTICS?: EmbedAnalyticsDataset;
-};
 
 const worker = {
   async fetch(request: Request, env: Env, context: ExecutionContext): Promise<Response> {
@@ -178,17 +173,18 @@ function scheduleEmbedUsage(
   request: Request,
   provenance: EmbedProvenance,
 ): void {
-  const analytics = (env as EmbedUsageEnv).EMBED_ANALYTICS;
   context.waitUntil(
-    recordEmbedUsage(env.DB, analytics, slug, request, provenance).catch((error: unknown) => {
-      console.error(
-        JSON.stringify({
-          event: "embed_usage_record_failed",
-          slug,
-          provenance,
-          message: error instanceof Error ? error.message : "unknown_error",
-        }),
-      );
-    }),
+    recordEmbedUsage(env.DB, env.EMBED_ANALYTICS, slug, request, provenance).catch(
+      (error: unknown) => {
+        console.error(
+          JSON.stringify({
+            event: "embed_usage_record_failed",
+            slug,
+            provenance,
+            message: error instanceof Error ? error.message : "unknown_error",
+          }),
+        );
+      },
+    ),
   );
 }

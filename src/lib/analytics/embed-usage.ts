@@ -9,10 +9,6 @@ const TRACKED_SOURCE_EMBED_PATH = /^\/e\/([a-z0-9][a-z0-9._-]{1,127})\/?$/u;
 const MARKETPLACE_EMBED_PATH = /^\/embed\/((?:eurostat|worldbank)-[a-z0-9][a-z0-9._-]{1,63})\/?$/u;
 const HASH_PREFIX = "citesupply:embed-usage:v1:";
 
-export type EmbedAnalyticsDataset = {
-  writeDataPoint(point: { blobs?: string[]; doubles?: number[]; indexes?: string[] }): void;
-};
-
 type TrackedEmbedAssetRow = EmbedAsset & {
   slug: string;
   canonical_url: string;
@@ -112,7 +108,7 @@ export async function resolveTrackedEmbedTarget(
 
 export async function recordEmbedUsage(
   db: D1Database,
-  analytics: EmbedAnalyticsDataset | undefined,
+  analytics: AnalyticsEngineDataset | undefined,
   slug: string,
   request: Request,
   provenance: EmbedProvenance,

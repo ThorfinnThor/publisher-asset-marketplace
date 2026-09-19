@@ -19,8 +19,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run cf:typegen
-      - run: npm run cf:typegen:scanner
       - run: npm run db:migrate:local
       - run: npm run check
       - name: URL scan conversion E2E

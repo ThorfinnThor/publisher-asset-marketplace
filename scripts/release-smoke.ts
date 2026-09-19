@@ -8,6 +8,8 @@ type SmokeCheck = {
   excludes?: string[];
   headers?: Record<string, string>;
   init?: RequestInit;
+  expectedLocation?: string;
+  responseHeaders?: Record<string, string>;
 };
 
 const checks: SmokeCheck[] = [
@@ -24,10 +26,17 @@ const checks: SmokeCheck[] = [
       "Solar photovoltaic panel prices",
       "Copy citation",
       "Copy source embed",
+      "https://citesupply.com/e/solar-pv-prices",
       'src="https://ourworldindata.org/grapher/solar-pv-prices.png?imType=thumbnail&amp;imWidth=640"',
       "Data visualization loaded directly from Our World in Data.",
     ],
     excludes: ["Interface preview only—not source data."],
+  },
+  {
+    path: "/e/solar-pv-prices",
+    expectedStatus: 302,
+    expectedLocation: "https://ourworldindata.org/grapher/solar-pv-prices?embed=1",
+    responseHeaders: { "cache-control": "private, no-store" },
   },
   {
     path: "/asset/absolute-number-of-deaths-from-outdoor-air-pollution",
@@ -144,6 +153,18 @@ async function run(): Promise<void> {
     const body = await response.text();
     if (response.status !== check.expectedStatus) {
       failures.push(`${check.path}: expected ${check.expectedStatus}, got ${response.status}`);
+    }
+    if (check.expectedLocation && response.headers.get("location") !== check.expectedLocation) {
+      failures.push(
+        `${check.path}: expected redirect to ${check.expectedLocation}, got ${response.headers.get("location") ?? "no location"}`,
+      );
+    }
+    for (const [name, expected] of Object.entries(check.responseHeaders ?? {})) {
+      if (response.headers.get(name) !== expected) {
+        failures.push(
+          `${check.path}: expected ${name}=${expected}, got ${response.headers.get(name) ?? "missing"}`,
+        );
+      }
     }
     for (const expected of check.includes ?? []) {
       if (!body.includes(expected)) failures.push(`${check.path}: missing text ${expected}`);

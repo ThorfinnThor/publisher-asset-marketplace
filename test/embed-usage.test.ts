@@ -4,6 +4,7 @@ import {
   isIframeEmbedRequest,
   marketplaceEmbedSlug,
   publisherOriginFromRequest,
+  recordEmbedUsage,
   resolveTrackedEmbedTarget,
   trackedSourceEmbedSlug,
 } from "../src/lib/analytics/embed-usage";
@@ -89,4 +90,130 @@ describe("embed usage analytics", () => {
     const missing = new Request("https://citesupply.com/e/solar");
     expect(publisherOriginFromRequest(missing)).toBeNull();
   });
+
+  it("writes hashed publisher usage to Analytics Engine and compact daily D1 aggregates", async () => {
+    const { db, prepared, batches } = recordingDatabase();
+    const points: AnalyticsEngineDataPoint[] = [];
+    const analytics: AnalyticsEngineDataset = {
+      writeDataPoint(point) {
+        points.push(point ?? {});
+      },
+    };
+    const request = new Request("https://citesupply.com/e/solar-pv-prices", {
+      headers: {
+        referer: "https://publisher.example/article/private-path?campaign=one",
+        "sec-fetch-dest": "iframe",
+      },
+    });
+
+    await recordEmbedUsage(
+      db,
+      analytics,
+      "solar-pv-prices",
+      request,
+      "source_hosted",
+      new Date("2026-09-19T12:34:56.000Z"),
+    );
+
+    expect(points).toHaveLength(1);
+    expect(points[0]?.blobs?.[0]).toBe("solar-pv-prices");
+    expect(points[0]?.blobs?.[1]).toMatch(/^[a-f0-9]{64}$/u);
+    expect(points[0]?.blobs?.[1]).not.toContain("publisher.example");
+    expect(points[0]?.blobs?.[2]).toBe("source_hosted");
+    expect(points[0]?.doubles).toEqual([1]);
+    expect(points[0]?.indexes?.[0]).toMatch(/^[a-f0-9]{64}$/u);
+    expect(prepared).toHaveLength(2);
+    expect(prepared[0]?.values).toEqual([
+      "solar-pv-prices",
+      "2026-09-19",
+      0,
+      "2026-09-19T12:34:56.000Z",
+      "2026-09-19T12:34:56.000Z",
+    ]);
+    expect(prepared[1]?.values).toEqual([
+      "solar-pv-prices",
+      points[0]?.blobs?.[1],
+      "2026-09-19",
+      "2026-09-19T12:34:56.000Z",
+    ]);
+    expect(batches).toHaveLength(1);
+    expect(batches[0]).toHaveLength(2);
+  });
+
+  it("counts missing referrers as loads without creating publisher-site rows", async () => {
+    const { db, prepared, batches } = recordingDatabase();
+    const points: AnalyticsEngineDataPoint[] = [];
+    const analytics: AnalyticsEngineDataset = {
+      writeDataPoint(point) {
+        points.push(point ?? {});
+      },
+    };
+
+    await recordEmbedUsage(
+      db,
+      analytics,
+      "worldbank-fb.bnk.capa.zs",
+      new Request("https://citesupply.com/embed/worldbank-fb.bnk.capa.zs", {
+        headers: { "sec-fetch-dest": "iframe" },
+      }),
+      "marketplace_rendered",
+      new Date("2026-09-19T23:00:00.000Z"),
+    );
+
+    expect(points[0]?.blobs).toEqual([
+      "worldbank-fb.bnk.capa.zs",
+      "unknown",
+      "marketplace_rendered",
+    ]);
+    expect(prepared).toHaveLength(1);
+    expect(prepared[0]?.values?.[2]).toBe(1);
+    expect(batches[0]).toHaveLength(1);
+  });
+
+  it("does not write analytics or D1 rows for non-iframe requests", async () => {
+    const { db, prepared, batches } = recordingDatabase();
+    let pointCount = 0;
+    const analytics: AnalyticsEngineDataset = {
+      writeDataPoint() {
+        pointCount += 1;
+      },
+    };
+
+    await recordEmbedUsage(
+      db,
+      analytics,
+      "solar-pv-prices",
+      new Request("https://citesupply.com/e/solar-pv-prices"),
+      "source_hosted",
+    );
+
+    expect(pointCount).toBe(0);
+    expect(prepared).toHaveLength(0);
+    expect(batches).toHaveLength(0);
+  });
 });
+
+function recordingDatabase(): {
+  db: D1Database;
+  prepared: Array<{ sql: string; values: unknown[] }>;
+  batches: unknown[][];
+} {
+  const prepared: Array<{ sql: string; values: unknown[] }> = [];
+  const batches: unknown[][] = [];
+  const db = {
+    prepare(sql: string) {
+      return {
+        bind(...values: unknown[]) {
+          const statement = { sql, values };
+          prepared.push(statement);
+          return statement;
+        },
+      };
+    },
+    async batch(statements: unknown[]) {
+      batches.push(statements);
+      return [];
+    },
+  } as unknown as D1Database;
+  return { db, prepared, batches };
+}
