@@ -16,7 +16,8 @@ export function withSecurityHeaders(
     );
     headers.delete("x-frame-options");
     headers.set("cross-origin-resource-policy", "cross-origin");
-    headers.set("cache-control", "public, max-age=300, must-revalidate");
+    // Embed usage is counted at request time, so browser/CDN reuse must not bypass the Worker.
+    headers.set("cache-control", "private, no-store");
   } else {
     headers.set(
       "content-security-policy",
