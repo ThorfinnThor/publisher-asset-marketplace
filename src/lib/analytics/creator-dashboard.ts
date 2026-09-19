@@ -189,7 +189,16 @@ export async function getCreatorDashboard(
   const reads = await db.batch([
     db
       .prepare(creatorAssetAnalyticsSql)
-      .bind(window.start, window.end, window.start, window.end, start, end, creatorId, creatorAssetLimit),
+      .bind(
+        window.start,
+        window.end,
+        window.start,
+        window.end,
+        start,
+        end,
+        creatorId,
+        creatorAssetLimit,
+      ),
     db.prepare(creatorDiscoveryQueriesSql).bind(start, end, creatorId, creatorQueryLimit),
   ]);
   return {
