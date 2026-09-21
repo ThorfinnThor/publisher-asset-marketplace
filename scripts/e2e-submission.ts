@@ -1,4 +1,5 @@
-import { createHmac } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
+import { execFileSync } from "node:child_process";
 
 const baseUrl = (process.env.E2E_BASE_URL ?? "http://localhost:8788").replace(/\/$/u, "");
 const creatorSession = process.env.E2E_CREATOR_SESSION ?? "creator-token-for-e2e";
@@ -12,6 +13,34 @@ const stamp = Date.now().toString(36);
 const title = `E2E creator asset ${stamp}`;
 const canonicalUrl = `https://e2e-test.example.com/assets/${stamp}`;
 const previewUrl = `${canonicalUrl}/preview.png`;
+const creatorProfileId = `github:e2e-submission-${stamp}`;
+
+function sql(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+function seedCreatorSession(): void {
+  const tokenHash = createHash("sha256").update(creatorSession).digest("base64url");
+  const command = `
+    INSERT INTO profiles (id, role, display_name, website_url, created_at)
+    VALUES (${sql(creatorProfileId)}, 'creator', 'E2E Submission Creator',
+      'https://example.com', '2026-09-15T00:00:00.000Z')
+    ON CONFLICT(id) DO UPDATE SET
+      role = excluded.role, display_name = excluded.display_name,
+      website_url = excluded.website_url;
+    INSERT INTO auth_sessions (id, profile_id, token_hash, expires_at, created_at)
+    VALUES ('e2e-session-creator', ${sql(creatorProfileId)}, ${sql(tokenHash)},
+      '2099-01-01T00:00:00.000Z', '2026-09-15T00:00:00.000Z')
+    ON CONFLICT(id) DO UPDATE SET
+      profile_id = excluded.profile_id, token_hash = excluded.token_hash,
+      expires_at = excluded.expires_at;
+  `;
+  execFileSync(
+    process.platform === "win32" ? "npx.cmd" : "npx",
+    ["wrangler", "d1", "execute", "DB", "--local", "--command", command],
+    { stdio: "pipe" },
+  );
+}
 
 function csrfToken(session: string): string {
   const value = `csrf:v1:${session}`;
@@ -43,6 +72,7 @@ function assert(condition: unknown, message: string): asserts condition {
 }
 
 async function run(): Promise<void> {
+  seedCreatorSession();
   const form = await request("/submit", { session: creatorSession });
   assert(form.response.status === 200, `submission form returned ${form.response.status}`);
   assert(form.text.includes("Submission requirements"), "submission requirements are not visible");
