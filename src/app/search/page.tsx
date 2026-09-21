@@ -28,6 +28,7 @@ type SearchPageProps = {
 
 type SearchLoadResult = {
   results: Array<SearchResultContract<SearchAsset>>;
+  nextCursor: string | null;
   unavailable: boolean;
 };
 
@@ -40,6 +41,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     parsed.selectedAssetTypes.length > 0 ||
     parsed.selectedSource !== "" ||
     parsed.selectedRights.length > 0 ||
+    parsed.commercialUseOnly ||
     parsed.selectedFreshness !== "any";
   const shouldLoadResults = hasSearch || hasActiveFilters;
   const loaded = await loadSearchResults(parsed.request, shouldLoadResults);
@@ -104,6 +106,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </div>
             <span className="result-count">
               {loaded.results.length} {loaded.results.length === 1 ? "result" : "results"}
+              {loaded.nextCursor ? " shown" : ""}
             </span>
           </div>
 
@@ -152,6 +155,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <SearchResultCard key={result.asset.id} result={result} />
             ))}
           </div>
+          {loaded.nextCursor ? (
+            <div className="search-results__pagination">
+              <Link
+                className="button button--secondary"
+                href={nextPageHref(parsed, loaded.nextCursor)}
+              >
+                Next results
+              </Link>
+            </div>
+          ) : null}
           <SearchAnalyticsBeacon
             query={parsed.query}
             resultCount={loaded.results.length}
@@ -167,12 +180,12 @@ async function loadSearchResults(
   request: Parameters<typeof searchAssets>[1],
   shouldLoadResults: boolean,
 ): Promise<SearchLoadResult> {
-  if (!shouldLoadResults) return { results: [], unavailable: false };
+  if (!shouldLoadResults) return { results: [], nextCursor: null, unavailable: false };
   try {
     const response = await searchAssets(getDatabase(), request);
-    return { results: response.results, unavailable: false };
+    return { results: response.results, nextCursor: response.next_cursor, unavailable: false };
   } catch {
-    return { results: [], unavailable: true };
+    return { results: [], nextCursor: null, unavailable: true };
   }
 }
 
@@ -279,14 +292,12 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
                 Embed
               </button>
             )}
-            <button
+            <Link
               className="button button--text button--small"
-              disabled
-              title="Citation actions are enabled in the asset detail view"
-              type="button"
+              href={`/asset/${asset.slug}#citation-heading`}
             >
               Cite
-            </button>
+            </Link>
             <TrackedSourceLink
               assetSlug={asset.slug}
               className="button button--text button--small"
@@ -301,6 +312,21 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
       </div>
     </article>
   );
+}
+
+function nextPageHref(
+  parsed: Awaited<ReturnType<typeof parseSearchPageParams>>,
+  cursor: string,
+): string {
+  const params = new URLSearchParams();
+  if (parsed.query) params.set("q", parsed.query);
+  for (const assetType of parsed.selectedAssetTypes) params.append("type", assetType);
+  if (parsed.selectedSource) params.set("source", parsed.selectedSource);
+  for (const rights of parsed.selectedRights) params.append("rights", rights);
+  if (parsed.commercialUseOnly) params.set("commercial", "allowed");
+  if (parsed.selectedFreshness !== "any") params.set("freshness", parsed.selectedFreshness);
+  params.set("cursor", cursor);
+  return `/search?${params.toString()}`;
 }
 
 function parseRights(value: string | null): {

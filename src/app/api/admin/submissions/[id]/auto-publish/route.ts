@@ -1,13 +1,18 @@
+import { env } from "cloudflare:workers";
+
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import type { PublishableSubmission } from "@/lib/assets/publish-submission";
 import { getDatabase } from "@/lib/db/client";
-import { rebuildAssetSearchTrigrams } from "@/lib/search/search-index";
+import { rebuildSelectedAssetSearchTrigrams } from "@/lib/search/search-index";
 import {
   planAutonomousPublication,
   prepareAutonomousPublicationStatements,
   validatedSubmissionFromStored,
 } from "@/lib/submissions/auto-publish";
-import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
+import {
+  previewVerificationErrorBody,
+  runVerifiedSubmissionPreScreen,
+} from "@/lib/submissions/server-pre-screen";
 
 const maxBodyBytes = 4 * 1024;
 
@@ -19,7 +24,17 @@ export async function POST(
     return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
   }
   const db = getDatabase();
-  const profile = await loadProfile(request, db);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, db);
+  } catch (error) {
+    logAuthenticationFailure("admin_auto_publish_authentication_failed", error);
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile) return errorResponse(401, "authentication_required", "Sign in first.");
   if (profile.role !== "admin") {
     return errorResponse(403, "admin_required", "Admin access is required.");
@@ -61,9 +76,18 @@ export async function POST(
         "The stored submission no longer meets the publication contract.",
       );
     }
-    const preScreen = runSubmissionPreScreen(submission, {
+    const verifiedPreScreen = await runVerifiedSubmissionPreScreen(submission, {
       marketplaceOrigin: new URL(request.url).origin,
+      creatorId: current.creator_id,
+      previewBucket: env.PREVIEW_UPLOADS,
     });
+    if (!verifiedPreScreen.ok) {
+      return Response.json(previewVerificationErrorBody(verifiedPreScreen), {
+        status: verifiedPreScreen.status,
+        headers: { "cache-control": "no-store" },
+      });
+    }
+    const preScreen = verifiedPreScreen.preScreen;
     if (preScreen.status !== "pass") {
       return Response.json(
         {
@@ -117,7 +141,7 @@ export async function POST(
     }
 
     try {
-      await rebuildAssetSearchTrigrams(db);
+      await rebuildSelectedAssetSearchTrigrams(db, [publication.value.asset.id]);
     } catch (error) {
       console.error(
         JSON.stringify({
@@ -142,12 +166,13 @@ export async function POST(
   }
 }
 
-async function loadProfile(request: Request, db: D1Database) {
-  try {
-    return await getAuthenticatedProfile(request, db);
-  } catch {
-    return null;
-  }
+function logAuthenticationFailure(event: string, error: unknown): void {
+  console.error(
+    JSON.stringify({
+      event,
+      message: error instanceof Error ? error.message : "unknown_error",
+    }),
+  );
 }
 
 async function readJson(request: Request): Promise<Record<string, unknown> | null> {

@@ -14,7 +14,22 @@ export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request))
     return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
 
-  const profile = await loadProfile(request);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, getDatabase());
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        event: "preview_upload_authentication_failed",
+        message: error instanceof Error ? error.message : "unknown_error",
+      }),
+    );
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile)
     return errorResponse(401, "authentication_required", "Sign in to upload a preview.");
 
@@ -59,6 +74,7 @@ export async function POST(request: Request): Promise<Response> {
       customMetadata: {
         creatorId: profile.id,
         uploadedAt: new Date().toISOString(),
+        imageValidation: "signature-v1",
       },
     });
   } catch {
@@ -72,14 +88,6 @@ export async function POST(request: Request): Promise<Response> {
     },
     { status: 201, headers: { "cache-control": "no-store" } },
   );
-}
-
-async function loadProfile(request: Request) {
-  try {
-    return await getAuthenticatedProfile(request, getDatabase());
-  } catch {
-    return null;
-  }
 }
 
 function sameOrigin(request: Request): boolean {

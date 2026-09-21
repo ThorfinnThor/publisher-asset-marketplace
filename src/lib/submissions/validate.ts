@@ -56,8 +56,10 @@ export type ValidatedSubmission = {
   opportunityTopic: string | null;
 };
 
+export type SubmissionValidationFailure = { ok: false; code: string; field?: string };
+
 export type SubmissionValidationResult =
-  { ok: true; value: ValidatedSubmission } | { ok: false; code: string; field?: string };
+  { ok: true; value: ValidatedSubmission } | SubmissionValidationFailure;
 
 export function validateSubmissionPayload(input: unknown): SubmissionValidationResult {
   if (!isRecord(input)) return { ok: false, code: "invalid_payload" };

@@ -21,7 +21,7 @@ jobs:
       - run: npm ci
       - run: npm run db:migrate:local
       - run: npm run check
-      - name: URL scan conversion E2E
+      - name: Creator publication E2E
         run: |
           printf 'AUTH_SECRET=e2e-local-secret\n' > .dev.vars
           npm run dev -- --port 8788 > /tmp/url-scan-e2e.log 2>&1 &
@@ -37,5 +37,6 @@ jobs:
             fi
             sleep 1
           done
+          npm run e2e:submission
           npm run e2e:url-scan-conversion
       - run: npm run e2e:embed-sandbox

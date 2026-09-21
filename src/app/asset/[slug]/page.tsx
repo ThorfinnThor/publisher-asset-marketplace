@@ -9,6 +9,7 @@ import { CopyEmbedButton } from "@/components/copy-embed-button";
 import { SourceDataPreview } from "@/components/source-data-preview";
 import { WorldBankDataChart } from "@/components/worldbank-data-chart";
 import { buildEmbedMarkup, canCopyEmbed, parseEmbedRights } from "@/lib/assets/embed";
+import { obligationLabel, permissionLabel, rightsValueState } from "@/lib/assets/rights-labels";
 import { getDatabase } from "@/lib/db/client";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import { parseSourcePreview } from "@/lib/assets/source-data-preview";
@@ -19,13 +20,21 @@ import {
   type RelatedAsset,
 } from "@/lib/assets/get-asset";
 
-export const metadata: Metadata = {
-  title: "Asset",
-};
-
 type AssetPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateMetadata({ params }: AssetPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const record = await loadAsset(slug);
+  if (!record) {
+    return { title: "Asset not found", robots: { index: false, follow: false } };
+  }
+  return {
+    title: record.asset.title,
+    description: record.asset.description,
+  };
+}
 
 type AssetRights = {
   embed_allowed?: boolean | null;
@@ -208,8 +217,8 @@ export default async function AssetPage({ params }: AssetPageProps) {
             ) : null}
             <PermissionRow label="Commercial use" value={rights.commercial_use} />
             <PermissionRow label="Modification" value={rights.modification_allowed} />
-            <PermissionRow label="Attribution" value={rights.attribution_required} />
-            <PermissionRow label="Citation" value={rights.citation_required} />
+            <ObligationRow label="Attribution" value={rights.attribution_required} />
+            <ObligationRow label="Citation" value={rights.citation_required} />
             <PermissionRow label="Raw-data redistribution" value={rights.raw_data_redistribution} />
           </dl>
           <p className="rights-separation-note">
@@ -303,11 +312,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
 }
 
 async function loadAsset(slug: string) {
-  try {
-    return await getPublishedAssetBySlug(getDatabase(), slug);
-  } catch {
-    return null;
-  }
+  return getPublishedAssetBySlug(getDatabase(), slug);
 }
 
 function RelatedAssets({ assets }: { assets: RelatedAsset[] }) {
@@ -342,11 +347,21 @@ function RelatedAssets({ assets }: { assets: RelatedAsset[] }) {
 }
 
 function PermissionRow({ label, value }: { label: string; value: boolean | null | undefined }) {
-  const state = value === true ? "allowed" : value === false ? "not-allowed" : "unknown";
+  const state = rightsValueState(value);
   return (
     <div>
       <dt>{label}</dt>
       <dd className={`permission permission--${state}`}>{permissionLabel(value)}</dd>
+    </div>
+  );
+}
+
+function ObligationRow({ label, value }: { label: string; value: boolean | null | undefined }) {
+  const state = rightsValueState(value);
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd className={`permission permission--${state}`}>{obligationLabel(value)}</dd>
     </div>
   );
 }
@@ -487,12 +502,6 @@ function EurostatDataPreview({ sample }: { sample: EurostatSample }) {
       </p>
     </div>
   );
-}
-
-function permissionLabel(value: boolean | null | undefined): string {
-  if (value === true) return "Allowed";
-  if (value === false) return "Not allowed";
-  return "Unknown";
 }
 
 function rightsBadgeState(

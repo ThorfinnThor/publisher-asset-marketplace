@@ -29,6 +29,7 @@ export type SearchPageParams = {
   type?: SearchPageParam;
   source?: SearchPageParam;
   rights?: SearchPageParam;
+  commercial?: SearchPageParam;
   freshness?: SearchPageParam;
   cursor?: SearchPageParam;
 };
@@ -38,6 +39,7 @@ export type ParsedSearchPage = {
   selectedAssetTypes: string[];
   selectedSource: string;
   selectedRights: Array<"safe" | "restricted">;
+  commercialUseOnly: boolean;
   selectedFreshness: string;
   request: SearchRequest;
 };
@@ -80,6 +82,7 @@ export function parseSearchPageParams(
   const selectedSource =
     values(params.source).find((value) => isSourceForOptions(value, availableSources)) ?? "";
   const selectedRights = values(params.rights).filter(isRights);
+  const commercialUseOnly = values(params.commercial).includes("allowed");
   const requestedFreshness = first(params.freshness);
   const selectedFreshness = freshnessOptions.some((option) => option.value === requestedFreshness)
     ? requestedFreshness
@@ -92,6 +95,7 @@ export function parseSearchPageParams(
       ...(selectedAssetTypes.length > 0 ? { asset_types: selectedAssetTypes } : {}),
       ...(selectedSource ? { source_ids: [selectedSource] } : {}),
       ...(selectedRights.length > 0 ? { rights_statuses: selectedRights } : {}),
+      ...(commercialUseOnly ? { commercial_use: true as const } : {}),
       ...(updatedSince ? { updated_since: updatedSince } : {}),
     },
     limit: 24,
@@ -103,6 +107,7 @@ export function parseSearchPageParams(
     selectedAssetTypes,
     selectedSource,
     selectedRights,
+    commercialUseOnly,
     selectedFreshness,
     request,
   };

@@ -1,3 +1,5 @@
+import { env } from "cloudflare:workers";
+
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
 import { isReviewableStatus, validateReviewPayload } from "@/lib/admin/moderation";
@@ -6,7 +8,8 @@ import {
   buildCreatorAssetRecord,
   type PublishableSubmission,
 } from "@/lib/assets/publish-submission";
-import { rebuildAssetSearchTrigrams } from "@/lib/search/search-index";
+import { rebuildSelectedAssetSearchTrigrams } from "@/lib/search/search-index";
+import { verifyMarketplacePreviewUpload } from "@/lib/submissions/marketplace-preview";
 
 const maxBodyBytes = 16 * 1024;
 
@@ -17,7 +20,17 @@ export async function POST(
   if (!sameOrigin(request))
     return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
 
-  const profile = await loadProfile(request);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, getDatabase());
+  } catch (error) {
+    logAuthenticationFailure("admin_review_authentication_failed", error);
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile)
     return errorResponse(401, "authentication_required", "Sign in to moderate submissions.");
   if (profile.role !== "admin")
@@ -72,6 +85,25 @@ export async function POST(
 
     let publishedAsset: ReturnType<typeof buildCreatorAssetRecord> | null = null;
     if (validation.value.decision === "approved") {
+      const previewVerification = await verifyMarketplacePreviewUpload(
+        env.PREVIEW_UPLOADS,
+        current.preview_url ?? "",
+        new URL(request.url).origin,
+        current.creator_id,
+      );
+      if (previewVerification.kind === "invalid" || previewVerification.kind === "unavailable") {
+        return Response.json(
+          {
+            error: previewVerification.message,
+            code: previewVerification.code,
+            field_errors: { preview_url: previewVerification.message },
+          },
+          {
+            status: previewVerification.kind === "unavailable" ? 503 : 422,
+            headers: { "cache-control": "no-store" },
+          },
+        );
+      }
       if (
         validation.value.rightsStatus !== "safe" &&
         validation.value.rightsStatus !== "restricted"
@@ -186,7 +218,7 @@ export async function POST(
 
     if (asset) {
       try {
-        await rebuildAssetSearchTrigrams(db);
+        await rebuildSelectedAssetSearchTrigrams(db, [asset.id]);
       } catch (error) {
         console.error(
           JSON.stringify({
@@ -217,12 +249,13 @@ export async function POST(
   }
 }
 
-async function loadProfile(request: Request) {
-  try {
-    return await getAuthenticatedProfile(request, getDatabase());
-  } catch {
-    return null;
-  }
+function logAuthenticationFailure(event: string, error: unknown): void {
+  console.error(
+    JSON.stringify({
+      event,
+      message: error instanceof Error ? error.message : "unknown_error",
+    }),
+  );
 }
 
 function sameOrigin(request: Request): boolean {

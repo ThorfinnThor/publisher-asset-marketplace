@@ -21,6 +21,7 @@ export type SubmissionPreScreenResult = {
 
 type SubmissionPreScreenOptions = {
   marketplaceOrigin?: string;
+  marketplacePreviewVerified?: boolean;
 };
 
 const promotionalLanguage =
@@ -39,7 +40,11 @@ export function runSubmissionPreScreen(
   submission: ValidatedSubmission,
   options: SubmissionPreScreenOptions = {},
 ): SubmissionPreScreenResult {
-  const marketplacePreview = isMarketplacePreview(submission.previewUrl, options.marketplaceOrigin);
+  const marketplacePreviewUrl = isMarketplacePreview(
+    submission.previewUrl,
+    options.marketplaceOrigin,
+  );
+  const marketplacePreview = marketplacePreviewUrl && options.marketplacePreviewVerified === true;
   const checks: SubmissionPreScreenCheck[] = [
     hostCheck(
       "embed_host",
@@ -54,13 +59,19 @@ export function runSubmissionPreScreen(
           status: "pass",
           message: "Preview was uploaded to the marketplace by the authenticated creator.",
         }
-      : hostCheck(
-          "preview_host",
-          submission.previewUrl,
-          [submission.canonicalUrl, submission.embedUrl, submission.attributionUrl],
-          "Preview host matches a submitted source host.",
-          "Preview host differs from the submitted source hosts.",
-        ),
+      : marketplacePreviewUrl
+        ? {
+            code: "preview_host",
+            status: "review",
+            message: "Marketplace preview ownership and validation were not verified.",
+          }
+        : hostCheck(
+            "preview_host",
+            submission.previewUrl,
+            [submission.canonicalUrl, submission.embedUrl, submission.attributionUrl],
+            "Preview host matches a submitted source host.",
+            "Preview host differs from the submitted source hosts.",
+          ),
     hostCheck(
       "attribution_host",
       submission.attributionUrl,

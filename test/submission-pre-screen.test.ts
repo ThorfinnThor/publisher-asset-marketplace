@@ -71,7 +71,10 @@ describe("submission automated pre-screen", () => {
         previewUrl:
           "https://marketplace.example/api/submission-previews/11111111-1111-4111-8111-111111111111",
       },
-      { marketplaceOrigin: "https://marketplace.example" },
+      {
+        marketplaceOrigin: "https://marketplace.example",
+        marketplacePreviewVerified: true,
+      },
     );
     expect(result.status).toBe("pass");
     expect(result.checks).toEqual(
@@ -79,6 +82,21 @@ describe("submission automated pre-screen", () => {
         expect.objectContaining({ code: "preview_host", status: "pass" }),
         expect.objectContaining({ code: "preview_format", status: "pass" }),
       ]),
+    );
+  });
+
+  it("does not trust an internal preview URL without storage verification", () => {
+    const result = runSubmissionPreScreen(
+      {
+        ...submission,
+        previewUrl:
+          "https://marketplace.example/api/submission-previews/11111111-1111-4111-8111-111111111111",
+      },
+      { marketplaceOrigin: "https://marketplace.example" },
+    );
+    expect(result.status).toBe("review");
+    expect(result.checks).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: "preview_host", status: "review" })]),
     );
   });
 

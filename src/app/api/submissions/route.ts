@@ -1,6 +1,8 @@
+import { env } from "cloudflare:workers";
+
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
-import { rebuildAssetSearchTrigrams } from "@/lib/search/search-index";
+import { rebuildSelectedAssetSearchTrigrams } from "@/lib/search/search-index";
 import {
   planAutonomousPublication,
   prepareAutonomousPublicationStatements,
@@ -11,8 +13,12 @@ import {
   currentAuthorizationVersion,
   submissionInsertSql,
 } from "@/lib/submissions/create";
-import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
+import {
+  previewVerificationErrorBody,
+  runVerifiedSubmissionPreScreen,
+} from "@/lib/submissions/server-pre-screen";
 import { validateSubmissionPayload } from "@/lib/submissions/validate";
+import { submissionValidationErrorBody } from "@/lib/submissions/validation-errors";
 
 const maxBodyBytes = 32 * 1024;
 const submissionLimit = 10;
@@ -22,7 +28,17 @@ export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request))
     return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
 
-  const profile = await loadProfile(request);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, getDatabase());
+  } catch (error) {
+    logAuthenticationFailure("submission_authentication_failed", error);
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile) return errorResponse(401, "authentication_required", "Sign in to submit an asset.");
 
   const body = await readLimitedBody(request);
@@ -45,11 +61,23 @@ export async function POST(request: Request): Promise<Response> {
   delete payload.csrf_token;
   const validation = validateSubmissionPayload(payload);
   if (!validation.ok) {
-    return errorResponse(400, validation.code, validationErrorMessage(validation.code));
+    return Response.json(submissionValidationErrorBody(validation), {
+      status: 400,
+      headers: { "cache-control": "no-store" },
+    });
   }
-  const preScreen = runSubmissionPreScreen(validation.value, {
+  const verifiedPreScreen = await runVerifiedSubmissionPreScreen(validation.value, {
     marketplaceOrigin: new URL(request.url).origin,
+    creatorId: profile.id,
+    previewBucket: env.PREVIEW_UPLOADS,
   });
+  if (!verifiedPreScreen.ok) {
+    return Response.json(previewVerificationErrorBody(verifiedPreScreen), {
+      status: verifiedPreScreen.status,
+      headers: { "cache-control": "no-store" },
+    });
+  }
+  const preScreen = verifiedPreScreen.preScreen;
   if (preScreen.status !== "pass") {
     return Response.json(
       {
@@ -121,7 +149,7 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     try {
-      await rebuildAssetSearchTrigrams(db);
+      await rebuildSelectedAssetSearchTrigrams(db, [publication.value.asset.id]);
     } catch (error) {
       console.error(
         JSON.stringify({
@@ -153,25 +181,13 @@ export async function POST(request: Request): Promise<Response> {
   }
 }
 
-function validationErrorMessage(code: string): string {
-  if (code === "sandbox_compatibility_required") {
-    return "Test the embed in the marketplace sandbox and confirm that it remains interactive without storage, cookies or same-origin access.";
-  }
-  if (code === "commercial_marketplace_acknowledgement_required") {
-    return "Confirm that the asset may be listed and promoted within the commercially operated marketplace.";
-  }
-  if (code === "creator_terms_acceptance_required") {
-    return "Read and accept the current Creator Terms before publishing.";
-  }
-  return "Please correct the highlighted submission fields.";
-}
-
-async function loadProfile(request: Request) {
-  try {
-    return await getAuthenticatedProfile(request, getDatabase());
-  } catch {
-    return null;
-  }
+function logAuthenticationFailure(event: string, error: unknown): void {
+  console.error(
+    JSON.stringify({
+      event,
+      message: error instanceof Error ? error.message : "unknown_error",
+    }),
+  );
 }
 
 function sameOrigin(request: Request): boolean {

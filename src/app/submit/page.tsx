@@ -112,48 +112,44 @@ type ScanPrefill = {
 };
 
 async function loadScanPrefill(id: string, creatorId: string): Promise<ScanPrefill | null> {
-  try {
-    const row = await getDatabase()
-      .prepare(
-        `
+  const row = await getDatabase()
+    .prepare(
+      `
           SELECT id, requested_url, status, attempt_count, result_json, error_code,
                  created_at, started_at, completed_at, expires_at, updated_at
           FROM url_scan_jobs
           WHERE id = ? AND creator_id = ?
           LIMIT 1
         `,
-      )
-      .bind(id, creatorId)
-      .first<UrlScanJobRow>();
-    if (!row || row.status !== "needs_confirmation") {
-      return null;
-    }
-    const job = publicUrlScanJob(row);
-    const result = isRecord(job.result) ? job.result : null;
-    if (!result) return null;
-    const embed = isRecord(result.embed) ? result.embed : null;
-    const preview = isRecord(result.preview) ? result.preview : null;
-    const type = result.asset_type_candidate;
-    if (!embed || !preview) {
-      return null;
-    }
-    const canonicalUrl = stringCandidate(result.canonical_url_candidate) ?? row.requested_url;
-    return {
-      scan_id: id,
-      canonical_url: canonicalUrl,
-      asset_type: isAssetType(type) ? type : undefined,
-      title: stringCandidate(result.title_candidate) ?? "",
-      description: stringCandidate(result.description_candidate) ?? "",
-      embed_url: stringCandidate(embed.candidate_url) ?? canonicalUrl,
-      // The scanner preview is temporary and private; submissions must use the creator's direct
-      // public HTTPS image URL instead.
-      preview_url: "",
-      attribution_name: stringCandidate(result.attribution_name_candidate) ?? "",
-      attribution_url: stringCandidate(result.attribution_url_candidate) ?? canonicalUrl,
-    };
-  } catch {
+    )
+    .bind(id, creatorId)
+    .first<UrlScanJobRow>();
+  if (!row || row.status !== "needs_confirmation") {
     return null;
   }
+  const job = publicUrlScanJob(row);
+  const result = isRecord(job.result) ? job.result : null;
+  if (!result) return null;
+  const embed = isRecord(result.embed) ? result.embed : null;
+  const preview = isRecord(result.preview) ? result.preview : null;
+  const type = result.asset_type_candidate;
+  if (!embed || !preview) {
+    return null;
+  }
+  const canonicalUrl = stringCandidate(result.canonical_url_candidate) ?? row.requested_url;
+  return {
+    scan_id: id,
+    canonical_url: canonicalUrl,
+    asset_type: isAssetType(type) ? type : undefined,
+    title: stringCandidate(result.title_candidate) ?? "",
+    description: stringCandidate(result.description_candidate) ?? "",
+    embed_url: stringCandidate(embed.candidate_url) ?? canonicalUrl,
+    // The scanner preview is temporary and private; submissions must use the creator's direct
+    // public HTTPS image URL instead.
+    preview_url: "",
+    attribution_name: stringCandidate(result.attribution_name_candidate) ?? "",
+    attribution_url: stringCandidate(result.attribution_url_candidate) ?? canonicalUrl,
+  };
 }
 
 function isAssetType(value: unknown): value is ScanPrefill["asset_type"] {
@@ -189,12 +185,8 @@ function parseOpportunityTopic(value: string | undefined): string | null {
 }
 
 async function loadAuth() {
-  try {
-    const requestHeaders = await headers();
-    const request = new Request("https://internal.invalid/submit", { headers: requestHeaders });
-    const profile = await getAuthenticatedProfile(request, getDatabase());
-    return { profile, csrfToken: profile ? await csrfTokenForRequest(request) : null };
-  } catch {
-    return { profile: null, csrfToken: null };
-  }
+  const requestHeaders = await headers();
+  const request = new Request("https://internal.invalid/submit", { headers: requestHeaders });
+  const profile = await getAuthenticatedProfile(request, getDatabase());
+  return { profile, csrfToken: profile ? await csrfTokenForRequest(request) : null };
 }

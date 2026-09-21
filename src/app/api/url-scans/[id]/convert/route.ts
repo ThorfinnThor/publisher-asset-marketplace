@@ -1,12 +1,17 @@
+import { env } from "cloudflare:workers";
+
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
-import { rebuildAssetSearchTrigrams } from "@/lib/search/search-index";
+import { rebuildSelectedAssetSearchTrigrams } from "@/lib/search/search-index";
 import {
   planAutonomousPublication,
   prepareAutonomousPublicationStatements,
 } from "@/lib/submissions/auto-publish";
 import { buildDeclaredRightsJson, currentAuthorizationVersion } from "@/lib/submissions/create";
-import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
+import {
+  previewVerificationErrorBody,
+  runVerifiedSubmissionPreScreen,
+} from "@/lib/submissions/server-pre-screen";
 import {
   buildConversionSubmissionInsertBindings,
   conversionScanUpdateSql,
@@ -15,6 +20,7 @@ import {
   type ConvertibleUrlScanRow,
 } from "@/lib/submissions/url-scan-conversion";
 import { validateSubmissionPayload } from "@/lib/submissions/validate";
+import { submissionValidationErrorBody } from "@/lib/submissions/validation-errors";
 
 const maxBodyBytes = 32 * 1024;
 const submissionLimit = 10;
@@ -28,7 +34,17 @@ export async function POST(
     return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
   }
 
-  const profile = await loadProfile(request);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, getDatabase());
+  } catch (error) {
+    logAuthenticationFailure("url_scan_conversion_authentication_failed", error);
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile) return errorResponse(401, "authentication_required", "Sign in to confirm a scan.");
 
   const { id } = await params;
@@ -54,7 +70,10 @@ export async function POST(
   delete payload.csrf_token;
   const validation = validateSubmissionPayload(payload);
   if (!validation.ok) {
-    return errorResponse(400, validation.code, validationErrorMessage(validation.code));
+    return Response.json(submissionValidationErrorBody(validation), {
+      status: 400,
+      headers: { "cache-control": "no-store" },
+    });
   }
 
   const db = getDatabase();
@@ -94,9 +113,18 @@ export async function POST(
       );
     }
 
-    const preScreen = runSubmissionPreScreen(validation.value, {
+    const verifiedPreScreen = await runVerifiedSubmissionPreScreen(validation.value, {
       marketplaceOrigin: new URL(request.url).origin,
+      creatorId: profile.id,
+      previewBucket: env.PREVIEW_UPLOADS,
     });
+    if (!verifiedPreScreen.ok) {
+      return Response.json(previewVerificationErrorBody(verifiedPreScreen), {
+        status: verifiedPreScreen.status,
+        headers: { "cache-control": "no-store" },
+      });
+    }
+    const preScreen = verifiedPreScreen.preScreen;
     if (preScreen.status !== "pass") {
       return Response.json(
         {
@@ -175,7 +203,7 @@ export async function POST(
     }
 
     try {
-      await rebuildAssetSearchTrigrams(db);
+      await rebuildSelectedAssetSearchTrigrams(db, [publication.value.asset.id]);
     } catch (error) {
       console.error(
         JSON.stringify({
@@ -208,29 +236,13 @@ export async function POST(
   }
 }
 
-function validationErrorMessage(code: string): string {
-  if (code === "sandbox_compatibility_required") {
-    return "Run and confirm the fixed sandbox test before submitting.";
-  }
-  if (
-    code === "source_identity_confirmation_required" ||
-    code === "attribution_confirmation_required" ||
-    code === "preview_display_authorization_required" ||
-    code === "authorization_required" ||
-    code === "commercial_marketplace_acknowledgement_required" ||
-    code === "creator_terms_acceptance_required"
-  ) {
-    return "Confirm the source, attribution, preview display, your authorization, the commercial marketplace acknowledgement and the current Creator Terms.";
-  }
-  return "Please correct the highlighted submission fields.";
-}
-
-async function loadProfile(request: Request) {
-  try {
-    return await getAuthenticatedProfile(request, getDatabase());
-  } catch {
-    return null;
-  }
+function logAuthenticationFailure(event: string, error: unknown): void {
+  console.error(
+    JSON.stringify({
+      event,
+      message: error instanceof Error ? error.message : "unknown_error",
+    }),
+  );
 }
 
 function sameOrigin(request: Request): boolean {

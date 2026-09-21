@@ -2,7 +2,6 @@ import { env } from "cloudflare:workers";
 
 import {
   creatorAssetDeletionLookupSql,
-  marketplacePreviewObjectKey,
   prepareCreatorAssetDeletionStatements,
   type CreatorAssetDeletionRow,
 } from "@/lib/assets/delete-creator-asset";
@@ -14,11 +13,15 @@ import {
 } from "@/lib/assets/update-creator-asset";
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
-import { rebuildAssetSearchTrigrams } from "@/lib/search/search-index";
+import { rebuildSelectedAssetSearchTrigrams } from "@/lib/search/search-index";
 import { planAutonomousPublication } from "@/lib/submissions/auto-publish";
 import { buildDeclaredRightsJson, currentAuthorizationVersion } from "@/lib/submissions/create";
-import { runSubmissionPreScreen } from "@/lib/submissions/pre-screen";
+import {
+  previewVerificationErrorBody,
+  runVerifiedSubmissionPreScreen,
+} from "@/lib/submissions/server-pre-screen";
 import { validateSubmissionPayload } from "@/lib/submissions/validate";
+import { submissionValidationErrorBody } from "@/lib/submissions/validation-errors";
 
 const maxDeleteBodyBytes = 2 * 1024;
 const maxUpdateBodyBytes = 32 * 1024;
@@ -32,7 +35,17 @@ export async function PATCH(
   }
 
   const db = getDatabase();
-  const profile = await loadProfile(request, db);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, db);
+  } catch (error) {
+    logAuthenticationFailure("creator_asset_update_authentication_failed", error);
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile) {
     return errorResponse(401, "authentication_required", "Sign in to update an asset.");
   }
@@ -52,11 +65,23 @@ export async function PATCH(
   delete payload.csrf_token;
   const validation = validateSubmissionPayload(payload);
   if (!validation.ok) {
-    return errorResponse(400, validation.code, "Please correct the highlighted asset fields.");
+    return Response.json(submissionValidationErrorBody(validation), {
+      status: 400,
+      headers: { "cache-control": "no-store" },
+    });
   }
-  const preScreen = runSubmissionPreScreen(validation.value, {
+  const verifiedPreScreen = await runVerifiedSubmissionPreScreen(validation.value, {
     marketplaceOrigin: new URL(request.url).origin,
+    creatorId: profile.id,
+    previewBucket: env.PREVIEW_UPLOADS,
   });
+  if (!verifiedPreScreen.ok) {
+    return Response.json(previewVerificationErrorBody(verifiedPreScreen), {
+      status: verifiedPreScreen.status,
+      headers: { "cache-control": "no-store" },
+    });
+  }
+  const preScreen = verifiedPreScreen.preScreen;
   if (preScreen.status !== "pass") {
     return Response.json(
       {
@@ -120,7 +145,7 @@ export async function PATCH(
     }
 
     try {
-      await rebuildAssetSearchTrigrams(db);
+      await rebuildSelectedAssetSearchTrigrams(db, [lookup.asset_id]);
     } catch (error) {
       console.error(
         JSON.stringify({
@@ -131,9 +156,6 @@ export async function PATCH(
       );
     }
 
-    if (lookup.preview_url !== validation.value.previewUrl) {
-      await deleteOwnedPreview(lookup.preview_url, new URL(request.url).origin, profile.id);
-    }
     return Response.json(
       { ok: true, auto_publish: true, asset_slug: lookup.slug, pre_screen: preScreen },
       { headers: { "cache-control": "no-store" } },
@@ -163,7 +185,17 @@ export async function DELETE(
   }
 
   const db = getDatabase();
-  const profile = await loadProfile(request, db);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, db);
+  } catch (error) {
+    logAuthenticationFailure("creator_asset_delete_authentication_failed", error);
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile) {
     return errorResponse(401, "authentication_required", "Sign in to delete an asset.");
   }
@@ -193,7 +225,6 @@ export async function DELETE(
       return errorResponse(409, "asset_delete_conflict", "The asset could not be deleted.");
     }
 
-    await deleteOwnedPreview(asset.preview_url, new URL(request.url).origin, profile.id);
     return Response.json(
       { ok: true, deleted_slug: slug },
       { headers: { "cache-control": "no-store" } },
@@ -211,34 +242,13 @@ export async function DELETE(
   }
 }
 
-async function deleteOwnedPreview(
-  previewUrl: string | null,
-  marketplaceOrigin: string,
-  creatorId: string,
-): Promise<void> {
-  const key = marketplacePreviewObjectKey(previewUrl, marketplaceOrigin);
-  if (!key) return;
-  try {
-    const object = await env.PREVIEW_UPLOADS.head(key);
-    if (object?.customMetadata?.creatorId !== creatorId) return;
-    await env.PREVIEW_UPLOADS.delete(key);
-  } catch (error) {
-    console.error(
-      JSON.stringify({
-        event: "creator_asset_preview_delete_failed",
-        key,
-        message: error instanceof Error ? error.message : "unknown_error",
-      }),
-    );
-  }
-}
-
-async function loadProfile(request: Request, db: D1Database) {
-  try {
-    return await getAuthenticatedProfile(request, db);
-  } catch {
-    return null;
-  }
+function logAuthenticationFailure(event: string, error: unknown): void {
+  console.error(
+    JSON.stringify({
+      event,
+      message: error instanceof Error ? error.message : "unknown_error",
+    }),
+  );
 }
 
 function sameOrigin(request: Request): boolean {

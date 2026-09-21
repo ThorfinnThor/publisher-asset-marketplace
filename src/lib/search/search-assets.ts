@@ -42,12 +42,23 @@ type SearchRow = SearchCandidate & {
   bm25_rank?: number;
 };
 
-type Cursor = {
+type RankedCursor = {
   version: string;
+  mode: "ranked";
   score: number;
   normalized_title: string;
   slug: string;
 };
+
+type BrowseCursor = {
+  version: string;
+  mode: "browse";
+  source_updated_at: string;
+  title: string;
+  slug: string;
+};
+
+type Cursor = RankedCursor | BrowseCursor;
 
 const stopWords = new Set<string>(searchRankingV1.query.stop_words);
 
@@ -209,10 +220,40 @@ function cursorEncode(cursor: Cursor): string {
 function cursorDecode(value: string | undefined): Cursor | null {
   if (!value) return null;
   try {
-    const cursor = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as Cursor;
-    return cursor.version === searchRankingV1.version && typeof cursor.score === "number"
-      ? cursor
-      : null;
+    const cursor = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as Record<
+      string,
+      unknown
+    >;
+    if (cursor.version !== searchRankingV1.version) return null;
+    if (
+      (cursor.mode === "ranked" || cursor.mode === undefined) &&
+      typeof cursor.score === "number" &&
+      typeof cursor.normalized_title === "string" &&
+      typeof cursor.slug === "string"
+    ) {
+      return {
+        version: searchRankingV1.version,
+        mode: "ranked",
+        score: cursor.score,
+        normalized_title: cursor.normalized_title,
+        slug: cursor.slug,
+      };
+    }
+    if (
+      cursor.mode === "browse" &&
+      typeof cursor.source_updated_at === "string" &&
+      typeof cursor.title === "string" &&
+      typeof cursor.slug === "string"
+    ) {
+      return {
+        version: searchRankingV1.version,
+        mode: "browse",
+        source_updated_at: cursor.source_updated_at,
+        title: cursor.title,
+        slug: cursor.slug,
+      };
+    }
+    return null;
   } catch {
     return null;
   }
@@ -222,7 +263,7 @@ function applyCursor<T extends SearchResultContract<SearchAsset>>(
   results: T[],
   cursor: Cursor | null,
 ): T[] {
-  if (!cursor) return results;
+  if (!cursor || cursor.mode !== "ranked") return results;
   const index = results.findIndex(
     (result) =>
       result.score === cursor.score &&
@@ -247,8 +288,11 @@ function filterSql(filters: SearchRequest["filters"]): { sql: string; bindings: 
     clauses.push(`a.rights_status IN (${filters.rights_statuses.map(() => "?").join(", ")})`);
     bindings.push(...filters.rights_statuses);
   }
+  if (filters?.commercial_use === true) {
+    clauses.push("json_extract(a.rights_json, '$.commercial_use') = 1");
+  }
   if (filters?.updated_since) {
-    clauses.push("COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) >= ?");
+    clauses.push("a.source_updated_at >= ?");
     bindings.push(filters.updated_since);
   }
   return { sql: clauses.join(" AND "), bindings };
@@ -260,8 +304,8 @@ export function buildPrimarySearchSql(filters: SearchRequest["filters"] = {}): s
     WITH ranked AS (
       SELECT a.id, a.source_id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
         a.rights_status, a.rights_json,
-        COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
-        a.canonical_url, a.embed_url, NULL AS embed_origin, a.preview_url, a.metadata_json,
+        a.source_updated_at,
+        a.canonical_url, a.embed_url, a.embed_origin, a.preview_url, a.metadata_json,
         sources.base_url AS source_base_url, a.attribution_name, a.attribution_url,
         a.citation_text,
         ROW_NUMBER() OVER (ORDER BY bm25(assets_fts, 0.0, 10.0, 4.0, 6.0, 1.0), a.slug) AS bm25_rank
@@ -285,8 +329,8 @@ export function buildFallbackSearchSql(
   return `
     SELECT a.id, a.source_id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
       a.rights_status, a.rights_json,
-      COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
-      a.canonical_url, a.embed_url, NULL AS embed_origin, a.preview_url, a.metadata_json,
+      a.source_updated_at,
+      a.canonical_url, a.embed_url, a.embed_origin, a.preview_url, a.metadata_json,
       sources.base_url AS source_base_url, a.attribution_name, a.attribution_url,
       a.citation_text,
       COUNT(DISTINCT index_trigrams.trigram) AS shared_trigrams,
@@ -301,19 +345,34 @@ export function buildFallbackSearchSql(
   `;
 }
 
-export function buildBrowseSearchSql(filters: SearchRequest["filters"] = {}): string {
+export function buildBrowseSearchSql(
+  filters: SearchRequest["filters"] = {},
+  includeCursor = false,
+): string {
   const eligibility = filterSql(filters).sql;
+  const continuation = includeCursor
+    ? `AND (
+      COALESCE(a.source_updated_at, '') < ?
+      OR (COALESCE(a.source_updated_at, '') = ? AND a.title COLLATE NOCASE > ? COLLATE NOCASE)
+      OR (
+        COALESCE(a.source_updated_at, '') = ?
+        AND a.title = ? COLLATE NOCASE
+        AND a.slug > ?
+      )
+    )`
+    : "";
   return `
     SELECT a.id, a.source_id, a.slug, a.title, a.description, a.asset_type, COALESCE(sources.name, a.attribution_name, '') AS source_name,
       a.rights_status, a.rights_json,
-      COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) AS source_updated_at,
-      a.canonical_url, a.embed_url, NULL AS embed_origin, a.preview_url, a.metadata_json,
+      a.source_updated_at,
+      a.canonical_url, a.embed_url, a.embed_origin, a.preview_url, a.metadata_json,
       sources.base_url AS source_base_url, a.attribution_name, a.attribution_url,
       a.citation_text
     FROM assets a
     LEFT JOIN sources ON sources.id = a.source_id
     WHERE ${eligibility}
-    ORDER BY COALESCE(a.source_updated_at, a.last_checked_at, a.updated_at) DESC, a.title COLLATE NOCASE, a.slug
+    ${continuation}
+    ORDER BY COALESCE(a.source_updated_at, '') DESC, a.title COLLATE NOCASE, a.slug
     LIMIT ?
   `;
 }
@@ -336,18 +395,41 @@ export async function searchAssets(
   );
   const { bindings } = filterSql(request.filters);
   if (request.query.trim() === "") {
+    const cursor = cursorDecode(request.cursor);
+    const browseCursor = cursor?.mode === "browse" ? cursor : null;
+    const cursorBindings = browseCursor
+      ? [
+          browseCursor.source_updated_at,
+          browseCursor.source_updated_at,
+          browseCursor.title,
+          browseCursor.source_updated_at,
+          browseCursor.title,
+          browseCursor.slug,
+        ]
+      : [];
     const browsed = await db
-      .prepare(buildBrowseSearchSql(request.filters))
-      .bind(...bindings, limit)
+      .prepare(buildBrowseSearchSql(request.filters, Boolean(browseCursor)))
+      .bind(...bindings, ...cursorBindings, limit + 1)
       .all<SearchRow>();
+    const page = browsed.results.slice(0, limit);
+    const last = page.at(-1);
     return {
-      results: browsed.results.map((candidate) => ({
+      results: page.map((candidate) => ({
         asset: publicAsset(candidate),
         score: 0,
         matched_fields: [],
         retrieval_path: "browse",
       })),
-      next_cursor: null,
+      next_cursor:
+        browsed.results.length > limit && last
+          ? cursorEncode({
+              version: searchRankingV1.version,
+              mode: "browse",
+              source_updated_at: last.source_updated_at ?? "",
+              title: last.title,
+              slug: last.slug,
+            })
+          : null,
     };
   }
   if (!matchExpression) return { results: [], next_cursor: null };
@@ -394,14 +476,16 @@ export async function searchAssets(
     }
   }
 
-  const page = applyCursor(ranked, cursorDecode(request.cursor)).slice(0, limit);
+  const remaining = applyCursor(ranked, cursorDecode(request.cursor));
+  const page = remaining.slice(0, limit);
   const last = page.at(-1);
   return {
     results: page,
     next_cursor:
-      page.length === limit && last
+      remaining.length > limit && last
         ? cursorEncode({
             version: searchRankingV1.version,
+            mode: "ranked",
             score: last.score,
             normalized_title: normalizeSearchIndexText(last.asset.title),
             slug: last.asset.slug,

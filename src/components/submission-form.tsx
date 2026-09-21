@@ -33,6 +33,8 @@ type SubmissionFormProps = {
 
 type SubmissionResponse = {
   error?: string;
+  code?: string;
+  field_errors?: Record<string, string>;
   auto_publish?: boolean;
   asset_slug?: string;
   pre_screen?: {
@@ -121,6 +123,21 @@ export function SubmissionForm({
   const [previewUrl, setPreviewUrl] = useState(initialValues?.preview_url ?? "");
   const [embedTest, setEmbedTest] = useState<{ url: string; loaded: boolean } | null>(null);
   const [publishedAsset, setPublishedAsset] = useState<PublishedAsset | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const fieldErrorProps = (name: string) => ({
+    "aria-describedby": fieldErrors[name] ? `${name}-error` : undefined,
+    "aria-invalid": fieldErrors[name] ? (true as const) : undefined,
+  });
+
+  function clearFieldError(name: string): void {
+    setFieldErrors((current) => {
+      if (!current[name]) return current;
+      const next = { ...current };
+      delete next[name];
+      return next;
+    });
+  }
 
   function testEmbed(event: MouseEvent<HTMLButtonElement>) {
     const field = event.currentTarget.form?.elements.namedItem("embed_url");
@@ -182,6 +199,7 @@ export function SubmissionForm({
     event.preventDefault();
     setSubmitting(true);
     setStatus(null);
+    setFieldErrors({});
     const form = event.currentTarget;
     const data = new FormData(form);
     const embedUrl = String(data.get("embed_url") ?? "").trim();
@@ -232,6 +250,15 @@ export function SubmissionForm({
       });
       const result = (await response.json().catch(() => null)) as SubmissionResponse | null;
       if (!response.ok) {
+        const responseFieldErrors = result?.field_errors ?? {};
+        setFieldErrors(responseFieldErrors);
+        const firstField = Object.keys(responseFieldErrors)[0];
+        if (firstField) {
+          requestAnimationFrame(() => {
+            const control = form.elements.namedItem(firstField);
+            if (control instanceof HTMLElement) control.focus();
+          });
+        }
         const failedChecks = result?.pre_screen?.checks
           ?.filter((check) => check.status === "review")
           .map((check) => check.message);
@@ -329,7 +356,20 @@ export function SubmissionForm({
   }
 
   return (
-    <form className="submission-form" onSubmit={submit}>
+    <form
+      className="submission-form"
+      onInput={(event) => {
+        const target = event.target;
+        if (
+          target instanceof HTMLInputElement ||
+          target instanceof HTMLSelectElement ||
+          target instanceof HTMLTextAreaElement
+        ) {
+          clearFieldError(target.name);
+        }
+      }}
+      onSubmit={submit}
+    >
       <section className="form-section" aria-labelledby="asset-details-heading">
         <div className="form-section__heading">
           <span>01</span>
@@ -346,9 +386,11 @@ export function SubmissionForm({
               name="canonical_url"
               placeholder="https://example.com/data-tool"
               defaultValue={initialValues?.canonical_url}
+              {...fieldErrorProps("canonical_url")}
               required
               type="url"
             />
+            <FieldError errors={fieldErrors} name="canonical_url" />
             <p className="form-hint">Public HTTPS only. The marketplace does not fetch this URL.</p>
           </div>
           <div className="form-field">
@@ -357,6 +399,7 @@ export function SubmissionForm({
               defaultValue={initialValues?.asset_type ?? ""}
               id="asset-type"
               name="asset_type"
+              {...fieldErrorProps("asset_type")}
               required
             >
               <option disabled value="">
@@ -369,6 +412,7 @@ export function SubmissionForm({
               <option value="benchmark">Benchmark</option>
               <option value="widget">Widget</option>
             </select>
+            <FieldError errors={fieldErrors} name="asset_type" />
           </div>
           <div className="form-field form-field--wide">
             <label htmlFor="asset-title">Title</label>
@@ -377,11 +421,13 @@ export function SubmissionForm({
               name="title"
               placeholder="A clear, specific title"
               defaultValue={initialValues?.title ?? opportunityTopic ?? undefined}
+              {...fieldErrorProps("title")}
               minLength={3}
               maxLength={160}
               required
               type="text"
             />
+            <FieldError errors={fieldErrors} name="title" />
           </div>
           <div className="form-field form-field--wide">
             <label htmlFor="asset-description">Short description</label>
@@ -397,8 +443,10 @@ export function SubmissionForm({
                   ? `A useful asset for publishers searching for “${opportunityTopic}”.`
                   : undefined)
               }
+              {...fieldErrorProps("description")}
               required
             />
+            <FieldError errors={fieldErrors} name="description" />
           </div>
           <div className="form-field">
             <label htmlFor="embed-url">Embed URL</label>
@@ -408,9 +456,11 @@ export function SubmissionForm({
               onChange={() => setEmbedTest(null)}
               placeholder="https://…"
               defaultValue={initialValues?.embed_url}
+              {...fieldErrorProps("embed_url")}
               required
               type="url"
             />
+            <FieldError errors={fieldErrors} name="embed_url" />
             <p className="form-hint">Paste only the iframe source URL, never iframe HTML.</p>
           </div>
           <div className="form-field">
@@ -432,9 +482,11 @@ export function SubmissionForm({
               onChange={(event) => setPreviewUrl(event.target.value)}
               placeholder="https://…/preview.png"
               value={previewUrl}
+              {...fieldErrorProps("preview_url")}
               required
               type="url"
             />
+            <FieldError errors={fieldErrors} name="preview_url" />
             <p className="form-hint">The image must show real data and be publicly reachable.</p>
           </div>
         </div>
@@ -474,6 +526,7 @@ export function SubmissionForm({
           )}
           <label className="attestation embed-test__attestation">
             <input
+              {...fieldErrorProps("sandbox_compatible")}
               disabled={!embedTest?.loaded}
               name="sandbox_compatible"
               required
@@ -485,6 +538,7 @@ export function SubmissionForm({
               authentication, or same-origin access.
             </span>
           </label>
+          <FieldError errors={fieldErrors} name="sandbox_compatible" />
         </div>
       </section>
 
@@ -512,9 +566,11 @@ export function SubmissionForm({
               minLength={2}
               name="attribution_name"
               defaultValue={initialValues?.attribution_name}
+              {...fieldErrorProps("attribution_name")}
               required
               type="text"
             />
+            <FieldError errors={fieldErrors} name="attribution_name" />
             <p className="form-hint">
               Used as visible link text. Enter a real source or brand, not SEO keywords.
             </p>
@@ -526,9 +582,11 @@ export function SubmissionForm({
               name="attribution_url"
               placeholder="https://…"
               defaultValue={initialValues?.attribution_url}
+              {...fieldErrorProps("attribution_url")}
               required
               type="url"
             />
+            <FieldError errors={fieldErrors} name="attribution_url" />
             <p className="form-hint">
               Public page identifying the source and supporting the declared reuse terms.
             </p>
@@ -536,7 +594,8 @@ export function SubmissionForm({
           <div className="form-field form-field--wide">
             <label htmlFor="attribution-terms">Attribution terms</label>
             <input
-              aria-describedby="attribution-terms-hint attribution-terms-meaning"
+              aria-describedby={`attribution-terms-hint attribution-terms-meaning${fieldErrors.attribution_terms ? " attribution_terms-error" : ""}`}
+              aria-invalid={fieldErrors.attribution_terms ? true : undefined}
               id="attribution-terms"
               name="attribution_terms"
               placeholder="Credit PassendPlanen — commercial use and embedding permitted with attribution"
@@ -546,6 +605,7 @@ export function SubmissionForm({
               required
               type="text"
             />
+            <FieldError errors={fieldErrors} name="attribution_terms" />
             <p className="form-hint" id="attribution-terms-hint">
               Suggestion:{" "}
               <code>
@@ -576,6 +636,7 @@ export function SubmissionForm({
           <legend className="sr-only">Declared usage rights</legend>
           <label>
             <input
+              {...fieldErrorProps("commercial_use")}
               defaultChecked={initialValues?.commercial_use}
               name="commercial_use"
               required
@@ -585,8 +646,10 @@ export function SubmissionForm({
               Commercial use allowed <small>Required</small>
             </span>
           </label>
+          <FieldError errors={fieldErrors} name="commercial_use" />
           <label>
             <input
+              {...fieldErrorProps("embed_allowed")}
               defaultChecked={initialValues?.embed_allowed}
               name="embed_allowed"
               required
@@ -596,22 +659,27 @@ export function SubmissionForm({
               Embedding allowed <small>Required</small>
             </span>
           </label>
+          <FieldError errors={fieldErrors} name="embed_allowed" />
           <label>
             <input
+              {...fieldErrorProps("modification_allowed")}
               defaultChecked={initialValues?.modification_allowed}
               name="modification_allowed"
               type="checkbox"
             />
             <span>Modification allowed</span>
           </label>
+          <FieldError errors={fieldErrors} name="modification_allowed" />
           <label>
             <input
+              {...fieldErrorProps("citation_required")}
               defaultChecked={initialValues?.citation_required}
               name="citation_required"
               type="checkbox"
             />
             <span>Citation required</span>
           </label>
+          <FieldError errors={fieldErrors} name="citation_required" />
         </fieldset>
       </section>
 
@@ -619,27 +687,56 @@ export function SubmissionForm({
 
       <div className="submission-form__footer">
         <label className="attestation">
-          <input name="source_identity_confirmed" required type="checkbox" />
+          <input
+            {...fieldErrorProps("source_identity_confirmed")}
+            name="source_identity_confirmed"
+            required
+            type="checkbox"
+          />
           <span>I confirm that the source or brand identity above is accurate.</span>
         </label>
+        <FieldError errors={fieldErrors} name="source_identity_confirmed" />
         <label className="attestation">
-          <input name="attribution_confirmed" required type="checkbox" />
+          <input
+            {...fieldErrorProps("attribution_confirmed")}
+            name="attribution_confirmed"
+            required
+            type="checkbox"
+          />
           <span>I confirm that the attribution URL and terms apply to this exact asset.</span>
         </label>
+        <FieldError errors={fieldErrors} name="attribution_confirmed" />
         <label className="attestation">
-          <input name="preview_display_authorized" required type="checkbox" />
+          <input
+            {...fieldErrorProps("preview_display_authorized")}
+            name="preview_display_authorized"
+            required
+            type="checkbox"
+          />
           <span>I authorize the marketplace to display the submitted preview image.</span>
         </label>
+        <FieldError errors={fieldErrors} name="preview_display_authorized" />
         <label className="attestation">
-          <input name="authorized_to_submit" required type="checkbox" />
+          <input
+            {...fieldErrorProps("authorized_to_submit")}
+            name="authorized_to_submit"
+            required
+            type="checkbox"
+          />
           <span>
             I am authorized to submit this asset and have described its usage terms accurately. I
             understand that these declarations are used for automatic publication and that false
             declarations may result in removal and account suspension.
           </span>
         </label>
+        <FieldError errors={fieldErrors} name="authorized_to_submit" />
         <label className="attestation">
-          <input name="commercial_marketplace_acknowledged" required type="checkbox" />
+          <input
+            {...fieldErrorProps("commercial_marketplace_acknowledged")}
+            name="commercial_marketplace_acknowledged"
+            required
+            type="checkbox"
+          />
           <span>
             I understand that Cite Supply is a commercial service that may earn revenue, including
             through fees, subscriptions, advertising, or similar business models. I agree that this
@@ -649,8 +746,14 @@ export function SubmissionForm({
             availability.
           </span>
         </label>
+        <FieldError errors={fieldErrors} name="commercial_marketplace_acknowledged" />
         <label className="attestation">
-          <input name="creator_terms_accepted" required type="checkbox" />
+          <input
+            {...fieldErrorProps("creator_terms_accepted")}
+            name="creator_terms_accepted"
+            required
+            type="checkbox"
+          />
           <span>
             I have read and accept the{" "}
             <Link href="/creator/terms" rel="noreferrer" target="_blank">
@@ -659,6 +762,17 @@ export function SubmissionForm({
             .
           </span>
         </label>
+        <FieldError errors={fieldErrors} name="creator_terms_accepted" />
+        {Object.keys(fieldErrors).length > 0 ? (
+          <div className="notice notice--error" role="alert">
+            <strong>Please correct the highlighted fields.</strong>
+            <ul>
+              {Object.entries(fieldErrors).map(([field, message]) => (
+                <li key={field}>{message}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         {status ? (
           <div
             className={`notice${status.tone === "error" ? " notice--error" : ""}`}
@@ -689,4 +803,13 @@ function previewVariant(assetType: string): "line" | "bars" | "steps" {
   if (assetType === "calculator" || assetType === "benchmark") return "steps";
   if (assetType === "dataset" || assetType === "table") return "bars";
   return "line";
+}
+
+function FieldError({ errors, name }: { errors: Record<string, string>; name: string }) {
+  const message = errors[name];
+  return message ? (
+    <p className="form-field-error" id={`${name}-error`}>
+      {message}
+    </p>
+  ) : null;
 }

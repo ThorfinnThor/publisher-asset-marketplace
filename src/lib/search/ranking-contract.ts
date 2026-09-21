@@ -4,6 +4,7 @@ export type SearchFilters = {
   asset_types?: string[];
   source_ids?: string[];
   rights_statuses?: Array<"safe" | "restricted">;
+  commercial_use?: true;
   updated_since?: string;
 };
 

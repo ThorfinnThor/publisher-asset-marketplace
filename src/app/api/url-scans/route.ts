@@ -16,7 +16,22 @@ export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request))
     return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
 
-  const profile = await loadProfile(request);
+  let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    profile = await getAuthenticatedProfile(request, getDatabase());
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        event: "url_scan_authentication_failed",
+        message: error instanceof Error ? error.message : "unknown_error",
+      }),
+    );
+    return errorResponse(
+      503,
+      "authentication_unavailable",
+      "Sign-in verification is temporarily unavailable.",
+    );
+  }
   if (!profile) return errorResponse(401, "authentication_required", "Sign in to scan a URL.");
 
   const body = await readLimitedBody(request);
@@ -191,14 +206,6 @@ export async function POST(request: Request): Promise<Response> {
     );
   } catch {
     return errorResponse(503, "scan_unavailable", "The URL scan could not be started.");
-  }
-}
-
-async function loadProfile(request: Request) {
-  try {
-    return await getAuthenticatedProfile(request, getDatabase());
-  } catch {
-    return null;
   }
 }
 

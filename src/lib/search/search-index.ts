@@ -107,3 +107,12 @@ export async function rebuildAssetSearchTrigrams(db: D1Database): Promise<void> 
   await db.prepare("DELETE FROM asset_search_trigrams").bind().run();
   await db.prepare(rebuildAssetSearchTrigramsSql).bind().run();
 }
+
+export async function rebuildSelectedAssetSearchTrigrams(
+  db: D1Database,
+  assetIds: readonly string[],
+): Promise<void> {
+  const queries = rebuildSelectedAssetSearchTrigramQueries(assetIds);
+  if (queries.length === 0) return;
+  await db.batch(queries.map((query) => db.prepare(query.sql).bind(...query.params)));
+}

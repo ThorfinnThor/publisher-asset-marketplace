@@ -13,7 +13,11 @@ type SearchFilterFieldsProps = {
   formId: string;
   parsed: Pick<
     ParsedSearchPage,
-    "selectedAssetTypes" | "selectedSource" | "selectedRights" | "selectedFreshness"
+    | "selectedAssetTypes"
+    | "selectedSource"
+    | "selectedRights"
+    | "commercialUseOnly"
+    | "selectedFreshness"
   >;
   sourceOptions: SearchSourceOption[];
 };
@@ -67,7 +71,21 @@ export function SearchFilterFields({
         </select>
       </fieldset>
       <fieldset className="filter-group">
-        <legend>Rights status</legend>
+        <legend>Commercial use</legend>
+        <label className="filter-option">
+          <input
+            defaultChecked={parsed.commercialUseOnly}
+            form={formId}
+            onChange={(event) => submitFilters(event.currentTarget.form)}
+            name="commercial"
+            type="checkbox"
+            value="allowed"
+          />
+          <span>Commercial use allowed</span>
+        </label>
+      </fieldset>
+      <fieldset className="filter-group">
+        <legend>Rights review</legend>
         <label className="filter-option">
           <input
             defaultChecked={parsed.selectedRights.includes("safe")}
@@ -77,7 +95,7 @@ export function SearchFilterFields({
             type="checkbox"
             value="safe"
           />
-          <span>Commercial use allowed</span>
+          <span>Source rights reviewed</span>
         </label>
         <label className="filter-option">
           <input
@@ -88,7 +106,7 @@ export function SearchFilterFields({
             type="checkbox"
             value="restricted"
           />
-          <span>Restricted use</span>
+          <span>Creator-attested or restricted</span>
         </label>
       </fieldset>
       <fieldset className="filter-group">

@@ -26,6 +26,7 @@ export async function createSearchBenchmarkDatabase(
     ),
   );
   migrations.forEach((migration) => sqlite.exec(migration));
+  sqlite.exec("ALTER TABLE assets ADD COLUMN embed_origin TEXT;");
 
   insertSources(sqlite, fixtures);
   insertAssets(sqlite, fixtures);

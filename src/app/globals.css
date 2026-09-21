@@ -656,6 +656,19 @@ summary {
   line-height: 1.45;
 }
 
+.form-field-error {
+  margin: 0;
+  color: #a1261d;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.submission-form :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: #c53a2f;
+  box-shadow: 0 0 0 3px rgba(197, 58, 47, 0.1);
+}
+
 .home-hero {
   border-bottom: 1px solid var(--border);
 }
