@@ -47,35 +47,46 @@ async function run(): Promise<void> {
   assert(form.response.status === 200, `submission form returned ${form.response.status}`);
   assert(form.text.includes("Submission requirements"), "submission requirements are not visible");
   assert(form.text.includes("Preview image"), "preview requirement is missing");
-  assert(form.text.includes("Sandbox compatibility test"), "sandbox test is missing");
+
+  const validBody = {
+    csrf_token: csrfToken(creatorSession),
+    canonical_url: canonicalUrl,
+    asset_type: "chart",
+    title,
+    description: "An end-to-end test asset proving the creator publication flow.",
+    embed_url: `${canonicalUrl}/embed`,
+    preview_url: previewUrl,
+    attribution_name: "E2E Example Source",
+    attribution_url: "https://e2e-test.example.com/about",
+    attribution_terms: "Credit E2E Example Source — CC BY 4.0",
+    commercial_use: true,
+    embed_allowed: true,
+    modification_allowed: false,
+    citation_required: true,
+    sandbox_compatible: true,
+    source_identity_confirmed: true,
+    attribution_confirmed: true,
+    preview_display_authorized: true,
+    authorized_to_submit: true,
+    commercial_marketplace_acknowledged: true,
+    creator_terms_accepted: true,
+    opportunity_topic: null,
+  };
+  const missingSandboxConfirmation = await request("/api/submissions", {
+    method: "POST",
+    session: creatorSession,
+    body: { ...validBody, sandbox_compatible: false },
+  });
+  assert(
+    missingSandboxConfirmation.response.status === 400 &&
+      missingSandboxConfirmation.text.includes("sandbox_compatibility_required"),
+    "a submission without sandbox confirmation was accepted",
+  );
 
   const submission = await request("/api/submissions", {
     method: "POST",
     session: creatorSession,
-    body: {
-      csrf_token: csrfToken(creatorSession),
-      canonical_url: canonicalUrl,
-      asset_type: "chart",
-      title,
-      description: "An end-to-end test asset proving the creator publication flow.",
-      embed_url: `${canonicalUrl}/embed`,
-      preview_url: previewUrl,
-      attribution_name: "E2E Example Source",
-      attribution_url: "https://e2e-test.example.com/about",
-      attribution_terms: "Credit E2E Example Source — CC BY 4.0",
-      commercial_use: true,
-      embed_allowed: true,
-      modification_allowed: false,
-      citation_required: true,
-      sandbox_compatible: true,
-      source_identity_confirmed: true,
-      attribution_confirmed: true,
-      preview_display_authorized: true,
-      authorized_to_submit: true,
-      commercial_marketplace_acknowledged: true,
-      creator_terms_accepted: true,
-      opportunity_topic: null,
-    },
+    body: validBody,
   });
   assert(submission.response.status === 201, `submission returned ${submission.response.status}`);
   const submissionPayload = JSON.parse(submission.text) as {

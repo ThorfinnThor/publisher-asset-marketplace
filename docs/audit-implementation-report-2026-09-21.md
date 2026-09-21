@@ -176,6 +176,7 @@ None as a whole finding.
 
 - `.github/workflows/ci.yml` — adds creator publication E2E.
 - `.github/workflows/deploy.yml` — makes all release-critical E2Es pre-deploy gates.
+- `scripts/e2e-submission.ts` — verifies sandbox confirmation at the API boundary without relying on streamed client-component text.
 - `scripts/lib/search-benchmark-db.ts` — aligns the benchmark schema with `embed_origin`.
 - `src/app/api/admin/submissions/[id]/auto-publish/route.ts` — verifies previews, distinguishes auth failures and updates only the selected search index.
 - `src/app/api/admin/submissions/[id]/review/route.ts` — verifies previews before approval and uses selected index maintenance.
