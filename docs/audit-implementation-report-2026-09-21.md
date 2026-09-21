@@ -169,8 +169,9 @@ None as a whole finding.
 - Local D1 migrations: no pending migrations.
 - Creator submission E2E: passed.
 - URL-scan conversion E2E: passed, including ownership and duplicate-conversion checks.
-- Embed sandbox E2E: locally unverified because the installed Chrome process exited before returning a status. It remains mandatory in CI and deployment before production mutation.
-- Production smoke/deployment: to be completed after commit and push.
+- Embed sandbox E2E: passed on the hosted GitHub runner in both CI and the deployment gate. The local macOS Chrome process exited before returning a status, so the hosted Linux result is the release evidence.
+- CI: passed for commit `a071fec6d230d0ebc6af19b30efb9f551633fc97` ([run 35659337902](https://github.com/ThorfinnThor/publisher-asset-marketplace/actions/runs/35659337902)).
+- Production deployment: D1 migration, isolated scanner deployment, Worker deployment and all 19 production release-smoke checks passed for the same commit ([run 35659337934](https://github.com/ThorfinnThor/publisher-asset-marketplace/actions/runs/35659337934)).
 
 ## Changed Files
 
@@ -178,6 +179,7 @@ None as a whole finding.
 - `.github/workflows/deploy.yml` — makes all release-critical E2Es pre-deploy gates.
 - `scripts/e2e-submission.ts` — verifies sandbox confirmation at the API boundary without relying on streamed client-component text.
 - `scripts/lib/search-benchmark-db.ts` — aligns the benchmark schema with `embed_origin`.
+- `scripts/release-smoke.ts` — uses an active, rights-reviewed World Bank embed for production verification.
 - `src/app/api/admin/submissions/[id]/auto-publish/route.ts` — verifies previews, distinguishes auth failures and updates only the selected search index.
 - `src/app/api/admin/submissions/[id]/review/route.ts` — verifies previews before approval and uses selected index maintenance.
 - `src/app/api/creator/assets/[slug]/route.ts` — safe preview lifecycle, field errors, auth distinction and selected index maintenance.
@@ -216,4 +218,3 @@ None as a whole finding.
 
 1. Define the preview-retention policy and implement grace-period R2 garbage collection with a reference registry.
 2. Add a browser-level accessibility test for the new inline validation states.
-3. Confirm the hosted CI Chrome sandbox E2E and production smoke results for the committed SHA.
