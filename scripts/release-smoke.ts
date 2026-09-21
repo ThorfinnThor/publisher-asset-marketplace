@@ -44,17 +44,17 @@ const checks: SmokeCheck[] = [
     includes: ["Copy citation", "Copy source embed", "Commercial use"],
   },
   {
-    path: "/asset/worldbank-fb.bnk.capa.zs",
+    path: "/asset/worldbank-eg.elc.accs.zs",
     expectedStatus: 200,
     includes: [
       "Copy citation",
       "Copy Cite Supply embed",
-      "https://citesupply.com/embed/worldbank-fb.bnk.capa.zs",
+      "https://citesupply.com/embed/worldbank-eg.elc.accs.zs",
       "reviewed World Bank observations under CC BY 4.0",
     ],
   },
   {
-    path: "/embed/worldbank-fb.bnk.capa.zs",
+    path: "/embed/worldbank-eg.elc.accs.zs",
     expectedStatus: 200,
     includes: [
       "Latest non-empty observations",
