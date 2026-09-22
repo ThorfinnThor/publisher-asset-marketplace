@@ -11,7 +11,11 @@ import {
 import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
 import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner";
-import { isEmbeddableMarketplacePath, withSecurityHeaders } from "../src/lib/security-headers";
+import {
+  isEmbeddableMarketplacePath,
+  isPublicPreviewPath,
+  withSecurityHeaders,
+} from "../src/lib/security-headers";
 import {
   previewGarbageCollectionConfig,
   runPreviewGarbageCollection,
@@ -58,7 +62,10 @@ const worker = {
 
     const response = await handler.fetch(request, env, context);
     const allowEmbedding = response.ok && isEmbeddableMarketplacePath(pathname);
-    const secured = withSecurityHeaders(response, { allowEmbedding });
+    const secured = withSecurityHeaders(response, {
+      allowEmbedding,
+      allowCrossOriginResource: response.ok && isPublicPreviewPath(pathname),
+    });
     const marketplaceSlug = allowEmbedding ? marketplaceEmbedSlug(pathname) : null;
     if (marketplaceSlug) {
       scheduleEmbedUsage(context, env, marketplaceSlug, request, "marketplace_rendered");

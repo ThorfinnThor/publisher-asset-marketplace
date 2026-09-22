@@ -1,12 +1,18 @@
 const MARKETPLACE_EMBED_PATH = /^\/embed\/(?:eurostat|worldbank)-[a-z0-9][a-z0-9._-]{1,63}\/?$/u;
+const PUBLIC_PREVIEW_PATH =
+  /^\/api\/submission-previews\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/?$/iu;
 
 export function isEmbeddableMarketplacePath(pathname: string): boolean {
   return MARKETPLACE_EMBED_PATH.test(pathname);
 }
 
+export function isPublicPreviewPath(pathname: string): boolean {
+  return PUBLIC_PREVIEW_PATH.test(pathname);
+}
+
 export function withSecurityHeaders(
   response: Response,
-  options: { allowEmbedding?: boolean } = {},
+  options: { allowEmbedding?: boolean; allowCrossOriginResource?: boolean } = {},
 ): Response {
   const headers = new Headers(response.headers);
   if (options.allowEmbedding) {
@@ -24,7 +30,10 @@ export function withSecurityHeaders(
       "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; frame-src https:; connect-src 'self'",
     );
     headers.set("x-frame-options", "DENY");
-    headers.set("cross-origin-resource-policy", "same-origin");
+    headers.set(
+      "cross-origin-resource-policy",
+      options.allowCrossOriginResource ? "cross-origin" : "same-origin",
+    );
   }
   headers.set("cross-origin-opener-policy", "same-origin");
   headers.set("permissions-policy", "camera=(), geolocation=(), microphone=(), payment=()");

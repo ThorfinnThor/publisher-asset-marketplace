@@ -100,7 +100,9 @@ export default async function AssetPage({ params }: AssetPageProps) {
             <span aria-hidden="true">·</span>
             <span>{asset.source_name || "Independent source"}</span>
           </div>
-          <h1 className={assetTitleClassName(asset.title)}>{asset.title}</h1>
+          <h1 className={assetTitleClassName(asset.title)} title={asset.title}>
+            {asset.title}
+          </h1>
           <p>{asset.description}</p>
 
           <dl className="asset-detail__meta">

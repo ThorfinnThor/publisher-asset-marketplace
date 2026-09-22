@@ -1419,9 +1419,13 @@ summary {
 }
 
 .asset-detail__copy h1.asset-detail__title--long {
+  display: -webkit-box;
+  overflow: hidden;
   font-size: clamp(28px, 3.1vw, 42px);
   letter-spacing: -0.035em;
   line-height: 1.08;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
 }
 
 .asset-detail__copy > p {
