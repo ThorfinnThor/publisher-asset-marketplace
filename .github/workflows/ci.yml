@@ -38,5 +38,6 @@ jobs:
             sleep 1
           done
           npm run e2e:submission
+          npm run e2e:submission-accessibility
           npm run e2e:url-scan-conversion
       - run: npm run e2e:embed-sandbox
