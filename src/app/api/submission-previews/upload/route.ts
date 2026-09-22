@@ -2,6 +2,7 @@ import { env } from "cloudflare:workers";
 
 import { getAuthenticatedProfile, verifyCsrfToken } from "@/lib/auth/github";
 import { getDatabase } from "@/lib/db/client";
+import { registerPreviewUpload } from "@/lib/storage/preview-garbage-collector";
 
 const maxImageBytes = 2 * 1024 * 1024;
 const allowedTypes = new Map([
@@ -15,8 +16,9 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse(403, "csrf_failed", "Request origin is not allowed.");
 
   let profile: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  const db = getDatabase();
   try {
-    profile = await getAuthenticatedProfile(request, getDatabase());
+    profile = await getAuthenticatedProfile(request, db);
   } catch (error) {
     console.error(
       JSON.stringify({
@@ -65,6 +67,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const uploadId = crypto.randomUUID();
   const key = `submission-previews/${uploadId}`;
+  const uploadedAt = new Date().toISOString();
   try {
     await env.PREVIEW_UPLOADS.put(key, bytes, {
       httpMetadata: {
@@ -73,11 +76,30 @@ export async function POST(request: Request): Promise<Response> {
       },
       customMetadata: {
         creatorId: profile.id,
-        uploadedAt: new Date().toISOString(),
+        uploadedAt,
         imageValidation: "signature-v1",
       },
     });
-  } catch {
+    await registerPreviewUpload(db, { r2Key: key, creatorId: profile.id, uploadedAt });
+  } catch (error) {
+    try {
+      await env.PREVIEW_UPLOADS.delete(key);
+    } catch (rollbackError) {
+      console.error(
+        JSON.stringify({
+          event: "preview_upload_rollback_failed",
+          r2_key: key,
+          message: rollbackError instanceof Error ? rollbackError.message : "unknown_error",
+        }),
+      );
+    }
+    console.error(
+      JSON.stringify({
+        event: "preview_upload_failed",
+        r2_key: key,
+        message: error instanceof Error ? error.message : "unknown_error",
+      }),
+    );
     return errorResponse(503, "preview_unavailable", "The preview could not be uploaded.");
   }
 

@@ -12,6 +12,10 @@ import { runOpportunityScoring } from "../src/lib/analytics/opportunity-runner";
 import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
 import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner";
 import { isEmbeddableMarketplacePath, withSecurityHeaders } from "../src/lib/security-headers";
+import {
+  previewGarbageCollectionConfig,
+  runPreviewGarbageCollection,
+} from "../src/lib/storage/preview-garbage-collector";
 import { expireUrlScanJobs } from "../src/lib/submissions/url-scan-jobs";
 import { consumeUrlScanResults } from "./url-scan-results";
 
@@ -153,6 +157,28 @@ const worker = {
           console.error(
             JSON.stringify({
               event: "demand_intelligence_failed",
+              message: error instanceof Error ? error.message : "unknown_error",
+            }),
+          );
+        }),
+    );
+    context.waitUntil(
+      runPreviewGarbageCollection(env.DB, env.PREVIEW_UPLOADS, {
+        now: scheduledAt,
+        ...previewGarbageCollectionConfig(env),
+      })
+        .then((result) => {
+          console.log(
+            JSON.stringify({
+              event: "preview_garbage_collection_completed",
+              ...result,
+            }),
+          );
+        })
+        .catch((error: unknown) => {
+          console.error(
+            JSON.stringify({
+              event: "preview_garbage_collection_failed",
               message: error instanceof Error ? error.message : "unknown_error",
             }),
           );
