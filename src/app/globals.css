@@ -166,6 +166,7 @@ summary {
 
 .site-footer nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 }
 
@@ -1381,9 +1382,17 @@ summary {
 
 .asset-detail__hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(430px, 1.18fr);
+  grid-template-columns: minmax(0, 1fr) minmax(430px, 1fr);
   align-items: center;
-  gap: clamp(48px, 8vw, 104px);
+  gap: clamp(40px, 6vw, 72px);
+}
+
+.asset-detail__copy,
+.asset-detail__preview,
+.asset-detail__columns > *,
+.detail-stack,
+.detail-panel {
+  min-width: 0;
 }
 
 .asset-type-line {
@@ -1402,6 +1411,17 @@ summary {
   font-weight: 690;
   letter-spacing: -0.05em;
   line-height: 1.02;
+}
+
+.asset-detail__copy h1.asset-detail__title--medium {
+  font-size: clamp(36px, 4vw, 50px);
+  line-height: 1.05;
+}
+
+.asset-detail__copy h1.asset-detail__title--long {
+  font-size: clamp(28px, 3.1vw, 42px);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
 }
 
 .asset-detail__copy > p {
@@ -1477,6 +1497,7 @@ summary {
 }
 
 .eurostat-data-preview {
+  min-width: 0;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -1543,6 +1564,7 @@ summary {
 }
 
 .source-data-preview {
+  min-width: 0;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -1668,6 +1690,7 @@ summary {
 }
 
 .worldbank-chart {
+  min-width: 0;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -2020,6 +2043,7 @@ body:has(.marketplace-embed-shell) > .site-footer {
 }
 
 .code-preview {
+  overflow-wrap: anywhere;
   margin: 17px 0 0;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -3349,6 +3373,10 @@ body:has(.marketplace-embed-shell) > .site-footer {
   border-bottom: 1px solid var(--border);
 }
 
+.creator-guide__step > div:last-child {
+  min-width: 0;
+}
+
 .creator-guide__step:last-child {
   border-bottom: 0;
 }
@@ -3381,6 +3409,7 @@ body:has(.marketplace-embed-shell) > .site-footer {
 }
 
 .creator-guide__step code {
+  overflow-wrap: anywhere;
   border-radius: 4px;
   padding: 2px 4px;
   background: #f1f3f7;
@@ -3828,6 +3857,10 @@ body:has(.marketplace-embed-shell) > .site-footer {
     grid-template-columns: 1fr;
   }
 
+  .creator-guide__overview {
+    grid-template-columns: 1fr;
+  }
+
   .creator-guide__aside {
     position: static;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3885,6 +3918,13 @@ body:has(.marketplace-embed-shell) > .site-footer {
     width: min(100% - 32px, 1240px);
   }
 
+  .marketplace-embed__title--long {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+
   .site-header__inner {
     gap: 12px;
   }
@@ -3908,14 +3948,19 @@ body:has(.marketplace-embed-shell) > .site-footer {
   }
 
   .site-footer__inner {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
+    align-items: start;
     padding-block: 28px;
   }
 
   .site-footer__inner p {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    grid-column: auto;
+    grid-row: auto;
     text-align: left;
+  }
+
+  .site-footer nav {
+    gap: 12px 18px;
   }
 
   .page-shell {

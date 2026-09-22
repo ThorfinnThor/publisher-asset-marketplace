@@ -70,7 +70,9 @@ export default async function MarketplaceEmbedPage({
       <header className="marketplace-embed__header">
         <div>
           <p className="eyebrow">Eurostat data · {sample.datasetCode}</p>
-          <h1>{record.asset.title}</h1>
+          <h1 className={embedTitleClassName(record.asset.title)} title={record.asset.title}>
+            {record.asset.title}
+          </h1>
         </div>
         <span className="marketplace-embed__badge">Custom EU27 selection</span>
       </header>
@@ -162,7 +164,9 @@ async function renderWorldBankEmbed(
       <header className="marketplace-embed__header">
         <div>
           <p className="eyebrow">World Bank Open Data · {indicator}</p>
-          <h1>{record.asset.title}</h1>
+          <h1 className={embedTitleClassName(record.asset.title)} title={record.asset.title}>
+            {record.asset.title}
+          </h1>
         </div>
         <span className="marketplace-embed__badge">Latest observations</span>
       </header>
@@ -227,4 +231,8 @@ function formatAccessDate(value: string | null): string {
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(value));
+}
+
+function embedTitleClassName(title: string): string | undefined {
+  return title.length > 140 ? "marketplace-embed__title--long" : undefined;
 }

@@ -100,7 +100,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
             <span aria-hidden="true">·</span>
             <span>{asset.source_name || "Independent source"}</span>
           </div>
-          <h1>{asset.title}</h1>
+          <h1 className={assetTitleClassName(asset.title)}>{asset.title}</h1>
           <p>{asset.description}</p>
 
           <dl className="asset-detail__meta">
@@ -354,6 +354,12 @@ function PermissionRow({ label, value }: { label: string; value: boolean | null 
       <dd className={`permission permission--${state}`}>{permissionLabel(value)}</dd>
     </div>
   );
+}
+
+function assetTitleClassName(title: string): string | undefined {
+  if (title.length > 140) return "asset-detail__title--long";
+  if (title.length > 90) return "asset-detail__title--medium";
+  return undefined;
 }
 
 function ObligationRow({ label, value }: { label: string; value: boolean | null | undefined }) {
