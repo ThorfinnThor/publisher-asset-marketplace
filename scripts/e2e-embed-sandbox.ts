@@ -28,7 +28,7 @@ function parentHtml(childPort: number, fixture: "compatible" | "broken"): string
   return `<!doctype html>
 <html><head><title>pending</title></head><body>
 <div id="result" data-e2e-result="pending">pending</div>
-<iframe id="embed" src="http://127.0.0.1:${childPort}/${fixture}" sandbox="allow-scripts"></iframe>
+<iframe id="embed" sandbox="allow-scripts"></iframe>
 <script>
   const result = document.getElementById("result");
   const embed = document.getElementById("embed");
@@ -38,6 +38,7 @@ function parentHtml(childPort: number, fixture: "compatible" | "broken"): string
     result.textContent = "pass";
     document.title = "pass";
   });
+  embed.src = "http://127.0.0.1:${childPort}/${fixture}";
   setTimeout(() => {
     if (result.dataset.e2eResult === "pending") {
       result.dataset.e2eResult = "failed";
