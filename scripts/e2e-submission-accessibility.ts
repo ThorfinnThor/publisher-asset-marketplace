@@ -304,7 +304,16 @@ async function run(): Promise<void> {
       client,
       `document.readyState === "complete" && Boolean(document.querySelector("form.submission-form"))`,
       Boolean,
-      "the hydrated submission form",
+      "the server-rendered submission form",
+    );
+    await waitFor<boolean>(
+      client,
+      `(() => {
+        const button = [...document.querySelectorAll("button")].find((candidate) => candidate.textContent?.trim() === "Test embed");
+        return Boolean(button) && Object.keys(button).some((key) => key.startsWith("__reactProps$"));
+      })()`,
+      Boolean,
+      "React to hydrate the submission form",
     );
 
     const formFilled = await evaluate<boolean>(
