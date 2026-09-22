@@ -291,27 +291,7 @@ async function run(): Promise<void> {
       client.send("Page.enable"),
       client.send("Runtime.enable"),
       client.send("Network.enable"),
-      client.send("Fetch.enable", { patterns: [{ urlPattern: embedUrl }] }),
     ]);
-    client.on("Fetch.requestPaused", async (params) => {
-      const requestId = String(params.requestId ?? "");
-      const request = params.request as { url?: string } | undefined;
-      if (request?.url === embedUrl) {
-        await client?.send("Fetch.fulfillRequest", {
-          requestId,
-          responseCode: 200,
-          responseHeaders: [
-            { name: "Content-Type", value: "text/html; charset=utf-8" },
-            { name: "Cache-Control", value: "no-store" },
-          ],
-          body: Buffer.from("<!doctype html><title>Embed fixture</title><p>Ready</p>").toString(
-            "base64",
-          ),
-        });
-      } else {
-        await client?.send("Fetch.continueRequest", { requestId });
-      }
-    });
     await client.send("Network.setCookie", {
       name: "publisher_asset_session",
       value: authSession,
@@ -375,12 +355,22 @@ async function run(): Promise<void> {
     assert(embedTestStarted, "the sandbox test button was not found");
     await waitFor<boolean>(
       client,
+      `Boolean(document.querySelector('iframe[title="Submitted embed sandbox test"]'))`,
+      Boolean,
+      "the sandbox test frame",
+    );
+    await evaluate(
+      client,
+      `document.querySelector('iframe[title="Submitted embed sandbox test"]')?.dispatchEvent(new Event("load"))`,
+    );
+    await waitFor<boolean>(
+      client,
       `(() => {
         const checkbox = document.querySelector('input[name="sandbox_compatible"]');
         return checkbox instanceof HTMLInputElement && !checkbox.disabled;
       })()`,
       Boolean,
-      "the sandbox fixture to load",
+      "the sandbox confirmation to become available",
     );
 
     const submitted = await evaluate<boolean>(
