@@ -1,5 +1,7 @@
 import type { PublicAssetEventType } from "@/lib/analytics/events";
 
+let ephemeralSessionId: string | null = null;
+
 export type SearchAnalyticsPayload = {
   query: string;
   resultCount: number;
@@ -68,12 +70,11 @@ export async function recordSearchAnalytics(payload: SearchAnalyticsPayload): Pr
 
 export function getAnonymousSessionId(): string | null {
   try {
-    const key = "publisher_asset_anonymous_session";
-    const existing = window.localStorage.getItem(key);
-    if (existing && isAnonymousSessionId(existing)) return existing;
-    const generated = crypto.randomUUID();
-    window.localStorage.setItem(key, generated);
-    return generated;
+    if (ephemeralSessionId && isAnonymousSessionId(ephemeralSessionId)) {
+      return ephemeralSessionId;
+    }
+    ephemeralSessionId = crypto.randomUUID();
+    return ephemeralSessionId;
   } catch {
     return null;
   }

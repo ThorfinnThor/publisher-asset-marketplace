@@ -5,7 +5,7 @@ import { ArrowUpRightIcon, RightsBadge, SearchIcon } from "@/components/design-s
 import { designAssets } from "@/lib/design-assets";
 import { siteBrand } from "@/lib/site-identity";
 
-const trendingQueries = ["AI adoption", "SaaS churn", "German salary", "Ecommerce benchmarks"];
+const trendingQueries = ["Internet access", "Population", "Solar photovoltaic", "Life expectancy"];
 const trustedSources = ["Our World in Data", "World Bank Open Data", "Eurostat"];
 
 export const metadata: Metadata = {
@@ -79,26 +79,30 @@ export default function HomePage() {
               </div>
             </article>
 
-            <article className="hero-preview hero-preview--calculator">
-              <div className="calculator-copy">
-                <p>Calculator preview</p>
-                <h2>SaaS churn rate</h2>
-                <span>Interface example</span>
+            <Link
+              aria-label="Open Solar photovoltaic module prices"
+              className="hero-preview hero-preview--secondary-chart"
+              href={`/asset/${designAssets[2].slug}`}
+            >
+              <div className="hero-preview__heading">
+                <div>
+                  <p>Chart preview</p>
+                  <h2>{designAssets[2].title}</h2>
+                </div>
+                <span className="source-monogram" aria-label="Source: Our World in Data">
+                  OWID
+                </span>
               </div>
-              <div className="calculator-fields" aria-label="Calculator interface preview">
-                <label>
-                  Monthly revenue
-                  <span>€10,000</span>
-                </label>
-                <label>
-                  Churn rate
-                  <span>5%</span>
-                </label>
-              </div>
-              <button className="button button--secondary" disabled type="button">
-                Calculate
-              </button>
-            </article>
+              <img
+                alt={`Our World in Data chart: ${designAssets[2].title}`}
+                className="hero-preview__source-image"
+                decoding="async"
+                src={designAssets[2].previewUrl}
+              />
+              <span className="hero-preview__open">
+                Open real asset <ArrowUpRightIcon />
+              </span>
+            </Link>
           </div>
         </div>
       </section>

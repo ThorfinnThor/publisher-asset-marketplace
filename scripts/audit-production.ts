@@ -9,6 +9,7 @@ const publicUtilityPaths = [
   "/opportunities",
   "/creator/guide",
   "/creator/terms",
+  "/privacy",
   "/legal-notice",
   "/report",
   "/submit",

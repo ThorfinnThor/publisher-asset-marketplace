@@ -1,11 +1,11 @@
 export const siteIdentity = {
   businessName: "SeitenHafen361",
   operatorName: "Schayan Yousefian",
-  legalForm: "Einzelunternehmen",
+  legalForm: "sole proprietorship",
   street: "Freienwalder Str. 34",
   postalCode: "13359",
   city: "Berlin",
-  country: "Deutschland",
+  country: "Germany",
 } as const;
 
 export const siteBrand = {
@@ -15,5 +15,4 @@ export const siteBrand = {
   discoveryLine: "Where publishers find data.",
 } as const;
 
-// The domain mailbox will be added before the legal pages are considered launch-ready.
-export const publicContactEmail: string | null = null;
+export const publicContactEmail = "info@citesupply.com";
