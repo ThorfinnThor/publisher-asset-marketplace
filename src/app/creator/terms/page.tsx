@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "Creator terms",
   description: `Terms for submitting and publishing assets in ${siteBrand.name}.`,
   alternates: { canonical: "/creator/terms" },
+  robots: { index: false, follow: true },
 };
 
 export default function CreatorTermsPage() {

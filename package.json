@@ -37,6 +37,7 @@
     "rights:worldbank-catalog": "tsx scripts/review-worldbank-catalog-rights.ts",
     "search:review": "tsx scripts/review-search-quality.ts --output docs/search-quality-review-c8.md",
     "release:smoke": "tsx scripts/release-smoke.ts",
+    "audit:production": "tsx scripts/audit-production.ts",
     "e2e:submission": "tsx scripts/e2e-submission.ts",
     "e2e:submission-accessibility": "tsx scripts/e2e-submission-accessibility.ts",
     "e2e:url-scan-conversion": "tsx scripts/e2e-url-scan-conversion.ts",
@@ -44,7 +45,7 @@
     "lint": "eslint src scripts test worker scanner",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --incremental false",
     "test": "vitest run",
     "check": "npm run cf:typegen:check && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
   },

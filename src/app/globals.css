@@ -7,11 +7,11 @@
   --surface: #ffffff;
   --border: #e4e2dd;
   --muted: #6f716f;
-  --accent: #2f6fed;
+  --accent: #2864df;
   --accent-soft: #edf3ff;
-  --verified: #23855a;
+  --verified: #17714a;
   --verified-soft: #edf8f2;
-  --caution: #a96f13;
+  --caution: #8a580b;
   --caution-soft: #fff7e8;
   --blocked: #b64949;
   --blocked-soft: #fff0f0;
@@ -1233,7 +1233,7 @@ summary {
   border-bottom: 1px solid var(--border);
 }
 
-.filter-header h2 {
+.filter-header strong {
   margin: 0;
   font-size: 16px;
   font-weight: 720;

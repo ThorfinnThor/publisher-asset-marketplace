@@ -13,6 +13,8 @@ describe("C4 published asset detail", () => {
     expect(buildAssetDetailSql()).toContain("a.search_indexable");
     expect(buildRelatedAssetsSql()).toContain("LIMIT 3");
     expect(buildRelatedAssetsSql()).toContain("a.slug <> ?");
+    expect(buildRelatedAssetsSql()).toContain("UNION ALL");
+    expect(buildRelatedAssetsSql()).not.toContain("OR a.asset_type = (SELECT");
   });
 
   it("loads the detail and related cards in one D1 batch", async () => {

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Impressum",
   description: `Anbieterkennzeichnung von ${siteBrand.name}.`,
   alternates: { canonical: "/legal-notice" },
+  robots: { index: false, follow: true },
 };
 
 export default function LegalNoticePage() {

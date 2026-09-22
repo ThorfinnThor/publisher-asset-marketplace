@@ -73,26 +73,59 @@ const detailSql = `
 `;
 
 const relatedSql = `
-  SELECT
-    a.id,
-    a.slug,
-    a.title,
-    a.asset_type,
-    COALESCE(s.name, a.attribution_name, '') AS source_name,
-    a.source_updated_at
-  FROM assets a
-  LEFT JOIN sources s ON s.id = a.source_id
-  WHERE a.slug <> ?
-    AND a.status = 'published'
-    AND a.rights_status IN ('safe', 'restricted')
-    AND (
-      a.source_id = (SELECT source_id FROM assets WHERE slug = ?)
-      OR a.asset_type = (SELECT asset_type FROM assets WHERE slug = ?)
-    )
-  ORDER BY
-    (a.source_id = (SELECT source_id FROM assets WHERE slug = ?)) DESC,
-    a.updated_at DESC,
-    a.slug ASC
+  WITH target AS (
+    SELECT source_id, asset_type
+    FROM assets
+    WHERE slug = ?
+    LIMIT 1
+  ),
+  same_source AS (
+    SELECT
+      a.id,
+      a.slug,
+      a.title,
+      a.asset_type,
+      COALESCE(s.name, a.attribution_name, '') AS source_name,
+      a.source_updated_at,
+      a.updated_at AS sort_updated_at,
+      1 AS source_priority
+    FROM target t
+    JOIN assets a ON t.source_id IS NOT NULL AND a.source_id = t.source_id
+    LEFT JOIN sources s ON s.id = a.source_id
+    WHERE a.slug <> ?
+      AND a.status = 'published'
+      AND a.rights_status IN ('safe', 'restricted')
+    ORDER BY a.updated_at DESC, a.slug ASC
+    LIMIT 3
+  ),
+  same_type AS (
+    SELECT
+      a.id,
+      a.slug,
+      a.title,
+      a.asset_type,
+      COALESCE(s.name, a.attribution_name, '') AS source_name,
+      a.source_updated_at,
+      a.updated_at AS sort_updated_at,
+      0 AS source_priority
+    FROM target t
+    JOIN assets a ON a.asset_type = t.asset_type
+    LEFT JOIN sources s ON s.id = a.source_id
+    WHERE a.slug <> ?
+      AND a.status = 'published'
+      AND a.rights_status IN ('safe', 'restricted')
+      AND (t.source_id IS NULL OR a.source_id IS NULL OR a.source_id <> t.source_id)
+    ORDER BY a.updated_at DESC, a.slug ASC
+    LIMIT 3
+  ),
+  candidates AS (
+    SELECT * FROM same_source
+    UNION ALL
+    SELECT * FROM same_type
+  )
+  SELECT id, slug, title, asset_type, source_name, source_updated_at
+  FROM candidates
+  ORDER BY source_priority DESC, sort_updated_at DESC, slug ASC
   LIMIT 3
 `;
 
@@ -110,7 +143,7 @@ export async function getPublishedAssetBySlug(
 ): Promise<{ asset: PublishedAssetDetail; related: RelatedAsset[] } | null> {
   const [detailResult, relatedResult] = (await db.batch([
     db.prepare(detailSql).bind(slug),
-    db.prepare(relatedSql).bind(slug, slug, slug, slug),
+    db.prepare(relatedSql).bind(slug, slug, slug),
   ])) as unknown as [{ results: PublishedAssetRow[] }, { results: RelatedAsset[] }];
   const asset = detailResult.results[0];
   if (!asset) return null;

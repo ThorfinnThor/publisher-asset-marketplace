@@ -6,7 +6,7 @@ import { designAssets } from "@/lib/design-assets";
 import { siteBrand } from "@/lib/site-identity";
 
 const trendingQueries = ["AI adoption", "SaaS churn", "German salary", "Ecommerce benchmarks"];
-const trustedSources = ["Our World in Data", "World Bank", "OECD", "United Nations", "Eurostat"];
+const trustedSources = ["Our World in Data", "World Bank Open Data", "Eurostat"];
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -106,8 +106,8 @@ export default function HomePage() {
       <section className="trusted-sources" aria-labelledby="trusted-sources-heading">
         <div className="page-shell trusted-sources__inner">
           <div>
-            <h2 id="trusted-sources-heading">Trusted public sources</h2>
-            <p>Source candidates, not implied partnerships.</p>
+            <h2 id="trusted-sources-heading">Reviewed public sources</h2>
+            <p>Sources represented in the catalog; no partnership implied.</p>
           </div>
           <ul>
             {trustedSources.map((source) => (

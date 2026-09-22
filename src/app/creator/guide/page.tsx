@@ -36,7 +36,7 @@ export default function CreatorGuidePage() {
       <section className="creator-guide__overview" aria-labelledby="four-resources-heading">
         <div>
           <p className="eyebrow">The four-resource rule</p>
-          <h2 id="four-resources-heading">One asset, four public URLs.</h2>
+          <h2 id="four-resources-heading">One asset, four public resources.</h2>
         </div>
         <ol>
           <li>
@@ -49,7 +49,7 @@ export default function CreatorGuidePage() {
           </li>
           <li>
             <strong>Preview image</strong>
-            <span>Direct PNG or JPG showing the actual result.</span>
+            <span>Uploaded image or direct URL showing the actual result.</span>
           </li>
           <li>
             <strong>Rights evidence</strong>

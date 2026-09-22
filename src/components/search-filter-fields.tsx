@@ -34,7 +34,7 @@ export function SearchFilterFields({
   return (
     <div className="filter-groups">
       <div className="filter-header">
-        <h2>Filters</h2>
+        <strong>Filters</strong>
         <Link href="/search">Clear</Link>
       </div>
       <fieldset className="filter-group">

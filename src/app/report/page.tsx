@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Meldung und Entfernung",
   description: "Meldeweg für rechtswidrige Inhalte und Entfernung von Marketplace-Listings.",
   alternates: { canonical: "/report" },
+  robots: { index: false, follow: true },
 };
 
 export default function ReportPage() {
