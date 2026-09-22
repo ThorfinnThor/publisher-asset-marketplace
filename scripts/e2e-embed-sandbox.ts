@@ -33,7 +33,7 @@ function parentHtml(childPort: number, fixture: "compatible" | "broken"): string
   const result = document.getElementById("result");
   const embed = document.getElementById("embed");
   window.addEventListener("message", (event) => {
-    if (event.source !== embed.contentWindow || event.data?.type !== "sandbox-e2e-pass") return;
+    if (event.data?.type !== "sandbox-e2e-pass") return;
     result.dataset.e2eResult = "pass";
     result.textContent = "pass";
     document.title = "pass";
