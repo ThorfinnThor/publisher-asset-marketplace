@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { JsonLd } from "@/components/json-ld";
+import { buildSiteJsonLd, siteSeo } from "@/lib/seo";
 import { siteBrand } from "@/lib/site-identity";
 
 import "./globals.css";
@@ -9,16 +11,47 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://citesupply.com"),
   title: {
-    default: siteBrand.name,
+    default: siteSeo.title,
     template: `%s | ${siteBrand.name}`,
   },
-  description: siteBrand.tagline,
+  description: siteSeo.description,
+  applicationName: siteBrand.name,
+  creator: siteBrand.name,
+  publisher: siteBrand.name,
+  category: "data publishing",
+  referrer: "strict-origin-when-cross-origin",
+  formatDetection: { address: false, email: false, telephone: false },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: siteBrand.name,
+    title: siteSeo.title,
+    description: siteSeo.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteSeo.title,
+    description: siteSeo.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
       <body>
+        <JsonLd value={buildSiteJsonLd()} />
         <header className="site-header">
           <div className="site-header__inner">
             <Link className="brand" href="/" aria-label={`${siteBrand.name} home`}>

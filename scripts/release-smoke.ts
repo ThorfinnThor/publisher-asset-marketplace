@@ -15,6 +15,16 @@ type SmokeCheck = {
 const checks: SmokeCheck[] = [
   { path: "/", expectedStatus: 200, includes: ["Find data worth citing."] },
   {
+    path: "/robots.txt",
+    expectedStatus: 200,
+    includes: [
+      "User-agent: OAI-SearchBot",
+      "Content-Signal: search=yes, ai-input=yes, ai-train=no, use=reference",
+      "Sitemap: https://citesupply.com/sitemap.xml",
+    ],
+    responseHeaders: { "content-type": "text/plain; charset=utf-8" },
+  },
+  {
     path: "/sitemap.xml",
     expectedStatus: 200,
     includes: ["<urlset", "https://citesupply.com/asset/solar-pv-prices"],
@@ -35,6 +45,7 @@ const checks: SmokeCheck[] = [
       "https://citesupply.com/e/solar-pv-prices",
       'src="https://ourworldindata.org/grapher/solar-pv-prices.png?imType=thumbnail&amp;imWidth=640"',
       "Data visualization loaded directly from Our World in Data.",
+      '"@type":"CreativeWork"',
     ],
     excludes: ["Interface preview only—not source data."],
   },

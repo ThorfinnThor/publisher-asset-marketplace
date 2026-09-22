@@ -6,6 +6,7 @@ import { AssetAnalyticsBeacon, TrackedSourceLink } from "@/components/analytics-
 import { ArrowUpRightIcon, ChartPreview, RightsBadge } from "@/components/design-system";
 import { CopyCitationButton } from "@/components/copy-citation-button";
 import { CopyEmbedButton } from "@/components/copy-embed-button";
+import { JsonLd } from "@/components/json-ld";
 import { SourceDataPreview } from "@/components/source-data-preview";
 import { WorldBankDataChart } from "@/components/worldbank-data-chart";
 import { buildEmbedMarkup, canCopyEmbed, parseEmbedRights } from "@/lib/assets/embed";
@@ -14,6 +15,7 @@ import { getDatabase } from "@/lib/db/client";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import { parseSourcePreview } from "@/lib/assets/source-data-preview";
 import { parseWorldBankIndicator } from "@/lib/assets/worldbank-chart";
+import { buildAssetJsonLd } from "@/lib/seo";
 import {
   getPublishedAssetBySlug,
   type PublishedAssetDetail,
@@ -30,10 +32,29 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
   if (!record) {
     return { title: "Asset not found", robots: { index: false, follow: false } };
   }
+  const normalizedPreview = normalizePublicHttpsUrl(record.asset.preview_url);
+  const images = normalizedPreview.ok
+    ? [{ url: normalizedPreview.value, alt: record.asset.title }]
+    : [{ url: "/opengraph-image", alt: "Cite Supply" }];
   return {
     title: record.asset.title,
     description: record.asset.description,
     alternates: { canonical: `/asset/${record.asset.slug}` },
+    openGraph: {
+      type: "article",
+      url: `/asset/${record.asset.slug}`,
+      title: record.asset.title,
+      description: record.asset.description,
+      siteName: "Cite Supply",
+      images,
+      ...(record.asset.source_updated_at ? { modifiedTime: record.asset.source_updated_at } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: record.asset.title,
+      description: record.asset.description,
+      images: images.map((image) => image.url),
+    },
   };
 }
 
@@ -87,6 +108,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
 
   return (
     <main className="asset-detail page-shell">
+      <JsonLd value={buildAssetJsonLd(asset)} />
       <AssetAnalyticsBeacon assetSlug={asset.slug} />
       <nav aria-label="Breadcrumb" className="breadcrumb">
         <Link href="/search">Browse</Link>
