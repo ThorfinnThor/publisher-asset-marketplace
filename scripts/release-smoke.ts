@@ -15,6 +15,12 @@ type SmokeCheck = {
 const checks: SmokeCheck[] = [
   { path: "/", expectedStatus: 200, includes: ["Find data worth citing."] },
   {
+    path: "/sitemap.xml",
+    expectedStatus: 200,
+    includes: ["<urlset", "https://citesupply.com/asset/solar-pv-prices"],
+    responseHeaders: { "content-type": "application/xml; charset=utf-8" },
+  },
+  {
     path: "/search?q=solar",
     expectedStatus: 200,
     includes: ["Results for", "Solar photovoltaic panel prices"],

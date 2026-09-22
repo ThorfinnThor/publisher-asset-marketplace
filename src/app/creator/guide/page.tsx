@@ -6,6 +6,7 @@ import { ArrowUpRightIcon } from "@/components/design-system";
 export const metadata: Metadata = {
   title: "Creator guide",
   description: "Prepare a chart, calculator, table, dataset, benchmark or widget for review.",
+  alternates: { canonical: "/creator/guide" },
 };
 
 const embedSnippet = `<iframe\n  src="https://your-domain.example/embed/my-calculator"\n  title="My calculator"\n  loading="lazy"\n  referrerpolicy="strict-origin-when-cross-origin"\n  sandbox="allow-scripts"\n></iframe>`;

@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
   return {
     title: record.asset.title,
     description: record.asset.description,
+    alternates: { canonical: `/asset/${record.asset.slug}` },
   };
 }
 

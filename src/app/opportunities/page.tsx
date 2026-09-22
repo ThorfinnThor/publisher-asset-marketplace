@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Publisher opportunities",
   description: "See topics where publishers are looking for useful, publishable assets.",
+  alternates: { canonical: "/opportunities" },
 };
 
 export default async function OpportunitiesPage() {

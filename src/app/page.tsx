@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ArrowUpRightIcon, RightsBadge, SearchIcon } from "@/components/design-system";
@@ -6,6 +7,10 @@ import { siteBrand } from "@/lib/site-identity";
 
 const trendingQueries = ["AI adoption", "SaaS churn", "German salary", "Ecommerce benchmarks"];
 const trustedSources = ["Our World in Data", "World Bank", "OECD", "United Nations", "Eurostat"];
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function HomePage() {
   return (

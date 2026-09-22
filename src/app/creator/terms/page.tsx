@@ -10,6 +10,7 @@ import { siteBrand } from "@/lib/site-identity";
 export const metadata: Metadata = {
   title: "Creator terms",
   description: `Terms for submitting and publishing assets in ${siteBrand.name}.`,
+  alternates: { canonical: "/creator/terms" },
 };
 
 export default function CreatorTermsPage() {

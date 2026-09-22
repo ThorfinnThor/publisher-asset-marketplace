@@ -6,6 +6,7 @@ import { publicContactEmail, siteBrand, siteIdentity } from "@/lib/site-identity
 export const metadata: Metadata = {
   title: "Impressum",
   description: `Anbieterkennzeichnung von ${siteBrand.name}.`,
+  alternates: { canonical: "/legal-notice" },
 };
 
 export default function LegalNoticePage() {

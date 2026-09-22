@@ -7,6 +7,7 @@ import { siteBrand } from "@/lib/site-identity";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://citesupply.com"),
   title: {
     default: siteBrand.name,
     template: `%s | ${siteBrand.name}`,

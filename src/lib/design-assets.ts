@@ -41,7 +41,7 @@ export const designAssets: DesignAsset[] = [
       "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet.png?imType=thumbnail&imWidth=900",
   },
   {
-    slug: "solar-photovoltaic-module-prices",
+    slug: "solar-pv-prices",
     title: "Solar photovoltaic module prices",
     description:
       "Review the long-run change in solar photovoltaic module prices in a compact chart format.",
