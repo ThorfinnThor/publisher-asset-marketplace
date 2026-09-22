@@ -70,7 +70,7 @@ function childHtml(fixture: "compatible" | "broken"): string {
     setTimeout(announcePass, 150);
     setTimeout(announcePass, 300);
   });
-  setTimeout(() => button.click(), 50);
+  button.click();
 </script>
 </body></html>`;
 }
