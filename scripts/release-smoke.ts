@@ -28,6 +28,7 @@ const checks: SmokeCheck[] = [
     path: "/sitemap.xml",
     expectedStatus: 200,
     includes: ["<urlset", "https://citesupply.com/asset/solar-pv-prices"],
+    excludes: ["https://citesupply.com/creator/terms", "https://citesupply.com/report"],
     responseHeaders: { "content-type": "application/xml; charset=utf-8" },
   },
   {
@@ -46,6 +47,7 @@ const checks: SmokeCheck[] = [
       'src="https://ourworldindata.org/grapher/solar-pv-prices.png?imType=thumbnail&amp;imWidth=640"',
       "Data visualization loaded directly from Our World in Data.",
       '"@type":"CreativeWork"',
+      'name="robots" content="index, follow',
     ],
     excludes: ["Interface preview only—not source data."],
   },
@@ -188,6 +190,14 @@ async function run(): Promise<void> {
     }
     for (const unexpected of check.excludes ?? []) {
       if (body.includes(unexpected)) failures.push(`${check.path}: unexpected text ${unexpected}`);
+    }
+    if (check.path === "/sitemap.xml") {
+      const urlCount = body.match(/<url>/gu)?.length ?? 0;
+      if (urlCount < 4 || urlCount > 503) {
+        failures.push(
+          `${check.path}: expected 3 static URLs plus 1-500 curated assets, got ${urlCount} URLs`,
+        );
+      }
     }
     if (check.path.startsWith("/embed/") && check.expectedStatus === 200) {
       if (response.headers.get("x-frame-options") !== null) {

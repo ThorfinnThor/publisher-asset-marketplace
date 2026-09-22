@@ -16,6 +16,7 @@ import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import { parseSourcePreview } from "@/lib/assets/source-data-preview";
 import { parseWorldBankIndicator } from "@/lib/assets/worldbank-chart";
 import { buildAssetJsonLd } from "@/lib/seo";
+import { assetRobotsMetadata } from "@/lib/seo/indexability";
 import {
   getPublishedAssetBySlug,
   type PublishedAssetDetail,
@@ -39,6 +40,7 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
   return {
     title: record.asset.title,
     description: record.asset.description,
+    robots: assetRobotsMetadata(record.asset.search_indexable),
     alternates: { canonical: `/asset/${record.asset.slug}` },
     openGraph: {
       type: "article",

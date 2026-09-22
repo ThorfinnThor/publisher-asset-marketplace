@@ -24,6 +24,7 @@ export type PublishedAssetDetail = {
   source_name: string;
   source_base_url: string | null;
   source_policy_url: string | null;
+  search_indexable: 0 | 1;
 };
 
 export type RelatedAsset = {
@@ -61,7 +62,8 @@ const detailSql = `
     COALESCE(s.name, a.attribution_name, '') AS source_name,
     s.base_url AS source_base_url,
     s.policy_url AS source_policy_url,
-    a.embed_origin AS embed_origin
+    a.embed_origin AS embed_origin,
+    a.search_indexable
   FROM assets a
   LEFT JOIN sources s ON s.id = a.source_id
   WHERE a.slug = ?

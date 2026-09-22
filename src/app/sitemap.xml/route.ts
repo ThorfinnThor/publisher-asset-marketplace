@@ -1,14 +1,7 @@
 import { getDatabase } from "@/lib/db/client";
 
 const SITE_ORIGIN = "https://citesupply.com";
-const staticPaths = [
-  "/",
-  "/opportunities",
-  "/creator/guide",
-  "/creator/terms",
-  "/legal-notice",
-  "/report",
-];
+const staticPaths = ["/", "/opportunities", "/creator/guide"];
 
 type SitemapRow = {
   slug: string;
@@ -21,6 +14,8 @@ export async function GET(): Promise<Response> {
       `SELECT slug, COALESCE(updated_at, source_updated_at, published_at) AS last_modified
        FROM assets
        WHERE status = 'published'
+         AND rights_status = 'safe'
+         AND search_indexable = 1
        ORDER BY slug`,
     )
     .all<SitemapRow>();

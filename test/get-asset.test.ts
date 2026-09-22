@@ -10,6 +10,7 @@ describe("C4 published asset detail", () => {
   it("keeps detail and related queries restricted to published, reviewed assets", () => {
     expect(buildAssetDetailSql()).toContain("a.status = 'published'");
     expect(buildAssetDetailSql()).toContain("a.rights_status IN ('safe', 'restricted')");
+    expect(buildAssetDetailSql()).toContain("a.search_indexable");
     expect(buildRelatedAssetsSql()).toContain("LIMIT 3");
     expect(buildRelatedAssetsSql()).toContain("a.slug <> ?");
   });
@@ -42,6 +43,7 @@ describe("C4 published asset detail", () => {
                 rights_json: JSON.stringify({ embed_allowed: true }),
                 source_name: "Example Source",
                 source_policy_url: "https://example.com/policy",
+                search_indexable: 1,
               },
             ],
           },

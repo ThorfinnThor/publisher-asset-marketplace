@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { PublishedAssetDetail } from "@/lib/assets/get-asset";
 import { buildAssetJsonLd, buildSiteJsonLd, serializeJsonLd } from "@/lib/seo";
+import { assetRobotsMetadata, isSearchIndexable } from "@/lib/seo/indexability";
 
 const asset: PublishedAssetDetail = {
   id: "asset-1",
@@ -27,6 +28,7 @@ const asset: PublishedAssetDetail = {
   source_name: "World Bank Open Data",
   source_base_url: "https://data.worldbank.org",
   source_policy_url: "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+  search_indexable: 1,
 };
 
 describe("SEO structured data", () => {
@@ -50,5 +52,27 @@ describe("SEO structured data", () => {
 
   it("escapes markup-breaking characters in JSON-LD", () => {
     expect(serializeJsonLd({ value: "</script>" })).toBe('{"value":"\\u003c/script>"}');
+  });
+});
+
+describe("search indexability", () => {
+  it("indexes only assets explicitly selected for search", () => {
+    expect(isSearchIndexable(1)).toBe(true);
+    expect(isSearchIndexable(true)).toBe(true);
+    expect(isSearchIndexable(0)).toBe(false);
+    expect(isSearchIndexable(undefined)).toBe(false);
+  });
+
+  it("keeps non-selected assets discoverable through internal links without indexing them", () => {
+    expect(assetRobotsMetadata(0)).toMatchObject({
+      index: false,
+      follow: true,
+      googleBot: { index: false, follow: true },
+    });
+    expect(assetRobotsMetadata(1)).toMatchObject({
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true },
+    });
   });
 });
