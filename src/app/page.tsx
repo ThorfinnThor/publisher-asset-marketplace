@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ArrowUpRightIcon, RightsBadge, SearchIcon } from "@/components/design-system";
+import { getPublishedAssetCount } from "@/lib/assets/count";
+import { getDatabase } from "@/lib/db/client";
 import { designAssets } from "@/lib/design-assets";
 import { siteBrand } from "@/lib/site-identity";
 
@@ -12,7 +14,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const assetCount = await loadPublishedAssetCount();
+
   return (
     <main>
       <section className="home-hero">
@@ -50,6 +56,10 @@ export default function HomePage() {
                   </Link>
                 ))}
               </div>
+            </div>
+            <div className="catalog-count" aria-label="Published asset count">
+              <strong>{assetCount === null ? "—" : assetCount.toLocaleString("en-US")}</strong>
+              <span>published assets in the catalog</span>
             </div>
           </div>
 
@@ -221,6 +231,14 @@ export default function HomePage() {
       />
     </main>
   );
+}
+
+async function loadPublishedAssetCount(): Promise<number | null> {
+  try {
+    return await getPublishedAssetCount(getDatabase());
+  } catch {
+    return null;
+  }
 }
 
 type ProcessStep = {

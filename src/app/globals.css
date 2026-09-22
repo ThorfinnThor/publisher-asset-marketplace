@@ -750,6 +750,23 @@ summary {
   color: var(--accent);
 }
 
+.catalog-count {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 9px;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.catalog-count strong {
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 720;
+  letter-spacing: -0.03em;
+}
+
 .hero-previews {
   position: relative;
   min-height: 482px;
