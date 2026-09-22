@@ -164,12 +164,21 @@ async function run(): Promise<void> {
   for (const check of checksToRun) {
     const url = new URL(check.path, `${baseUrl}/`);
     url.searchParams.set("__release_smoke", process.env.GITHUB_SHA ?? Date.now().toString());
-    const response = await fetch(url, {
-      redirect: "manual",
-      headers: { "cache-control": "no-cache", ...check.headers },
-      ...check.init,
-    });
-    const body = await response.text();
+    let response: Response | null = null;
+    let body = "";
+    const maxAttempts = check.path === "/sitemap.xml" ? 5 : 1;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      response = await fetch(url, {
+        redirect: "manual",
+        headers: { "cache-control": "no-cache", ...check.headers },
+        ...check.init,
+      });
+      body = await response.text();
+      const sitemapUrlCount = body.match(/<url>/gu)?.length ?? 0;
+      if (check.path !== "/sitemap.xml" || sitemapUrlCount <= 503 || attempt === maxAttempts) break;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+    }
+    if (!response) throw new Error(`No response received for ${check.path}`);
     if (response.status !== check.expectedStatus) {
       failures.push(`${check.path}: expected ${check.expectedStatus}, got ${response.status}`);
     }
