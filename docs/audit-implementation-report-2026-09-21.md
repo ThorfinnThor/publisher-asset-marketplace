@@ -153,18 +153,19 @@ None as a whole finding.
 
 ### Long-term R2 orphan cleanup (follow-up to CS-03)
 
-- Decision required: retention period and reference model for uploaded previews, including drafts, rejected submissions and cached public images.
+- Follow-up status (2026-09-22): Option B is implemented and deployed in dry-run mode with a D1 reference registry, a 90-day retention period, a 7-day second-observation window and a 100-object daily scan limit. Deletion remains disabled until production inventory has completed and the dry-run candidates have been reviewed. See `docs/preview-retention-runbook.md`.
+- Remaining decision: whether to activate deletion after the dry-run evidence is available.
 - Option A: retain all uploads. Lowest data-loss risk; storage grows indefinitely.
 - Option B: add a reference registry and grace-period garbage collector. Best long-term balance; requires a migration, scheduled job, concurrency rules and operational monitoring.
 - Option C: synchronous reference counting. Faster cleanup, but greater mutation/concurrency risk.
-- Recommendation: Option B after the retention policy is defined. The current safe behavior is retention, not deletion.
+- Recommendation: review the first complete inventory and at least seven days of dry-run evidence before changing `PREVIEW_GC_DELETE_ENABLED` to `true`. The current safe behavior remains retention, not deletion.
 
 ## Regression Check
 
 - Formatting: passed (`prettier --check .`).
 - Lint: passed (`eslint src scripts test worker scanner`).
 - Type check: passed (`tsc --noEmit`).
-- Unit/integration tests: 58 files, 324 tests passed.
+- Unit/integration tests: 59 files, 330 tests passed.
 - Build: completed successfully. Wrangler could not write its optional debug log under the sandboxed macOS preferences directory, but vinext completed all five build stages.
 - Local D1 migrations: no pending migrations.
 - Creator submission E2E: passed.
@@ -180,6 +181,8 @@ None as a whole finding.
 - `scripts/e2e-submission.ts` — verifies sandbox confirmation at the API boundary without relying on streamed client-component text.
 - `scripts/lib/search-benchmark-db.ts` — aligns the benchmark schema with `embed_origin`.
 - `scripts/release-smoke.ts` — uses an active, rights-reviewed World Bank embed for production verification.
+- `docs/preview-retention-runbook.md` — documents the dry-run, activation checks and emergency stop.
+- `migrations/0025_preview_object_registry.sql` — adds the preview inventory and scheduled-run state.
 - `src/app/api/admin/submissions/[id]/auto-publish/route.ts` — verifies previews, distinguishes auth failures and updates only the selected search index.
 - `src/app/api/admin/submissions/[id]/review/route.ts` — verifies previews before approval and uses selected index maintenance.
 - `src/app/api/creator/assets/[slug]/route.ts` — safe preview lifecycle, field errors, auth distinction and selected index maintenance.
@@ -206,6 +209,7 @@ None as a whole finding.
 - `src/lib/submissions/server-pre-screen.ts` — shared async verified publication gate.
 - `src/lib/submissions/validate.ts` — exports the field-aware failure contract.
 - `src/lib/submissions/validation-errors.ts` — stable field-specific API messages.
+- `src/lib/storage/preview-garbage-collector.ts` — bounded R2 inventory, reference checking and guarded deletion planning.
 - `test/marketplace-preview.test.ts` — preview integrity regression coverage.
 - `test/rights-labels.test.ts` — permission/obligation regression coverage.
 - `test/search-assets.test.ts` — origin, freshness, commercial filter and pagination coverage.
@@ -213,8 +217,9 @@ None as a whole finding.
 - `test/search-page.test.ts` — commercial filter parsing coverage.
 - `test/submission-pre-screen.test.ts` — internal URL trust regression coverage.
 - `test/validation-errors.test.ts` — stable field-specific API error coverage.
+- `test/preview-garbage-collector.test.ts` — retention, confirmation, reference and dry-run safety coverage.
 
 ## Remaining Recommendations
 
-1. Define the preview-retention policy and implement grace-period R2 garbage collection with a reference registry.
+1. After at least seven days, review the preview-GC dry-run registry and decide whether to activate deletion.
 2. Add a browser-level accessibility test for the new inline validation states.
