@@ -64,7 +64,11 @@ function childHtml(fixture: "compatible" | "broken"): string {
   const button = document.getElementById("advance");
   button.addEventListener("click", () => {
     document.getElementById("step").textContent = "Step 2";
-    parent.postMessage({ type: "sandbox-e2e-pass" }, "*");
+    const announcePass = () => parent.postMessage({ type: "sandbox-e2e-pass" }, "*");
+    announcePass();
+    setTimeout(announcePass, 50);
+    setTimeout(announcePass, 150);
+    setTimeout(announcePass, 300);
   });
   setTimeout(() => button.click(), 50);
 </script>
