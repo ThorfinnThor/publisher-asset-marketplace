@@ -27,8 +27,8 @@ export default function CreatorGuidePage() {
           <Link className="button button--primary" href="/submit">
             Submit an asset
           </Link>
-          <Link className="text-link" href="/opportunities">
-            See publisher demand <ArrowUpRightIcon />
+          <Link className="text-link" href="/#for-creators">
+            See how publishing works <ArrowUpRightIcon />
           </Link>
         </div>
       </header>

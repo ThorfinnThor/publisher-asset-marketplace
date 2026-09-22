@@ -1,7 +1,7 @@
 import { getDatabase } from "@/lib/db/client";
 
 const SITE_ORIGIN = "https://citesupply.com";
-const staticPaths = ["/", "/opportunities", "/creator/guide"];
+const staticPaths = ["/", "/creator/guide"];
 
 type SitemapRow = {
   slug: string;

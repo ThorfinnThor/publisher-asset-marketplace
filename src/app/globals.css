@@ -1016,47 +1016,112 @@ summary {
   line-height: 1.55;
 }
 
-.creator-cta {
+.process-section {
   border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.process-section__inner {
+  padding-block: 68px 76px;
+}
+
+.process-section__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.process-section__header > div:first-child {
+  max-width: 720px;
+}
+
+.process-section__header h2 {
+  margin-top: 9px;
+}
+
+.process-section__header p:last-child {
+  max-width: 680px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.process-section__actions {
+  display: grid;
+  flex: 0 0 auto;
+  justify-items: start;
+  gap: 12px;
+}
+
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.process-card {
+  min-height: 210px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--page);
+}
+
+.process-card__number {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 780;
+  letter-spacing: 0.12em;
+}
+
+.process-card h3 {
+  margin: 42px 0 0;
+  font-size: 19px;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+}
+
+.process-card p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.process-section--dark {
+  border-color: #292d34;
   background: var(--ink);
   color: white;
 }
 
-.page-shell.creator-cta__inner {
-  padding-block: 58px;
-}
-
-.creator-cta .eyebrow {
+.process-section--dark .eyebrow,
+.process-section--dark .process-card__number,
+.process-section--dark .text-link {
   color: #9db8f5;
 }
 
-.creator-cta p:not(.eyebrow) {
-  margin: 15px 0 0;
-  font-size: 16px;
+.process-section--dark .process-section__header p:last-child,
+.process-section--dark .process-card p {
+  color: #b8bbc2;
 }
 
-.creator-cta__inner > div > span {
-  display: block;
-  margin-top: 7px;
-  color: #aaaeb6;
-  font-size: 13px;
+.process-section--dark .process-card {
+  border-color: #353941;
+  background: #181b21;
 }
 
-.creator-cta .button {
-  border-color: #4c5058;
-  background: transparent;
-  color: white;
+.process-section--dark .button {
+  background: white;
+  color: var(--ink);
 }
 
-.creator-cta .button:hover {
-  border-color: #777b84;
-  background: #25282e;
-}
-
-.creator-cta__actions {
-  display: grid;
-  justify-items: start;
-  gap: 13px;
+.process-section--dark .button:hover {
+  background: #e8e9ec;
 }
 
 .opportunities-page {
@@ -4050,11 +4115,24 @@ body:has(.marketplace-embed-shell) > .site-footer {
   }
 
   .creator-cta__inner,
+  .process-section__header,
   .section-header,
   .dashboard-header,
   .dashboard-table__heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .process-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .process-card {
+    min-height: 0;
+  }
+
+  .process-card h3 {
+    margin-top: 28px;
   }
 
   .opportunities-header {

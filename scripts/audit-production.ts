@@ -6,7 +6,6 @@ const concurrency = Number(process.env.AUDIT_CONCURRENCY ?? "2");
 
 const publicUtilityPaths = [
   "/search",
-  "/opportunities",
   "/creator/guide",
   "/creator/terms",
   "/privacy",
@@ -150,8 +149,8 @@ async function run(): Promise<void> {
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/gu)].map((match) =>
     decodeHtml(match[1] ?? ""),
   );
-  if (sitemapUrls.length < 4 || sitemapUrls.length > 503) {
-    failures.push(`sitemap contains ${sitemapUrls.length} URLs; expected 4-503`);
+  if (sitemapUrls.length < 3 || sitemapUrls.length > 502) {
+    failures.push(`sitemap contains ${sitemapUrls.length} URLs; expected 3-502`);
   }
 
   const auditUrls = [

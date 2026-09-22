@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <main>
-      <section className="home-hero" id="publishers">
+      <section className="home-hero">
         <div className="page-shell home-hero__grid">
           <div className="home-hero__copy">
             <p className="eyebrow">{siteBrand.tagline}</p>
@@ -121,6 +121,32 @@ export default function HomePage() {
         </div>
       </section>
 
+      <ProcessSection
+        actionHref="/search"
+        actionLabel="Browse assets"
+        description="Cite Supply brings publisher-ready charts, tables, datasets, calculators and benchmarks into one searchable catalog."
+        eyebrow="For publishers"
+        id="publishers"
+        steps={[
+          {
+            title: "Find the right asset",
+            description:
+              "Search by topic, format or source and choose an asset that fits your article.",
+          },
+          {
+            title: "Check the details",
+            description:
+              "Preview the real data, source, freshness, attribution and permitted uses before publishing.",
+          },
+          {
+            title: "Copy and publish",
+            description:
+              "Copy the approved embed or citation with one click and paste it into your content.",
+          },
+        ]}
+        title="Find it. Check it. Publish it."
+      />
+
       <section className="featured-section" id="topics">
         <div className="page-shell">
           <div className="section-header">
@@ -166,26 +192,103 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="creator-cta" id="creators">
-        <div className="page-shell creator-cta__inner">
+      <ProcessSection
+        actionHref="/submit"
+        actionLabel="Publish an asset"
+        description="Have a useful chart, table, dataset, calculator, benchmark or widget? Add it without uploading code."
+        eyebrow="For creators"
+        id="for-creators"
+        secondaryAction={{ href: "/creator/guide", label: "Read the creator guide" }}
+        steps={[
+          {
+            title: "Sign in",
+            description:
+              "Use Google or GitHub to create a creator profile or return to your existing account.",
+          },
+          {
+            title: "Add your asset",
+            description:
+              "Paste its public URL, add the source and rights details, and provide a real preview.",
+          },
+          {
+            title: "Pass checks and go live",
+            description:
+              "Automated checks validate the URLs and permissions. Passing assets are published in the catalog.",
+          },
+        ]}
+        title="Publish in three simple steps."
+        variant="dark"
+      />
+    </main>
+  );
+}
+
+type ProcessStep = {
+  title: string;
+  description: string;
+};
+
+function ProcessSection({
+  actionHref,
+  actionLabel,
+  description,
+  eyebrow,
+  id,
+  secondaryAction,
+  steps,
+  title,
+  variant = "light",
+}: {
+  actionHref: string;
+  actionLabel: string;
+  description: string;
+  eyebrow: string;
+  id: string;
+  secondaryAction?: { href: string; label: string };
+  steps: ProcessStep[];
+  title: string;
+  variant?: "light" | "dark";
+}) {
+  const headingId = `${id}-heading`;
+
+  return (
+    <section
+      aria-labelledby={headingId}
+      className={`process-section process-section--${variant}`}
+      id={id}
+    >
+      <div className="page-shell process-section__inner">
+        <div className="process-section__header">
           <div>
-            <p className="eyebrow">For creators</p>
-            <h2 className="section-heading editorial-heading">Have useful data or a tool?</h2>
-            <p>
-              Publish a chart, calculator, benchmark or dataset and get discovered by publishers.
-            </p>
-            <span>See what publishers need and where good sources are missing.</span>
+            <p className="eyebrow">{eyebrow}</p>
+            <h2 className="section-heading" id={headingId}>
+              {title}
+            </h2>
+            <p>{description}</p>
           </div>
-          <div className="creator-cta__actions">
-            <Link className="button button--secondary" href="/opportunities">
-              See publisher demand <ArrowUpRightIcon />
+          <div className="process-section__actions">
+            <Link className="button button--primary" href={actionHref}>
+              {actionLabel}
             </Link>
-            <Link className="text-link" href="/submit">
-              Publish an asset
-            </Link>
+            {secondaryAction ? (
+              <Link className="text-link" href={secondaryAction.href}>
+                {secondaryAction.label} <ArrowUpRightIcon />
+              </Link>
+            ) : null}
           </div>
         </div>
-      </section>
-    </main>
+        <ol className="process-grid">
+          {steps.map((step, index) => (
+            <li className="process-card" key={step.title}>
+              <span aria-hidden="true" className="process-card__number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
   );
 }

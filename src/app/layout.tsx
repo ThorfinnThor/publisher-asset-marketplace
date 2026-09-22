@@ -62,9 +62,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             </Link>
             <nav aria-label="Primary" className="site-nav">
               <Link href="/search">Browse</Link>
-              <Link href="/opportunities">Opportunities</Link>
               <Link href="/#topics">Topics</Link>
               <Link href="/#publishers">For publishers</Link>
+              <Link href="/#for-creators">For creators</Link>
               <Link href="/creator/guide">Creator guide</Link>
             </nav>
             <div className="site-header__actions">

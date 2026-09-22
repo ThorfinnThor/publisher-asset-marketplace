@@ -28,7 +28,11 @@ const checks: SmokeCheck[] = [
     path: "/sitemap.xml",
     expectedStatus: 200,
     includes: ["<urlset", "https://citesupply.com/asset/solar-pv-prices"],
-    excludes: ["https://citesupply.com/creator/terms", "https://citesupply.com/report"],
+    excludes: [
+      "https://citesupply.com/opportunities",
+      "https://citesupply.com/creator/terms",
+      "https://citesupply.com/report",
+    ],
     responseHeaders: { "content-type": "application/xml; charset=utf-8" },
   },
   {
@@ -120,8 +124,7 @@ const checks: SmokeCheck[] = [
   },
   {
     path: "/opportunities",
-    expectedStatus: 200,
-    includes: ["Build what publishers are looking for."],
+    expectedStatus: 308,
   },
   {
     path: "/creator/dashboard",
@@ -202,9 +205,9 @@ async function run(): Promise<void> {
     }
     if (check.path === "/sitemap.xml") {
       const urlCount = body.match(/<url>/gu)?.length ?? 0;
-      if (urlCount < 4 || urlCount > 503) {
+      if (urlCount < 3 || urlCount > 502) {
         failures.push(
-          `${check.path}: expected 3 static URLs plus 1-500 curated assets, got ${urlCount} URLs`,
+          `${check.path}: expected 2 static URLs plus 1-500 curated assets, got ${urlCount} URLs`,
         );
       }
     }
