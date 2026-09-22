@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   category: "data publishing",
   referrer: "strict-origin-when-cross-origin",
   formatDetection: { address: false, email: false, telephone: false },
+  icons: {
+    icon: "/citesupply-mark.png",
+    apple: "/citesupply-mark.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -55,10 +59,13 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <header className="site-header">
           <div className="site-header__inner">
             <Link className="brand" href="/" aria-label={`${siteBrand.name} home`}>
-              <span aria-hidden="true" className="brand__mark">
-                {siteBrand.mark}
-              </span>
-              <span>{siteBrand.name}</span>
+              <img
+                alt={siteBrand.name}
+                className="brand__logo"
+                height="176"
+                src="/citesupply-logo.png"
+                width="512"
+              />
             </Link>
             <nav aria-label="Primary" className="site-nav">
               <Link href="/search">Browse</Link>
@@ -84,10 +91,13 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <footer className="site-footer">
           <div className="site-footer__inner">
             <Link className="brand brand--footer" href="/">
-              <span aria-hidden="true" className="brand__mark">
-                {siteBrand.mark}
-              </span>
-              <span>{siteBrand.name}</span>
+              <img
+                alt={siteBrand.name}
+                className="brand__logo"
+                height="176"
+                src="/citesupply-logo.png"
+                width="512"
+              />
             </Link>
             <p>
               {siteBrand.tagline} Source links and rights evidence stay visible. Backlinks are never

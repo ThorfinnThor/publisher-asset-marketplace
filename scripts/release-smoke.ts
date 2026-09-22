@@ -13,7 +13,11 @@ type SmokeCheck = {
 };
 
 const checks: SmokeCheck[] = [
-  { path: "/", expectedStatus: 200, includes: ["Find data worth citing."] },
+  {
+    path: "/",
+    expectedStatus: 200,
+    includes: ["Find data worth citing.", "/citesupply-logo.png", "/citesupply-mark.png"],
+  },
   {
     path: "/robots.txt",
     expectedStatus: 200,

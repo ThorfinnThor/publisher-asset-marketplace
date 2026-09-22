@@ -93,11 +93,17 @@ summary {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
   font-size: 15px;
   font-weight: 720;
   letter-spacing: -0.02em;
   white-space: nowrap;
+}
+
+.brand__logo {
+  display: block;
+  width: 150px;
+  height: auto;
+  mix-blend-mode: multiply;
 }
 
 .brand__mark {
@@ -162,6 +168,10 @@ summary {
 .site-footer__inner p {
   margin: 0;
   text-align: center;
+}
+
+.brand--footer .brand__logo {
+  width: 180px;
 }
 
 .site-footer nav {
@@ -3984,9 +3994,12 @@ body:has(.marketplace-embed-shell) > .site-footer {
     gap: 12px;
   }
 
-  .header-login,
-  .brand > span:last-child {
+  .header-login {
     display: none;
+  }
+
+  .brand__logo {
+    width: 136px;
   }
 
   .site-header__actions {

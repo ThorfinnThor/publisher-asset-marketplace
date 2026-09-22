@@ -18,7 +18,7 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         "@id": `${SITE_ORIGIN}/#organization`,
         name: "Cite Supply",
         url: SITE_ORIGIN,
-        logo: `${SITE_ORIGIN}/icon.svg`,
+        logo: `${SITE_ORIGIN}/citesupply-logo.png`,
       },
       {
         "@type": "WebSite",
