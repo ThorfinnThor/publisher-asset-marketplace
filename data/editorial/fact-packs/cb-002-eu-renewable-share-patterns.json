@@ -1,0 +1,517 @@
+{
+  "schema_version": "1.0.0",
+  "id": "cb-002-eu-renewable-share-patterns",
+  "topic": "EU27 renewable-energy shares across selected consumption sectors, 2020–2024; 2020–2021 methodology break noted.",
+  "generated_at": "2026-09-26T10:02:57.827Z",
+  "source_fetched_at": "2026-09-23T10:01:40.592Z",
+  "method_version": "citesupply-editorial-fetch/1.0.0",
+  "brief_revision": "2.0.0",
+  "scope_note": "EU27_2020 only; retain annual observations from 2020 through 2024 for these four categories. Treat 2020–2021 as a methodology break, so any trend calculation must use 2021 onward or explain the discontinuity. 2025 is excluded from comparisons because it is provisional and the transport observation is absent.",
+  "status": "ready_for_sol_review",
+  "input_assets": [
+    {
+      "asset_id": null,
+      "asset_id_resolution": "public_route_only",
+      "slug": "eurostat-nrg_ind_ren",
+      "source_id": "source_eurostat",
+      "canonical_url": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+      "evidence_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "evidence_checked_at": "2026-09-23T09:15:00.000Z",
+      "licence_code": "Eurostat re-use policy (exceptions apply)",
+      "commercial_use": "Allowed",
+      "modification_allowed": "Allowed",
+      "raw_data_redistribution": "Allowed",
+      "attribution_required": true
+    }
+  ],
+  "source_requests": [
+    {
+      "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_ind_ren?lang=en&sinceTimePeriod=2020&geo=EU27_2020",
+      "final_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_ind_ren?lang=en&sinceTimePeriod=2020&geo=EU27_2020",
+      "parameters": {
+        "geo": "EU27_2020",
+        "lang": "en",
+        "sinceTimePeriod": "2020"
+      },
+      "http_status": 200,
+      "content_type": "application/json",
+      "response_sha256": "251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7",
+      "retrieved_at": "2026-09-23T10:01:40.592Z",
+      "snapshot_path": "data/editorial/source-snapshots/cb-002-eu-renewable-share-patterns/251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7/nrg_ind_ren.json",
+      "parser_version": "citesupply-editorial-fetch/1.0.0"
+    },
+    {
+      "url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "final_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "parameters": {},
+      "http_status": 200,
+      "content_type": "text/html;charset=UTF-8",
+      "response_sha256": "af8717d250713371fedeadb95c803f818aa8155441f11afd7e41ef1485be2c7c",
+      "retrieved_at": "2026-09-23T10:01:40.679Z",
+      "snapshot_path": "data/editorial/source-snapshots/cb-002-eu-renewable-share-patterns/af8717d250713371fedeadb95c803f818aa8155441f11afd7e41ef1485be2c7c/eurostat-copyright-notice.html",
+      "parser_version": "citesupply-editorial-fetch/1.0.0"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2020:0",
+      "value": 22.038,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2020",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:0",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2020"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2021:1",
+      "value": 21.897,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2021",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:1",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2021"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2022:2",
+      "value": 23.003,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2022",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:2",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2022"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2023:3",
+      "value": 24.579,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2023",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:3",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2023"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2024:4",
+      "value": 25.241,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2024",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:4",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2024"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2020:6",
+      "value": 10.253,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2020",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:6",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_TRA",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2020"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2021:7",
+      "value": 9.051,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2021",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:7",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_TRA",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2021"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2022:8",
+      "value": 9.64,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2022",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:8",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_TRA",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2022"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2023:9",
+      "value": 10.962,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2023",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:9",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_TRA",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2023"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2024:10",
+      "value": 11.2,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2024",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:10",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_TRA",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2024"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2020:12",
+      "value": 37.408,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2020",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:12",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_ELC",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2020"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2021:13",
+      "value": 37.793,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2021",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:13",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_ELC",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2021"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2022:14",
+      "value": 41.239,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2022",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:14",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_ELC",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2022"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2023:15",
+      "value": 45.397,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2023",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:15",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_ELC",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2023"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2024:16",
+      "value": 47.503,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2024",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:16",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_ELC",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2024"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2020:18",
+      "value": 22.983,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2020",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:18",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_HEAT_CL",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2020"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2021:19",
+      "value": 23.033,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2021",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:19",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_HEAT_CL",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2021"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2022:20",
+      "value": 24.775,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2022",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:20",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_HEAT_CL",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2022"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2023:21",
+      "value": 26.231,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2023",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:21",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_HEAT_CL",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2023"
+      }
+    },
+    {
+      "fact_id": "cb-002-eu-renewable-share-patterns:eu27_2020:2024:22",
+      "value": 26.738,
+      "unit": "Percentage",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2024",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:22",
+      "dimensions": {
+        "freq": "A",
+        "nrg_bal": "REN_HEAT_CL",
+        "unit": "PC",
+        "geo": "EU27_2020",
+        "time": "2024"
+      }
+    }
+  ],
+  "derived_facts": [],
+  "source_status_labels": { "p": "provisional" },
+  "caveats": [
+    "The full response dimension and status metadata for the scoped EU aggregate is preserved.",
+    "Only the EU27_2020 aggregate is included. Eurostat's commercial reuse policy has exceptions for third-party data and data for other countries.",
+    "The secondary SDG series is not included because its compatibility with the main energy-balance categories has not been demonstrated.",
+    "2024 is the latest complete common year for the four selected categories in this snapshot. Values through 2020 and from 2021 onward cross a source methodology change.",
+    "2025 is excluded because the available values are provisional and the transport observation is absent. No derived statistic has been calculated."
+  ],
+  "source_provenance": [
+    {
+      "source_metadata_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "origin_name": "Eurostat",
+      "origin_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "license_name": "Eurostat statistical data re-use policy (attribution; exceptions apply)",
+      "license_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "non_redistributable": false,
+      "metadata_sha256": "af8717d250713371fedeadb95c803f818aa8155441f11afd7e41ef1485be2c7c"
+    }
+  ]
+}

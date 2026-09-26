@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0.0",
+  "step": 33,
+  "workflow_role": "Luna",
+  "completed_at": "2026-09-26T07:30:00Z",
+  "publication_effect": "none",
+  "deployment": "not_performed",
+  "overall_decision": "implemented_locally_pending_independent_review_and_browser_qa",
+  "corrected_contract": {
+    "path": "data/editorial/private-eurostat-external-gate-inventory-v2.3.json",
+    "sha256": "ea1737a00db0f6fe65b9f8d61f9d7d96839995bda92b986aef0656800fc66441",
+    "identity_re_evaluation": "pass_from_step32_evidence_after_semantic_correction",
+    "source_canonical_rule": "assets.canonical_url equals the official Eurostat dataset URL",
+    "public_asset_route_rule": "https://citesupply.com/asset/<slug> is derived and verified independently",
+    "production_data_change_required": false
+  },
+  "protected_preview": {
+    "route_shape": "https://citesupply.com/_editorial/preview/<brief-id>",
+    "implementation_state": "local_build_only",
+    "route_source": {
+      "path": "src/app/%5Feditorial/preview/[briefId]/route.ts",
+      "sha256": "995d34fe57f8cf3d7f8035dd3a2e567fa57df9dc3731e58a30788a4478a89c42"
+    },
+    "artifact_loader": {
+      "path": "src/lib/editorial/private-preview.ts",
+      "sha256": "483aebf12b4ca9a3b64d62a2df13cd6385df669a7d4c65547a5e416a0ad5261b",
+      "fail_closed_on_hash_mismatch": true
+    },
+    "access": {
+      "model": "authenticated_admin_session",
+      "required_role": "admin",
+      "unauthorized_status": 404,
+      "session_lookup_failure_status": 404,
+      "static_secret_url": false
+    },
+    "defence_in_depth": {
+      "cache_control": "private, no-store",
+      "x_robots_tag": "noindex, nofollow, noarchive",
+      "referrer_policy": "no-referrer",
+      "x_frame_options": "DENY",
+      "csp_frame_ancestors": "none",
+      "csp_script_src": "none",
+      "robots_disallow": "/_editorial/",
+      "public_navigation_entry": false,
+      "sitemap_entry": false
+    },
+    "artifacts": [
+      {
+        "brief_id": "cb-002-eu-renewable-share-patterns",
+        "rendered_preview_sha256": "15f5560b8617a0edb6349ec23f973f80811cec4fa5106261dfb66cdf55a6e1a9"
+      },
+      {
+        "brief_id": "cb-003-hicp-inflation-explainer",
+        "rendered_preview_sha256": "7a1d1c17e842b9fdd178cf3bd2c94c46c9f326430fbbf10d6ff35722c2ffadce"
+      }
+    ]
+  },
+  "verification": {
+    "targeted_vitest": {
+      "files": 6,
+      "tests": 36,
+      "result": "pass"
+    },
+    "route_and_header_vitest": {
+      "files": 3,
+      "tests": 13,
+      "result": "pass"
+    },
+    "full_vitest": {
+      "files": 67,
+      "tests": 372,
+      "result": "pass"
+    },
+    "lint": "pass",
+    "typecheck": "pass",
+    "build": "pass",
+    "build_route_detected": "/_editorial/preview/:briefId",
+    "unauthenticated_local_smoke": {
+      "http_status": 404,
+      "cache_control": "private, no-store",
+      "x_robots_tag": "noindex, nofollow, noarchive",
+      "referrer_policy": "no-referrer",
+      "x_frame_options": "DENY"
+    },
+    "editorial_static_preview_check": "pass",
+    "draft_schema_check": "pass",
+    "minimum_substantive_words": {
+      "cb-002-eu-renewable-share-patterns": 586,
+      "cb-003-hicp-inflation-explainer": 715,
+      "minimum": 500,
+      "result": "pass"
+    }
+  },
+  "gate_state_after_step": {
+    "live_asset_identity": "pass_from_step32_after_contract_correction",
+    "asset_level_rights": "pass_from_step32",
+    "source_freshness": "pass_from_step32",
+    "source_policy": "pass_from_step32",
+    "private_article_preview": "implemented_locally_pending_independent_review",
+    "responsive_and_assistive_qa": "not_run",
+    "release": "blocked"
+  },
+  "next_step": {
+    "step": 34,
+    "workflow_role": "Sol",
+    "task": "Independently review the corrected identity contract and protected preview implementation for code quality, SEO isolation, rights integrity, and security. Do not deploy."
+  }
+}

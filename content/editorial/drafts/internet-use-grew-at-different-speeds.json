@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0.0",
+  "slug": "internet-use-grew-at-different-speeds",
+  "status": "draft",
+  "indexable": false,
+  "language": "en",
+  "format": "paired_cohort_trend_analysis",
+  "title": "Internet use grew at different speeds across countries and areas, 2000–2024",
+  "seo_title": "How Internet Use Spread at Uneven Speeds",
+  "seo_description": "A matched comparison of Internet use from 2000 to 2024 shows how widely adoption changes varied among countries and areas with data at both endpoints.",
+  "dek": "The share of people using the Internet rose across the matched source cohort, but the pace varied widely. Here is what the comparison measures, and what it leaves out.",
+  "thesis": "Across 175 matched UN M49 country-or-area entities, the median change was 67.9 percentage points, while the middle half of changes spanned 50.9 to 81.1 points.",
+  "metadata_claim_refs": [
+    "coverage:paired_entity_count",
+    "internet-distribution-p25:2000-2024",
+    "internet-distribution-p50:2000-2024",
+    "internet-distribution-p75:2000-2024"
+  ],
+  "date_created": "2026-09-24T21:02:00.000Z",
+  "date_modified": "2026-09-25T07:21:38.000Z",
+  "date_published": null,
+  "brief_id": "cb-001-internet-adoption-gap",
+  "fact_pack_id": "cb-001-internet-adoption-gap",
+  "fact_pack_sha256": "18caf49193eb48eb76ef06be0df5d4a87ebefd23e9fd160d00ac6f559861c116",
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "draft_decisions_sha256": "1a30a3e7a4d95d9c102c43ed5cd0db232aa61260c2c30539489e611565440912",
+  "asset_slugs": ["share-of-individuals-using-the-internet"],
+  "citations": [
+    {
+      "id": "owid-indicator",
+      "title": "Share of the population using the Internet",
+      "publisher": "Our World in Data; data from ITU via World Bank",
+      "url": "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet",
+      "accessed_at": "2026-09-24T21:13:00.000Z"
+    },
+    {
+      "id": "un-m49",
+      "title": "Standard country or area codes for statistical use (M49)",
+      "publisher": "United Nations Statistics Division",
+      "url": "https://unstats.un.org/unsd/methodology/m49/overview",
+      "accessed_at": "2026-09-23T10:26:00.000Z"
+    },
+    {
+      "id": "itu-measurement-manual",
+      "title": "Manual for Measuring ICT Access and Use by Households and Individuals",
+      "publisher": "International Telecommunication Union",
+      "url": "https://www.itu.int/en/ITU-D/Statistics/Documents/publications/manual/ITUManualHouseholds2020_E.pdf",
+      "accessed_at": "2026-09-25T07:21:38.000Z"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "opening",
+      "type": "prose",
+      "text": "Internet adoption is often summarized as a single rising curve. That view can make expansion look uniform, even though places began at very different points and moved at very different speeds. This comparison keeps a fixed set of countries and areas selected from the source records using a United Nations reference list, with observations at both endpoints. The result describes change within that matched cohort rather than whichever places happened to report in either year."
+    },
+    {
+      "id": "what-counts-as-use",
+      "type": "prose",
+      "text": "The International Telecommunication Union defines an Internet user as someone who accessed the Internet from any location in the preceding three months; Our World in Data presents the series with data supplied through the World Bank. This is a measure of recent use, not subscription ownership. It does not tell us whether a connection is fast, reliable, affordable, or useful for a particular task."
+    },
+    {
+      "id": "distribution-finding",
+      "type": "finding",
+      "heading": "A large rise, with a wide spread",
+      "text": "Among the 175 matched country-or-area entities, the median increase was 67.9 percentage points. The central half of the changes ran from 50.9 to 81.1 points. These are percentage-point differences in the share using the Internet, not percentage growth relative to each place's starting value.",
+      "claim_refs": [
+        "coverage:paired_entity_count",
+        "internet-distribution-p25:2000-2024",
+        "internet-distribution-p50:2000-2024",
+        "internet-distribution-p75:2000-2024"
+      ]
+    },
+    {
+      "id": "quartile-table",
+      "type": "data_table",
+      "heading": "Change across the matched cohort",
+      "caption": "Percentage-point changes between 2000 and 2024 for the matched country-or-area cohort. Each entity has equal weight in the distribution.",
+      "columns": ["Position in distribution", "Change"],
+      "rows": [
+        {
+          "label": "Lower quartile (25th percentile)",
+          "metric_refs": ["internet-distribution-p25:2000-2024"]
+        },
+        {
+          "label": "Median (50th percentile)",
+          "metric_refs": ["internet-distribution-p50:2000-2024"]
+        },
+        {
+          "label": "Upper quartile (75th percentile)",
+          "metric_refs": ["internet-distribution-p75:2000-2024"]
+        }
+      ]
+    },
+    {
+      "id": "how-to-read-the-middle",
+      "type": "prose",
+      "text": "The median is the middle change after sorting the included entities from the smallest increase to the largest. It is not the change for a typical person, because the calculation gives each entity equal weight rather than weighting by population. The quartiles describe the spread of those entity-level changes; they do not imply that a quarter of the world's people experienced a particular change."
+    },
+    {
+      "id": "what-the-spread-says",
+      "type": "finding",
+      "heading": "The spread describes places, not people",
+      "text": "The distance between the lower and upper quartiles is 30.2 percentage points. It summarizes how dispersed the matched entity-level changes are around the middle of this distribution. It does not say that every entity inside that interval followed a similar path, and it leaves the smallest and largest changes outside the picture. The median is useful here because it is not pulled toward unusually large or small changes in the same way an arithmetic mean can be. Neither summary gives more influence to an entity with a larger population. A separate population-weighted calculation would answer a different question: how the change relates to people across the cohort. That is not what this chart estimates.",
+      "claim_refs": ["internet-distribution-p25:2000-2024", "internet-distribution-p75:2000-2024"]
+    },
+    {
+      "id": "endpoint-comparison",
+      "type": "method",
+      "heading": "Two endpoints cannot show the route between them",
+      "text": "This calculation subtracts each entity's 2000 observation from its 2024 observation. It does not measure a smooth annual trend, identify when adoption accelerated, or count how many people first went online. Places may have risen steadily, changed quickly in a shorter interval, or moved unevenly; the endpoint difference cannot distinguish those paths. The percentage scale also has a ceiling: once a measured share is already high, there is less room for a further increase than for a place starting from a low base. For that reason, a smaller percentage-point rise is not automatically evidence of weaker progress. Comparing starting levels, later access quality, or population-weighted change would require additional approved calculations and should be presented as separate analyses.",
+      "claim_refs": ["internet-distribution-p50:2000-2024"]
+    },
+    {
+      "id": "cohort-method",
+      "type": "method",
+      "heading": "How the comparison was built",
+      "text": "We kept only source entities whose codes appear in the pinned UN M49 country-or-area reference and that have a non-missing observation at both endpoints. Source aggregates and an unresolved code were excluded. The distribution uses the same paired entities throughout and linear interpolation to estimate its quartiles. The source values remain percentages of population; only their endpoint difference is calculated.",
+      "claim_refs": [
+        "coverage:paired_entity_count",
+        "internet-distribution-p25:2000-2024",
+        "internet-distribution-p50:2000-2024",
+        "internet-distribution-p75:2000-2024"
+      ]
+    },
+    {
+      "id": "what-is-not-in-the-chart",
+      "type": "limitation",
+      "heading": "What this does not explain",
+      "text": "The data shows that adoption changes differed. It does not identify why. Income, infrastructure, policy, age, geography, and measurement practices could matter, but this calculation tests none of those explanations. Country-or-area coverage also excludes places without both endpoint observations, so the cohort is not a census of the world."
+    },
+    {
+      "id": "how-to-use-the-comparison",
+      "type": "prose",
+      "text": "For a report or classroom explanation, describe this result as a distribution of endpoint changes among 175 matched country-or-area entities. Keep the dates and unit beside the number, then say explicitly that every entity has equal weight. If the question is about how many people gained access, use a population-weighted measure with verified population data instead. If it is about service quality or meaningful access, this indicator is only a starting point: it records recent use, not reliability, affordability, speed, skills, or what people could do online. Keeping those questions separate makes the chart more useful and prevents one adoption statistic from standing in for the broader digital divide.",
+      "claim_refs": ["coverage:paired_entity_count"]
+    },
+    {
+      "id": "asset-context",
+      "type": "asset_link",
+      "asset_slug": "share-of-individuals-using-the-internet",
+      "label": "Explore the source chart",
+      "context": "Open the underlying Our World in Data chart to inspect the indicator and its source notes.",
+      "claim_refs": []
+    }
+  ],
+  "creator_guide_included": false
+}

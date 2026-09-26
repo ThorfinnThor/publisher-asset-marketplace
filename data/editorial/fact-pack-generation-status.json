@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-26T10:02:59.530Z",
+  "step": 4,
+  "production_writes": false,
+  "source_mode": "verified_snapshots",
+  "entries": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "candidate_id": "c-001-digital-adoption",
+      "status": "ready_for_sol_review",
+      "fact_pack_path": "data/editorial/fact-packs/cb-001-internet-adoption-gap.json",
+      "error_code": null
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "candidate_id": "c-003-renewable-share-eurostat",
+      "status": "ready_for_sol_review",
+      "fact_pack_path": "data/editorial/fact-packs/cb-002-eu-renewable-share-patterns.json",
+      "error_code": null
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "candidate_id": "c-033-inflation-definition",
+      "status": "ready_for_sol_review",
+      "fact_pack_path": "data/editorial/fact-packs/cb-003-hicp-inflation-explainer.json",
+      "error_code": null
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "candidate_id": "c-037-wildfire-area",
+      "status": "ready_for_sol_review",
+      "fact_pack_path": "data/editorial/fact-packs/cb-004-wildfire-land-cover.json",
+      "error_code": null
+    }
+  ]
+}

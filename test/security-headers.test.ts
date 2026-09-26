@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   isEmbeddableMarketplacePath,
+  isPrivateEditorialPreviewPath,
   isPublicPreviewPath,
   withSecurityHeaders,
 } from "../src/lib/security-headers";
@@ -46,5 +47,28 @@ describe("production security headers", () => {
     });
     expect(response.headers.get("cross-origin-resource-policy")).toBe("cross-origin");
     expect(response.headers.get("x-frame-options")).toBe("DENY");
+  });
+
+  it("protects the complete private editorial namespace, including encoded paths", () => {
+    expect(
+      isPrivateEditorialPreviewPath("/_editorial/preview/cb-002-eu-renewable-share-patterns"),
+    ).toBe(true);
+    expect(isPrivateEditorialPreviewPath("/_editorial/preview/not-a-brief")).toBe(true);
+    expect(isPrivateEditorialPreviewPath("/%5Feditorial/preview/cb-002-reviewed")).toBe(true);
+    expect(isPrivateEditorialPreviewPath("/%255Feditorial/preview/cb-002-reviewed")).toBe(true);
+    expect(isPrivateEditorialPreviewPath("/_editorial-other/preview/cb-002-reviewed")).toBe(false);
+    expect(isPrivateEditorialPreviewPath("/%E0%A4%A")).toBe(false);
+  });
+
+  it("applies fail-closed indexing, caching, referrer and framing headers to editorial previews", () => {
+    const response = withSecurityHeaders(new Response("private preview"), {
+      privateEditorialPreview: true,
+    });
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
+    expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow, noarchive");
+    expect(response.headers.get("content-security-policy")).toContain("script-src 'none'");
+    expect(response.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
   });
 });

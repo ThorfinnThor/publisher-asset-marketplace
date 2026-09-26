@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "step": 27,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-25",
+  "subject": "data/editorial/private-eurostat-external-gate-inventory-v2.json",
+  "publication_effect": "none",
+  "read_only_review": true,
+  "overall_decision": "revision_required_before_gate_execution",
+  "verified": [
+    {
+      "check": "artifact_hash_binding",
+      "result": "pass",
+      "evidence": "Both draft hashes, both rendered-preview hashes, and the shared analysis-results hash match the current files byte-for-byte."
+    },
+    {
+      "check": "asset_slug_uniqueness",
+      "result": "pass",
+      "evidence": "migrations/0001_initial.sql defines assets.slug as UNIQUE COLLATE NOCASE and also uniquely constrains non-null (source_id, external_id). The SELECT-only identity query therefore has a schema-backed single-row invariant."
+    },
+    {
+      "check": "identity_query_is_read_only",
+      "result": "pass",
+      "evidence": "The recorded statement is a parameterised SELECT with no write clause and filters to published assets with safe or restricted rights."
+    },
+    {
+      "check": "exact_source_requests",
+      "result": "pass_with_revision_note",
+      "evidence": "Both Eurostat API URLs, expected dimensions, period policies, dataset pages, policy URL, and methodology URLs are explicit. The response-byte hashing rule still needs one deterministic definition."
+    },
+    {
+      "check": "rights_sources_separated",
+      "result": "pass_with_revision_note",
+      "evidence": "The inventory distinguishes the live asset declaration, dataset identity page, and Eurostat reuse policy. The database projection and JSON assertions do not yet capture every field that the rights contract requires."
+    },
+    {
+      "check": "article_preview_boundary",
+      "result": "pass_with_revision_note",
+      "evidence": "The inventory correctly rejects asset and embed pages as article previews, requires noindex/noarchive/no-store, and keeps the route absent. Its access-control alternative is still too broad for implementation."
+    }
+  ],
+  "blocking_findings": [
+    {
+      "id": "S27-01",
+      "severity": "high",
+      "area": "rights_evidence_projection",
+      "finding": "rights_evidence_contract.asset_record_fields requires attribution_name, attribution_url, attribution_terms, and embed_origin, but asset_identity_contract.sql does not select those columns. A reviewer cannot reproduce the declared evidence record from the specified query.",
+      "required_revision": "Add those four columns to the read-only SELECT and required_columns. Also select source key/name/active so the source binding is explicit rather than inferred from policy_url alone.",
+      "fail_closed": true
+    },
+    {
+      "id": "S27-02",
+      "severity": "high",
+      "area": "source_identity_binding",
+      "finding": "The identity acceptance rule says source_id must match the brief, but neither preview records an expected_source_id. The condition is therefore not executable without outside knowledge.",
+      "required_revision": "Record expected_source_id=source_eurostat and expected_source_key=eurostat for both previews, and require sources.active=1.",
+      "fail_closed": true
+    },
+    {
+      "id": "S27-03",
+      "severity": "high",
+      "area": "rights_json_assertions",
+      "finding": "The rights gate lists human-readable states but does not define exact required rights_json and metadata_json paths. This permits a page label to pass even if the persisted review provenance is missing or stale.",
+      "required_revision": "Add exact assertions for embed_allowed, marketplace_rendered_embed_allowed, embed_provenance, commercial_use, modification_allowed, attribution_required, citation_required, raw_data_redistribution, evidence_url, evidence_checked_at, automated_review_completed/version, embed_review_version, evidence_conflict, and chart_reuse_prohibited. Require the expected review-version values from the current Eurostat review code or explicitly mark a version change for renewed review.",
+      "fail_closed": true
+    },
+    {
+      "id": "S27-04",
+      "severity": "high",
+      "area": "private_preview_access",
+      "finding": "The phrase 'authenticated or high-entropy, expiring preview token' allows a bearer URL without a defined signature, lifetime, audience, replay policy, or referrer protection. Such a URL can leak through logs, history, screenshots, or outbound requests.",
+      "required_revision": "Require an authenticated reviewer session or a signed, single-purpose, short-lived token bound to brief_id and artifact hashes. Specify maximum lifetime, invalidation, Referrer-Policy: no-referrer, frame restrictions, and denial behavior. A merely unguessable static URL must not qualify.",
+      "fail_closed": true
+    },
+    {
+      "id": "S27-05",
+      "severity": "medium",
+      "area": "source_response_hashing",
+      "finding": "The inventory requires a SHA-256 of the complete response but does not define whether this means transport bytes, decoded body bytes, or re-serialised JSON. Those can produce different hashes for equivalent responses.",
+      "required_revision": "Define SHA-256 over the exact decoded HTTP response-body bytes before JSON parsing, persist byte length and Content-Type, and use parsed JSON only for semantic assertions.",
+      "fail_closed": true
+    }
+  ],
+  "non_blocking_observations": [
+    "Allowing rights_status=restricted at the identity gate is acceptable because the later rights gate independently requires all permissions needed by these articles.",
+    "The API requests intentionally use sinceTimePeriod. A newly added year must cause a reviewed revision rather than silent article expansion.",
+    "The current source client stores a bounded observation sample; the inventory correctly requires the external gate to hash and assess the complete scoped API response instead."
+  ],
+  "gate_state_after_review": {
+    "live_asset_identity": "not_run",
+    "asset_level_rights": "not_run",
+    "source_freshness": "not_run",
+    "private_article_preview": "not_run",
+    "responsive_and_assistive_qa": "not_run",
+    "release": "blocked"
+  },
+  "next_step": {
+    "step": 28,
+    "workflow_role": "Luna",
+    "task": "Create a narrowly revised v2.1 inventory resolving S27-01 through S27-05. Do not execute the external gates, change production code, commit, or deploy."
+  }
+}

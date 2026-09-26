@@ -1,0 +1,212 @@
+{
+  "schema_version": "1.0.0",
+  "step": 32,
+  "workflow_role": "Sol",
+  "executed_at": "2026-09-26T07:17:19Z",
+  "publication_effect": "none",
+  "read_only": true,
+  "subject": "data/editorial/private-eurostat-external-gate-inventory-v2.2.json",
+  "overall_decision": "blocked_pending_canonical_contract_correction_and_private_preview",
+  "execution": {
+    "production_d1": {
+      "database_name": "publisher-asset-marketplace",
+      "database_id": "93b3f1b1-a71e-4387-bbfc-64d237e9551d",
+      "method": "authenticated Cloudflare D1 dashboard console",
+      "fallback_reason": "Local Wrangler 4.131.1 authentication was expired; no Wrangler query ran.",
+      "query_file": "scripts/editorial/sql/eurostat-external-gates.sql",
+      "query_file_sha256": "4af2bc45d90bd9a086343cb04d93ba0b47a8801f39397550167a8dc73f3a9ebe",
+      "statements_executed": 3,
+      "statements_were_select_only": true,
+      "writes": 0
+    },
+    "external_https": {
+      "script": "scripts/editorial/run-eurostat-external-http-gates.ts",
+      "script_sha256": "ab28fb7c2ec18da0af6097b474dcee6faa7fbc9f22336a684a8c3081388d40d7",
+      "tls_verification": "enabled",
+      "accept_encoding": "identity",
+      "insecure_tls_bypass": false
+    }
+  },
+  "production_identity": {
+    "formal_contract_result": "blocked",
+    "blocking_finding": {
+      "id": "S32-01",
+      "severity": "high",
+      "area": "canonical_url_semantics",
+      "finding": "v2.2 calls the Cite Supply public asset route the pinned canonical URL, but assets.canonical_url stores the official source canonical URL. Both rows correctly point to their Eurostat Data Browser pages, while their separate Cite Supply asset routes return HTTPS 200.",
+      "required_correction": "Model expected_source_canonical_url and expected_public_asset_url as separate fields. Compare assets.canonical_url with the Eurostat dataset URL and verify the derived Cite Supply route independently.",
+      "production_data_change_required": false,
+      "fail_closed": true
+    },
+    "rows": [
+      {
+        "brief_id": "cb-002-eu-renewable-share-patterns",
+        "id": "asset_eurostat_nrg_ind_ren",
+        "source_id": "source_eurostat",
+        "slug": "eurostat-nrg_ind_ren",
+        "external_id": "nrg_ind_ren",
+        "status": "published",
+        "asset_type": "dataset",
+        "source_key": "eurostat",
+        "source_name": "Eurostat",
+        "source_active": 1,
+        "rights_status": "safe",
+        "license_code": "EU_COMMISSION_REUSE_2011",
+        "canonical_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+        "attribution_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+        "canonical_matches_attribution": true,
+        "expected_public_asset_url": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+        "public_asset_http_status": 200,
+        "canonical_matches_v2_2_pinned_value": false,
+        "citation_text_length": 89,
+        "attribution_name": "Eurostat",
+        "attribution_terms_length": 0,
+        "embed_url": "https://publisher-asset-marketplace.shuu9599.workers.dev/embed/eurostat-nrg_ind_ren",
+        "embed_origin": "https://publisher-asset-marketplace.shuu9599.workers.dev",
+        "embed_origin_matches": true,
+        "embed_origin_approved": true,
+        "source_updated_at": "2026-09-15T23:00:00+0200",
+        "source_policy_url": "https://ec.europa.eu/eurostat/help/copyright-notice"
+      },
+      {
+        "brief_id": "cb-003-hicp-inflation-explainer",
+        "id": "asset_eurostat_tec00118",
+        "source_id": "source_eurostat",
+        "slug": "eurostat-tec00118",
+        "external_id": "tec00118",
+        "status": "published",
+        "asset_type": "dataset",
+        "source_key": "eurostat",
+        "source_name": "Eurostat",
+        "source_active": 1,
+        "rights_status": "safe",
+        "license_code": "EU_COMMISSION_REUSE_2011",
+        "canonical_url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+        "attribution_url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+        "canonical_matches_attribution": true,
+        "expected_public_asset_url": "https://citesupply.com/asset/eurostat-tec00118",
+        "public_asset_http_status": 200,
+        "canonical_matches_v2_2_pinned_value": false,
+        "citation_text_length": 64,
+        "attribution_name": "Eurostat",
+        "attribution_terms_length": 0,
+        "embed_url": "https://publisher-asset-marketplace.shuu9599.workers.dev/embed/eurostat-tec00118",
+        "embed_origin": "https://publisher-asset-marketplace.shuu9599.workers.dev",
+        "embed_origin_matches": true,
+        "embed_origin_approved": true,
+        "source_updated_at": "2026-09-17T11:00:00+0200",
+        "source_policy_url": "https://ec.europa.eu/eurostat/help/copyright-notice"
+      }
+    ]
+  },
+  "asset_level_rights": {
+    "result": "pass",
+    "rows": [
+      {
+        "slug": "eurostat-nrg_ind_ren",
+        "asset_rights_pass": true,
+        "evidence_pass": true,
+        "automated_review_version": "eurostat-automated-policy-v1",
+        "embed_review_version": "eurostat-marketplace-embed-v2",
+        "indicator_evidence_count": 1,
+        "evidence_checked_at": "2026-09-17T13:53:45.500Z"
+      },
+      {
+        "slug": "eurostat-tec00118",
+        "asset_rights_pass": true,
+        "evidence_pass": true,
+        "automated_review_version": "eurostat-automated-policy-v1",
+        "embed_review_version": "eurostat-marketplace-embed-v2",
+        "indicator_evidence_count": 1,
+        "evidence_checked_at": "2026-09-17T11:32:20.341Z"
+      }
+    ],
+    "draft_attribution": {
+      "source_links_present": true,
+      "reuse_policy_links_present": true,
+      "modified_data_disclaimer_present": true,
+      "eurostat_non_responsibility_disclaimer_present": true
+    }
+  },
+  "source_freshness": {
+    "result": "pass",
+    "datasets": [
+      {
+        "brief_id": "cb-002-eu-renewable-share-patterns",
+        "dataset_code": "nrg_ind_ren",
+        "retrieved_at": "2026-09-26T07:17:46.301Z",
+        "http_status": 200,
+        "content_type": "application/json",
+        "tls_authorized": true,
+        "decoded_body_length_bytes": 3549,
+        "response_sha256": "251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7",
+        "pinned_response_sha256": "251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7",
+        "response_sha256_matches_pinned": true,
+        "updated": "2026-09-15T23:00:00+0200",
+        "expected_dimensions_contained": true,
+        "selected_period": "2020-2024",
+        "unexpected_source_dimensions": {
+          "nrg_bal": ["REN_HEAT_CL_WHC", "REN_WHC_DHEAT_DCL"],
+          "time": ["2025"]
+        },
+        "status_flags": ["p"],
+        "scope_resolution": "The byte-identical pinned snapshot already excludes the extra series and provisional 2025 values from article calculations; the selected 2020-2024 observations are unchanged and unflagged.",
+        "dataset_page_http_status": 200,
+        "dataset_page_sha256": "9c90a4e10dad8981dd2251fda0e9deda4e6e920432fdba9325a22640c50c635d"
+      },
+      {
+        "brief_id": "cb-003-hicp-inflation-explainer",
+        "dataset_code": "tec00118",
+        "retrieved_at": "2026-09-26T07:17:46.520Z",
+        "http_status": 200,
+        "content_type": "application/json",
+        "tls_authorized": true,
+        "decoded_body_length_bytes": 4645,
+        "response_sha256": "f507370fe6a6b782654faf59775f16cd95e16843e890b753a4efc4dbc104659e",
+        "pinned_response_sha256": "f507370fe6a6b782654faf59775f16cd95e16843e890b753a4efc4dbc104659e",
+        "response_sha256_matches_pinned": true,
+        "updated": "2026-09-17T11:00:00+0200",
+        "expected_dimensions_contained": true,
+        "selected_period": "2018-2025",
+        "unexpected_source_dimensions": {},
+        "status_flags": [],
+        "dataset_page_http_status": 200,
+        "dataset_page_sha256": "b87db474cc2f5fd141bba0db50eb4f0f49b364d5c04d97638d9b123534b56706"
+      }
+    ]
+  },
+  "source_policy": {
+    "result": "pass",
+    "url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+    "retrieved_at": "2026-09-26T07:17:46.658Z",
+    "http_status": 200,
+    "content_type": "text/html;charset=UTF-8",
+    "tls_authorized": true,
+    "decoded_body_length_bytes": 176445,
+    "response_sha256": "62ad38b9d58c2c1802c7bee46d90e91f68a1adc5b0ad3e2fda3c8f7c189042ee",
+    "semantic_checks": {
+      "commercial_and_noncommercial_statistical_reuse_authorized_with_source_acknowledgement": true,
+      "individual_notices_and_exceptions_must_be_checked": true,
+      "third_party_material_exception_present": true,
+      "modified_data_must_be_disclosed": true,
+      "eurostat_non_responsibility_disclaimer_required_for_modified_data": true,
+      "customised_dataset_citation_format_present": true
+    },
+    "selected_dataset_scope": "EU27 aggregate data; no non-EU country, trade, logo, trademark, photo, illustration, or separately identified third-party material is reused in the two article calculations.",
+    "note": "The page contains dynamic markup, so its byte hash may change without a semantic policy change. The exact response hash and independent semantic checks are both recorded."
+  },
+  "gate_state_after_run": {
+    "live_asset_identity": "blocked_contract_definition",
+    "asset_level_rights": "pass",
+    "source_freshness": "pass",
+    "source_policy": "pass",
+    "private_article_preview": "not_run",
+    "responsive_and_assistive_qa": "not_run",
+    "release": "blocked"
+  },
+  "next_step": {
+    "step": 33,
+    "workflow_role": "Luna",
+    "task": "Correct the source-canonical versus public-asset-route distinction, re-evaluate the identity gate without changing production data, and then implement the protected non-indexable article preview route locally. Do not deploy."
+  }
+}

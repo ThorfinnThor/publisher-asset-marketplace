@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "step": 23,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "indexable": false,
+  "public_route_created": false,
+  "sitemap_changed": false,
+  "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+  "decisions": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_sha256": "297519e9b1e754432f5db6d1d4041730911d7c3244b91b8587d1095ddde6f4f8",
+      "preview_sha256": "15f5560b8617a0edb6349ec23f973f80811cec4fa5106261dfb66cdf55a6e1a9",
+      "substantive_words": 586,
+      "decision": "editorial_logic_pass_advance_to_external_gates",
+      "findings": [
+        "The transport paragraph now stays within the claims supported by Eurostat's 2024 reporting note.",
+        "It no longer asserts a road-and-rail denominator or an unsupported multiplier.",
+        "The adjacent source identifies the reporting-year value, transport scope, and qualifying renewable inputs used by the paragraph.",
+        "The heating-and-cooling paragraph remains supported by its separate 2024 Eurostat reporting note.",
+        "Exact block-level citation binding, approved metrics, private directives, hashes, and minimum depth pass automated review."
+      ],
+      "remaining_gates": [
+        "resolve_live_asset_identity",
+        "confirm_asset_level_reuse_rights",
+        "recheck_source_freshness_before_release",
+        "complete_responsive_browser_and_assistive_technology_qa"
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_sha256": "dfd79de90f9e9f5336f6e3e4ff7543ab0f07d7af94edcddbeee14ccd590f13b1",
+      "preview_sha256": "7a1d1c17e842b9fdd178cf3bd2c94c46c9f326430fbbf10d6ff35722c2ffadce",
+      "substantive_words": 715,
+      "decision": "editorial_logic_pass_advance_to_external_gates",
+      "findings": [
+        "The annual-average, rate-versus-index, and classification claims each retain their required adjacent source binding.",
+        "The exact block-level checker cannot be satisfied by a URL appearing only in the final source list.",
+        "The plotted values remain inside the declared domain and have markers, direct labels, axis ticks, an accessible description, and an equivalent table.",
+        "Approved metrics, private directives, hashes, and minimum depth pass automated review."
+      ],
+      "remaining_gates": [
+        "resolve_live_asset_identity",
+        "confirm_asset_level_reuse_rights",
+        "recheck_source_freshness_before_release",
+        "complete_responsive_browser_and_assistive_technology_qa"
+      ]
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "decision": "held",
+      "reason": "Source lineage and asset-level rights remain unresolved; the draft is also below the 500-word substantive-depth floor."
+    }
+  ],
+  "checker_review": {
+    "decision": "meaningful_and_passed",
+    "verified_pairs": [
+      "transport-scope:eurostat-transport-2024",
+      "heating-cooling-scope:eurostat-renewable-heating-2024",
+      "how-the-annual-average-works:eurostat-hicp-table",
+      "rate-vs-index:eurostat-hicp-methodology",
+      "classification:eurostat-hicp-dataset-mapping"
+    ],
+    "limitation": "Static source-binding checks do not replace browser rendering or assistive-technology review."
+  },
+  "browser_visual_qa": "not_completed_no_permitted_browser_surface",
+  "global_release_status": "blocked_pending_external_identity_rights_freshness_and_browser_qa",
+  "next_step": {
+    "step": 24,
+    "workflow_role": "Luna",
+    "task": "Build a read-only external-gate resolution inventory for the two advanced previews without publishing them."
+  }
+}

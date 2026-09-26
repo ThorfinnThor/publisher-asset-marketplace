@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "step": 12,
+  "stage": "private_preview_prepared",
+  "reviewer_role": "Luna",
+  "reviewed_at": "2026-09-24T21:40:00.000Z",
+  "publication_effect": "none",
+  "indexable": false,
+  "article_route_created": false,
+  "sitemap_changed": false,
+  "source_lineage": [
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "assessment": "metadata_reconciled_public_source_page_stale_live_confirmation_required",
+      "owid_chart_metadata_sha256": "af8d91eda5a30d68e92407cc0fe69991ae3c38003616f861d0520a2078622000",
+      "owid_csv_sha256": "97704c3480477739ec1ad280ebe4bc7e392fe845b36b84b42746013dfa3657ea",
+      "owid_snapshot_retrieved_at": "2026-09-23T10:26:24.353Z",
+      "metadata_provider": "Global Wildfire Information System",
+      "metadata_citation": "Global Wildfire Information System (2026)",
+      "metadata_access_date": "2026-09-11",
+      "metadata_timespan": "2002-2025",
+      "metadata_license": "CC BY 4.0",
+      "primary_method_url": "https://gwis.jrc.ec.europa.eu/about-gwis/technical-background/burnt-areas",
+      "primary_method_page_note": "The public page currently says data through 2023; the pinned OWID metadata says its series was sourced from the newer GWIS country-profile API.",
+      "resolution_limit": "This establishes what the pinned OWID chart metadata claims about provider and coverage, not independent validation of the GWIS API's 2025 observations or all OWID transformations. Recheck API lineage and current rights before publication."
+    }
+  ],
+  "artifacts": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "draft_path": "content/editorial/drafts/internet-use-grew-at-different-speeds.json",
+      "draft_sha256": "3fa95379ac5bc01d0b1d0e4ef37ab805a2f2a9b9d021e8a59df0452075bd3799",
+      "preview_path": "docs/editorial/previews/cb-001-internet-use-private-preview.md",
+      "preview_sha256": "8f6f11ab9d58b87a6ddfa7ffeab36bfdb123b6583854b0fd3a6815521870c3bf",
+      "review_decision": "approved_for_private_preview_in_step_11; source_bound_preview_prepared_in_step_12"
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_path": "content/editorial/drafts/reading-eu-renewables-by-energy-use.json",
+      "draft_sha256": "9de54d9c96243a806b206cbeca45ff606db5816669e10183041b7194cbab3533",
+      "review_decision": "revision_returned_in_step_11; revised_for_sol_re_review_in_step_12"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_path": "content/editorial/drafts/what-eu-hicp-inflation-rate-means.json",
+      "draft_sha256": "0ca338ab905ba5d8fd799f8fb59e6c24120de81c91489b50179e6f3f2c0ddafe",
+      "review_decision": "revision_returned_in_step_11; revised_for_sol_re_review_in_step_12"
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "draft_path": "content/editorial/drafts/world-burned-area-across-four-land-cover-types.json",
+      "draft_sha256": "dc5b2b03afb56930c18febcc3d4f8074c1bde78ea2064c1c9aa46c418be6f38c",
+      "preview_path": "docs/editorial/previews/cb-004-wildfire-private-preview.md",
+      "preview_sha256": "c574ee70b6b92898a5c3a1e292cee0c8cc9b093390758c6c52adb39b1f1ea5e8",
+      "review_decision": "approved_for_private_preview_in_step_11; source_bound_preview_prepared_in_step_12"
+    }
+  ],
+  "unresolved_release_gates": [
+    "The Step 11 review decision file remains the immutable record of the exact drafts reviewed then; revised drafts have new hashes and need a fresh Sol editorial review.",
+    "Confirm exact current asset IDs, source freshness, and live asset-level reuse rights for all four source assets.",
+    "For the wildfire series, independently confirm current GWIS API lineage and 2025 data before public publication.",
+    "Review actual rendered responsive article layouts and citation/attribution placement before adding any public route.",
+    "No public route, sitemap URL, indexing state, production code, commit, or deployment was changed."
+  ]
+}

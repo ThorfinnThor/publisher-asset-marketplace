@@ -13,6 +13,7 @@ import { runAssetRefresh } from "../src/lib/ingest/refresh-runner";
 import { runWorldBankRefresh } from "../src/lib/ingest/worldbank-refresh-runner";
 import {
   isEmbeddableMarketplacePath,
+  isPrivateEditorialPreviewPath,
   isPublicPreviewPath,
   withSecurityHeaders,
 } from "../src/lib/security-headers";
@@ -65,6 +66,7 @@ const worker = {
     const secured = withSecurityHeaders(response, {
       allowEmbedding,
       allowCrossOriginResource: response.ok && isPublicPreviewPath(pathname),
+      privateEditorialPreview: isPrivateEditorialPreviewPath(pathname),
     });
     const marketplaceSlug = allowEmbedding ? marketplaceEmbedSlug(pathname) : null;
     if (marketplaceSlug) {

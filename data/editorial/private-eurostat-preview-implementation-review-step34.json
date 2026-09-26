@@ -1,0 +1,117 @@
+{
+  "schema_version": "1.0.0",
+  "step": 34,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-26T07:57:06Z",
+  "subject": {
+    "contract": "data/editorial/private-eurostat-external-gate-inventory-v2.3.json",
+    "implementation": "data/editorial/private-eurostat-preview-implementation-step33.json"
+  },
+  "publication_effect": "none",
+  "deployment": "not_performed",
+  "overall_decision": "approved_for_responsive_browser_accessibility_and_link_qa",
+  "review_amendment": {
+    "id": "S34-01",
+    "severity": "medium",
+    "area": "private_namespace_header_enforcement",
+    "finding": "The Worker applied private headers only when the raw pathname matched the canonical preview pattern. A percent-encoded private namespace could therefore miss the Worker-level private-header branch if the application router decoded it.",
+    "change": "The Worker now treats the complete /_editorial/ namespace as private after up to two safe URI-decoding passes. Malformed escapes fail closed without throwing. Regression tests cover canonical, unknown, encoded, double-encoded, adjacent public, and malformed paths.",
+    "policy_effect": "none"
+  },
+  "verified": [
+    {
+      "check": "authenticated_admin_boundary",
+      "result": "pass",
+      "evidence": "The route resolves the existing D1-backed session and returns the same non-indexable 404 for missing, creator, expired, unknown, and lookup-failure outcomes. Only role=admin receives the reviewed HTML."
+    },
+    {
+      "check": "artifact_hash_binding",
+      "result": "pass",
+      "evidence": "Both bundled HTML artifacts match the reviewed SHA-256 values in v2.3 and the Step-33 implementation record. A hash mismatch returns no preview."
+    },
+    {
+      "check": "seo_isolation",
+      "result": "pass",
+      "evidence": "The route is absent from sitemap and public navigation, authenticated access fails as 404 for crawlers, and every private-namespace response receives no-store, noindex, no-referrer, no-script, no-frame headers. robots.txt is defence in depth, not the access control."
+    },
+    {
+      "check": "rights_and_identity_integrity",
+      "result": "pass",
+      "evidence": "v2.3 correctly separates official source canonical URLs from Cite Supply asset URLs. The immutable Step-32 result remains authoritative for the passed read-only production identity, asset rights, source policy, and freshness evidence. No rights or production records changed."
+    },
+    {
+      "check": "cloudflare_runtime_shape",
+      "result": "pass",
+      "evidence": "The Worker retains the module-handler shape, uses generated Wrangler binding types, awaits the application handler, and performs no new background or per-request outbound work. Latest inspected @cloudflare/workers-types version: 5.20260926.1."
+    },
+    {
+      "check": "next_route_shape",
+      "result": "pass",
+      "evidence": "The route uses an App Router route.ts handler, Promise-based dynamic params, Web Request/Response APIs, and a private URL segment escaped as %5Feditorial in the filesystem. The production build detects /_editorial/preview/:briefId."
+    },
+    {
+      "check": "content_and_accessibility_static_gate",
+      "result": "pass",
+      "evidence": "Both previews have one H1, accessible SVG title/description, equivalent tables, adjacent method sources, exact metric bindings, and 586/715 substantive words respectively. Interactive browser and assistive-technology QA remains Step 35."
+    }
+  ],
+  "artifact_hashes": {
+    "contract_v2_3": "ea1737a00db0f6fe65b9f8d61f9d7d96839995bda92b986aef0656800fc66441",
+    "step32_gate_result": "2d5c814c7c3cc0de99da64f8f5dea05ce4b5edc466b89df7af340d668e4bb39f",
+    "step33_implementation_result": "363731904a42c97a3e6c01e902c973d48b3b8574909eea5f99303c81181366d0",
+    "route": "995d34fe57f8cf3d7f8035dd3a2e567fa57df9dc3731e58a30788a4478a89c42",
+    "artifact_loader": "483aebf12b4ca9a3b64d62a2df13cd6385df669a7d4c65547a5e416a0ad5261b",
+    "security_headers_after_review": "d4c345092bb61cd8f1432d0efe8a47351b12603f9fba3c17ba9a3797641aa2b0",
+    "worker": "3b20317008e163daebb7bbe84aa3433fe64a90943ef28377e70a9f1fd0e9c1be",
+    "robots": "488a22f7739cb103022235d1972341d0e5b7cb0ce7cdf325433a8143f9e5485f",
+    "renewables_preview": "15f5560b8617a0edb6349ec23f973f80811cec4fa5106261dfb66cdf55a6e1a9",
+    "hicp_preview": "7a1d1c17e842b9fdd178cf3bd2c94c46c9f326430fbbf10d6ff35722c2ffadce"
+  },
+  "verification": {
+    "latest_cloudflare_types": "5.20260926.1",
+    "targeted_vitest": {
+      "files": 3,
+      "tests": 13,
+      "result": "pass"
+    },
+    "full_vitest": {
+      "files": 67,
+      "tests": 372,
+      "result": "pass"
+    },
+    "editorial_static_preview_check": "pass",
+    "draft_schema_check": "pass",
+    "minimum_substantive_words": {
+      "cb-002-eu-renewable-share-patterns": 586,
+      "cb-003-hicp-inflation-explainer": 715,
+      "minimum": 500,
+      "result": "pass"
+    },
+    "wrangler_typegen_check": "pass",
+    "lint": "pass",
+    "typecheck": "pass",
+    "build": "pass",
+    "git_diff_check": "pass",
+    "repository_wide_prettier_check": "not_applicable_generated_source_snapshots_are_intentionally_byte_exact_and_include_upstream_html_not_parseable_by_prettier"
+  },
+  "non_blocking_observations": [
+    "The v2.3 contract retains not_run in its reusable root rights/freshness contract templates and null source-query result slots. The per-preview gate states and immutable Step-32 result are the authoritative execution evidence; release automation must not infer a failure or a pass from those template slots alone.",
+    "Google cannot consume X-Robots-Tag on a URL blocked by robots.txt, so privacy does not rely on noindex. The admin session boundary and indistinguishable 404 are the primary controls; robots.txt and noindex are supplementary.",
+    "No browser, screen-reader, keyboard, responsive, or external-link interaction result is claimed in this step. Those remain mandatory in Step 35.",
+    "No commit, production write, asset mutation, rights mutation, or deployment was performed."
+  ],
+  "gate_state_after_review": {
+    "live_asset_identity": "pass_from_step32_after_contract_correction",
+    "asset_level_rights": "pass_from_step32",
+    "source_freshness": "pass_from_step32",
+    "source_policy": "pass_from_step32",
+    "private_article_preview": "pass_code_seo_rights_security_review",
+    "responsive_and_assistive_qa": "not_run",
+    "release": "blocked"
+  },
+  "next_step": {
+    "step": 35,
+    "workflow_role": "Sol",
+    "task": "Run authenticated responsive browser, keyboard, accessibility, console, network, and external-link QA for both protected previews at the four required viewports. Do not deploy."
+  }
+}

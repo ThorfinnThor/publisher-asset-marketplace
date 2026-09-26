@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "step": 29,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-25",
+  "subject": "data/editorial/private-eurostat-external-gate-inventory-v2.1.json",
+  "publication_effect": "none",
+  "read_only_review": true,
+  "overall_decision": "revision_required_before_gate_execution",
+  "verified": [
+    {
+      "check": "S27-01_complete_projection",
+      "result": "pass",
+      "evidence": "The SELECT now includes attribution fields, attribution_terms, embed_origin, source key/name/policy/active, rights_json, and metadata_json."
+    },
+    {
+      "check": "S27-02_source_binding",
+      "result": "pass",
+      "evidence": "Both previews bind to source_eurostat/eurostat and require sources.active=1."
+    },
+    {
+      "check": "S27-03_persisted_rights_provenance",
+      "result": "partial",
+      "evidence": "Review versions and most rights fields are explicit, but two fields are asserted in the wrong persisted object, the source path is mis-scoped, and a non-empty attribution_terms value is not produced by the Eurostat importer."
+    },
+    {
+      "check": "S27-04_private_preview_access",
+      "result": "pass",
+      "evidence": "The contract rejects static secret URLs and specifies a signed, single-purpose, five-minute, one-use token with artifact binding, replay denial, no-referrer, no-store, and noindex controls."
+    },
+    {
+      "check": "S27-05_response_hash_definition",
+      "result": "pass",
+      "evidence": "The SHA-256 input is the decoded response-body bytes before parsing or re-serialisation, with byte length, content type, timestamp, and hash recorded."
+    },
+    {
+      "check": "artifact_hash_binding",
+      "result": "pass",
+      "evidence": "Both draft hashes, both rendered-preview hashes, and the analysis-results hash match the current files."
+    }
+  ],
+  "blocking_findings": [
+    {
+      "id": "S29-01",
+      "severity": "high",
+      "area": "rights_json_shape",
+      "finding": "rights_json is typed as AssetRights. It does not contain evidence_conflict or chart_reuse_prohibited; those fields belong to metadata_json.rights_evidence. Requiring them in rights_json makes the gate impossible for correctly classified assets.",
+      "required_revision": "Remove evidence_conflict and chart_reuse_prohibited from the rights_json assertions and retain them only at $.rights_evidence.evidence_conflict and $.rights_evidence.chart_reuse_prohibited in metadata_json.",
+      "fail_closed": true
+    },
+    {
+      "id": "S29-02",
+      "severity": "high",
+      "area": "metadata_json_paths",
+      "finding": "The v2.1 object labelled metadata_json_rights_evidence places source beside rights-evidence fields. The importer stores source at $.source and the evidence object at $.rights_evidence. The current notation does not define executable JSON paths.",
+      "required_revision": "Express every persisted assertion as an explicit JSON path. Require $.source=eurostat separately, then require chart/review/evidence fields below $.rights_evidence and indicator origin fields below $.rights_evidence.indicator_evidence[*].origins[*].",
+      "fail_closed": true
+    },
+    {
+      "id": "S29-03",
+      "severity": "high",
+      "area": "attribution_terms",
+      "finding": "The assets attribution_terms column defaults to an empty string and the Eurostat import/review paths do not populate it. Requiring a non-empty value would reject correctly imported Eurostat assets for a field the current pipeline never writes.",
+      "required_revision": "Keep attribution_terms in the projection for transparency, but do not use non-empty attribution_terms as a Eurostat release gate. Instead verify attribution_name, attribution_url, citation_text, the source policy, and the article's Eurostat modification disclaimer.",
+      "fail_closed": true
+    },
+    {
+      "id": "S29-04",
+      "severity": "high",
+      "area": "embed_origin",
+      "finding": "v2.1 hard-codes https://citesupply.com as embed_origin, while the Eurostat importer defaults to the production workers.dev origin and historical reviewed manifests use that origin. The gate could fail on a valid reviewed embed or hide the need for a separate production migration.",
+      "required_revision": "Require embed_origin to be HTTPS, equal to the origin of embed_url, and paired with the persisted embed_review_version. Record the observed origin during the read-only production lookup. If Cite Supply wants to migrate existing embeds to citesupply.com, treat that as a separate reviewed production change rather than an editorial assumption.",
+      "fail_closed": true
+    },
+    {
+      "id": "S29-05",
+      "severity": "medium",
+      "area": "rights_status",
+      "finding": "The release assertions allow rights_status=restricted even though the listed Eurostat rights and review provenance describe the safe automated policy classification and no permitted restriction is enumerated.",
+      "required_revision": "Require rights_status=safe for these two releases. If a future row is restricted, block it until the exact restriction and its compatibility with the article are explicitly reviewed.",
+      "fail_closed": true
+    }
+  ],
+  "non_blocking_observations": [
+    "The identity SELECT remains read-only and schema-backed for a single slug result.",
+    "The source/API requests, periods, dimensions, and deterministic response hash contract remain suitable for a later external run.",
+    "The private-preview token contract is sufficiently specific for a future implementation, but no route exists yet and no browser QA may be claimed."
+  ],
+  "gate_state_after_review": {
+    "live_asset_identity": "not_run",
+    "asset_level_rights": "not_run",
+    "source_freshness": "not_run",
+    "private_article_preview": "not_run",
+    "responsive_and_assistive_qa": "not_run",
+    "release": "blocked"
+  },
+  "next_step": {
+    "step": 30,
+    "workflow_role": "Luna",
+    "task": "Create v2.2 with executable JSON paths, correct AssetRights versus RightsEvidence field placement, a pipeline-compatible attribution check, observed embed-origin validation, and safe-only release status. Do not run external gates or change production."
+  }
+}

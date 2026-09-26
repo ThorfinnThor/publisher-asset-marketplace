@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "step": 11,
+  "reviewer_role": "Sol",
+  "reviewed_at": "2026-09-24T21:18:24.000Z",
+  "status": "editorial_review_complete",
+  "publication_effect": "none",
+  "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+  "draft_decisions_sha256": "176d32ba1eef54fe00ba762ad7e6248a18a3032c3ddca10f5b922c6ad9bcb8a1",
+  "decisions": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "draft_slug": "internet-use-grew-at-different-speeds",
+      "draft_sha256": "3fa95379ac5bc01d0b1d0e4ef37ab805a2f2a9b9d021e8a59df0452075bd3799",
+      "copy_decision": "approved_for_private_preview",
+      "evidence_review": "The 175 paired UN M49 country-or-area entities and the 50.9, 67.9, and 81.1 percentage-point quartiles match the reviewed analysis. All paired changes are positive in the pinned cohort. Internet-use definition matches the ITU series presented by OWID.",
+      "edits_made": [
+        "Replaced the misleading global-average SEO description with the fixed-cohort question.",
+        "Corrected the cohort description to reflect the UN reference selection rather than a source-defined country list.",
+        "Clarified the data-provider chain, quantile labels, and calculation reference."
+      ],
+      "remaining_before_publication": [
+        "Render the distribution and its units from approved metric IDs, with the 175-entity cohort label near the figure.",
+        "Confirm the exact live asset, freshness, attribution, and current reuse rights."
+      ]
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_slug": "reading-eu-renewables-by-energy-use",
+      "draft_sha256": "3680ab6b1c8cc313282c6a3927bc9afe4f693b21f39637750e1708b389205e29",
+      "copy_decision": "revision_required",
+      "evidence_review": "The 2024 EU27 shares and 2021–2024 within-category differences match the eight approved metrics. Eurostat documents four distinct indicators and a RED I to RED II break between 2020 and 2021.",
+      "edits_made": [
+        "Changed the causal-sounding title to a reading guide.",
+        "Made the 2024 values, 2021 comparison baseline, units, and methodology break explicit."
+      ],
+      "required_revisions": [
+        "Explain the denominator and accounting rule for each of the four indicators in source-grounded language, especially the transport and heating-and-cooling measures.",
+        "Use the approved within-category changes to show what a publisher can accurately say; avoid comparing different shares as if they were additive contributions.",
+        "Give the page a distinct explanatory structure instead of the same finding-table-method-limitations order used by the other drafts."
+      ],
+      "remaining_before_publication": [
+        "Confirm the exact live asset, source status, current rights, and Eurostat attribution and modification notice."
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_slug": "what-eu-hicp-inflation-rate-means",
+      "draft_sha256": "bd76d0644e5fdcd6271e2ac98da3c92bfa8305ad2a6089d1baec3f956e68f29a",
+      "copy_decision": "revision_required",
+      "evidence_review": "The 2018–2025 EU27 annual-average rates, including 2.6% in 2024 and 2.5% in 2025, and the -0.1 percentage-point rate change match the reviewed metrics. The text now distinguishes annual averages from within-year prices and monthly rates.",
+      "edits_made": [
+        "Added the exact, metric-backed comparison and clarified that positive but slower annual-average inflation still means a higher annual-average index.",
+        "Clarified the HICP expenditure scope and prevented a December-to-December reading."
+      ],
+      "required_revisions": [
+        "Develop a reader-useful worked interpretation of the annual-average rate and the index level using only approved facts; do not invent a price basket or cumulative figure.",
+        "Give the selected annual series a purposeful visual or annotated reading path instead of relying on an eight-row data dump.",
+        "Explain the old versus revised ECOICOP classification precisely if the series is extended beyond the reviewed period."
+      ],
+      "remaining_before_publication": [
+        "Confirm the exact live asset, source status, current rights, and Eurostat attribution and modification notice."
+      ]
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "draft_slug": "world-burned-area-across-four-land-cover-types",
+      "draft_sha256": "dc5b2b03afb56930c18febcc3d4f8074c1bde78ea2064c1c9aa46c418be6f38c",
+      "copy_decision": "approved_for_private_preview",
+      "evidence_review": "The four later five-year means are lower than the earlier means in the reviewed OWID World extract. The forest example of 32.5 versus 27.9 million hectares follows the approved display precision. No summed total or causal claim appears.",
+      "edits_made": [
+        "Put the exact 2002–2006 and 2021–2025 windows beside the claim and table.",
+        "Added a source-grounded forest example and a primary GWIS method citation."
+      ],
+      "remaining_before_publication": [
+        "Reconcile the OWID snapshot updated in September 2026 and containing 2025 data with the GWIS technical webpage that still describes coverage through 2023; establish the provider lineage for the later window.",
+        "Confirm the exact live asset, freshness, attribution, and current reuse rights.",
+        "Show four distinct land-cover series and the satellite-detection caveat together in the final visual."
+      ]
+    }
+  ],
+  "global_release_gates": [
+    "This review does not approve publication, indexing, a route, or a sitemap entry.",
+    "No draft is eligible for publication until its exact live asset identity, current source data and rights, and final rendering are checked.",
+    "The held calculator guide remains outside the article set until its live checks are complete."
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0.0",
+  "slug": "what-eu-hicp-inflation-rate-means",
+  "status": "draft",
+  "indexable": false,
+  "language": "en",
+  "format": "worked-rate-reading",
+  "title": "What the EU's annual HICP inflation rate measures",
+  "seo_title": "What the EU HICP Inflation Rate Measures",
+  "seo_description": "Read the EU27 annual-average HICP rate correctly: what a positive rate means, how it differs from the index, and which classification the back series uses.",
+  "dek": "A rate is a change in an index, not the index itself—and a smaller positive rate still describes an increase in the annual average.",
+  "thesis": "The EU27 annual-average HICP rate measures the change between successive annual-average index levels; the positive 2025 rate was slightly below 2024, but this does not mean average prices fell.",
+  "metadata_claim_refs": ["hicp-rate:2025"],
+  "date_created": "2026-09-24T21:06:32.000Z",
+  "date_modified": "2026-09-25T07:21:38.000Z",
+  "date_published": null,
+  "brief_id": "cb-003-hicp-inflation-explainer",
+  "fact_pack_id": "cb-003-hicp-inflation-explainer",
+  "fact_pack_sha256": "7dfa0c81be45158c20d1041a74761ca7a60c5f1088eeb6807c83910bf60f9ad6",
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "draft_decisions_sha256": "1a30a3e7a4d95d9c102c43ed5cd0db232aa61260c2c30539489e611565440912",
+  "asset_slugs": ["eurostat-tec00118"],
+  "citations": [
+    {
+      "id": "eurostat-hicp-table",
+      "title": "HICP - annual data (average index and rate of change)",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "accessed_at": "2026-09-23T10:01:40.840Z"
+    },
+    {
+      "id": "eurostat-hicp-methodology",
+      "title": "Harmonised index of consumer prices metadata",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm",
+      "accessed_at": "2026-09-24T21:30:00.000Z"
+    },
+    {
+      "id": "eurostat-reuse-terms",
+      "title": "Eurostat copyright notice and reuse policy",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "accessed_at": "2026-09-23T10:01:40.840Z"
+    },
+    {
+      "id": "eurostat-hicp-dataset-mapping",
+      "title": "HICP dataset mapping note: ECOICOP version 2",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/databrowser-backend/api/public/explanatory-notes/get/Info_note_HICP_COICOP18_20260128.pdf",
+      "accessed_at": "2026-09-25T07:00:00.000Z"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "opening",
+      "type": "prose",
+      "text": "When someone says ‘inflation was 2.5%,’ the number is easy to repeat and easy to misread. This Eurostat series is an annual-average rate of change in the Harmonised Index of Consumer Prices (HICP). It is not a price tag, not the index level itself, and not a claim that every household's expenses moved by the same amount.",
+      "claim_refs": ["hicp-rate:2025"]
+    },
+    {
+      "id": "worked-example",
+      "type": "finding",
+      "heading": "Read 2025 as a comparison of yearly averages",
+      "text": "For the EU27_2020 aggregate, the annual-average rate was 2.5% in 2025 and 2.6% in 2024. In plain terms, the average HICP index for 2025 was 2.5% above the 2024 average. The rate itself was 0.1 percentage points lower than in 2024; it remained positive, so this series does not say that the average price level fell.",
+      "claim_refs": ["hicp-rate:2024", "hicp-rate:2025", "hicp-rate-change:2024-2025"]
+    },
+    {
+      "id": "rate-path",
+      "type": "data_table",
+      "heading": "A short reading path through the annual series",
+      "caption": "EU27_2020 all-items annual-average rates from 2018 to 2025. These are rates of change, not index points or month-to-month inflation.",
+      "columns": ["Reference year", "Annual-average rate"],
+      "rows": [
+        { "label": "2018", "metric_refs": ["hicp-rate:2018"] },
+        { "label": "2019", "metric_refs": ["hicp-rate:2019"] },
+        { "label": "2020", "metric_refs": ["hicp-rate:2020"] },
+        { "label": "2021", "metric_refs": ["hicp-rate:2021"] },
+        { "label": "2022", "metric_refs": ["hicp-rate:2022"] },
+        { "label": "2023", "metric_refs": ["hicp-rate:2023"] },
+        { "label": "2024", "metric_refs": ["hicp-rate:2024"] },
+        { "label": "2025", "metric_refs": ["hicp-rate:2025"] }
+      ]
+    },
+    {
+      "id": "read-the-turning-points",
+      "type": "prose",
+      "text": "The selected checkpoints show why ‘inflation came down’ needs a date and a measure. The rate moved from 0.7% in 2020 to 9.2% in 2022, then to 2.5% in 2025. This is a path of annual-average rates: it tells readers that the pace of change varied, but it does not supply index levels for calculating a cumulative rise or describe what happened between January and December.",
+      "claim_refs": ["hicp-rate:2020", "hicp-rate:2022", "hicp-rate:2025"]
+    },
+    {
+      "id": "how-the-annual-average-works",
+      "type": "method",
+      "heading": "The annual average smooths a full calendar year",
+      "text": "Eurostat's annual-average rate compares the average of the monthly HICP index values in one calendar year with the average of the monthly values in the preceding year. It is therefore a year-level comparison built from twelve monthly observations, not the rate between two December readings. A sharp rise or fall during a year can be hidden by the annual average, and the same year-on-year rate can coexist with different month-to-month paths. The line in the table should be read as a sequence of annual summaries. It cannot tell a reader which month prices changed most or what happened to a particular purchase. For those questions, use a monthly HICP series at the relevant geography and category, and state whether the comparison is month-on-month or the same month a year earlier.",
+      "claim_refs": ["hicp-rate:2025"]
+    },
+    {
+      "id": "rate-vs-index",
+      "type": "method",
+      "heading": "Rate, index level, and a household bill are different things",
+      "text": "An index level is a measured price level relative to a reference base; a rate of change compares index levels across periods. The selected annual rates alone do not identify an absolute index level: that requires a base or reference index observation as well. Nor do they calculate a household's personal cost of living. HICP covers household final monetary consumption expenditure within the territory, including spending by residents and visitors; household purchasing patterns differ.",
+      "claim_refs": ["hicp-rate:2025"]
+    },
+    {
+      "id": "classification",
+      "type": "method",
+      "heading": "The years are historical; this extract uses the newer classification",
+      "text": "The reviewed observations end in 2025, but that does not make this an extract from the old HICP classification. The pinned Eurostat response identifies tec00118 as a presentation of PRC_HICP_AINR, with the coicop18 dimension set to TOTAL. Eurostat identifies PRC_HICP_AINR as an ECOICOP version 2 annual dataset and says that its historical back series were recalculated under the revised classification introduced with the January 2026 release. The older ECOICOP series for 1996–2025 remains separately available and is frozen except for error corrections. A reader comparing this table with an older download must check the source dataset and classification first, even when both tables show the same calendar years. For a future update, select a consistent series and verify any revisions before adding another year. Category-level comparisons need particular care because classification boundaries can change; this article uses the all-items TOTAL category only.",
+      "claim_refs": ["hicp-rate:2025"]
+    },
+    {
+      "id": "practical-reading-rule",
+      "type": "prose",
+      "text": "A practical reading rule is to state four things together: the geography, the category, the period, and whether the number is an index or a rate. Here the geography is the EU27_2020 aggregate, the category is all-items HICP, the period is a calendar year, and the measure is an annual-average rate. Change any one of those choices and the question changes. A household-specific basket, a national figure, a monthly rate, and an annual-average EU rate are not interchangeable descriptions. When quoting the 2025 value, keep the comparison with 2024 close by and say that the rate remained positive. This makes clear that the pace of annual-average price growth eased slightly in this series while the average index level still rose.",
+      "claim_refs": ["hicp-rate:2024", "hicp-rate:2025", "hicp-rate-change:2024-2025"]
+    },
+    {
+      "id": "limits",
+      "type": "limitation",
+      "heading": "What this rate does not establish",
+      "text": "The EU-wide annual average is not a forecast, a month-on-month figure, a December-to-December comparison, or a personalised inflation estimate. A positive rate below the prior year's rate means slower growth in the annual-average index, not lower prices. The reviewed aggregate also does not explain the causes of inflation or show how its component categories contributed.",
+      "claim_refs": []
+    },
+    {
+      "id": "reuse-note",
+      "type": "prose",
+      "text": "This presentation uses Eurostat data and includes modifications. Eurostat is not responsible for any use that may be made of this information. Refer to Eurostat's reuse notice and the linked HICP metadata before republishing or extending the series.",
+      "claim_refs": []
+    },
+    {
+      "id": "asset-context",
+      "type": "asset_link",
+      "asset_slug": "eurostat-tec00118",
+      "label": "Open the Eurostat annual HICP table",
+      "context": "Inspect the reviewed Cite Supply presentation and use its source link to check the selected observations and Eurostat metadata.",
+      "claim_refs": []
+    }
+  ],
+  "creator_guide_included": false
+}

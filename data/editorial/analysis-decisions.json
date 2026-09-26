@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0.0",
+  "step": 7,
+  "review_date": "2026-09-23",
+  "reviewer_role": "Sol",
+  "status": "fact_pack_scope_review_complete",
+  "publication_effect": "none",
+  "source_mode_reviewed": "verified_snapshots",
+  "decisions": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "brief_revision": "1.0.0",
+      "decision": "conditional_analysis",
+      "step_8_scope": "Classify source entities against the versioned UN M49 country-or-area reference plus explicit source-aggregate overrides before computing a distribution. Use 2000 as the fixed baseline and 2024 as the endpoint for this snapshot only if at least 150 M49 country-or-area entities have non-missing observations at both endpoints. Exclude aggregates, unresolved codes, and all 2025 observations from the comparison. Recalculate and report eligible and excluded counts; never infer entity type from code shape alone.",
+      "permitted_formulas": [
+        "Within-entity percentage-point change = 2024 share minus 2000 share, using the unrounded source values and linked input fact IDs.",
+        "Distribution summaries may be computed over the identical eligible M49 country-or-area cohort, with a named formula, denominator, missing-data rule, and tests."
+      ],
+      "display_policy": "Shares and percentage-point changes: one decimal. Round only for display; do not calculate from rounded values. Report the cohort size and the fixed years next to every distribution.",
+      "blocked_claims": [
+        "2025 is a comparable country endpoint in this snapshot",
+        "OWID regional or income-group aggregates are countries",
+        "Internet use measures connection quality, affordability, or digital skill",
+        "A changing-coverage ranking describes a stable cohort"
+      ],
+      "required_checks": [
+        "Version and cite the country-code reference, validate every included code, and list excluded or unknown codes.",
+        "Prove the 2000/2024 paired-country threshold and preserve zero separately from missing.",
+        "Recheck live asset-level rights and source freshness before any draft can be approved."
+      ]
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "brief_revision": "2.0.0",
+      "decision": "approved_for_scoped_calculation",
+      "step_8_scope": "EU27_2020 annual percentages only. Present the four nrg_bal categories REN, REN_ELC, REN_TRA, and REN_HEAT_CL in their shared 2024 year. Within-category temporal change may compare 2021 with 2024, never 2020 with 2021 without a separate methodological analysis. Exclude 2025.",
+      "permitted_formulas": [
+        "Within the same nrg_bal category, percentage-point change = 2024 percentage minus 2021 percentage, using unrounded source facts and linked input fact IDs."
+      ],
+      "display_policy": "Source percentages and percentage-point differences: one decimal, calculated before rounding. Label each category and year explicitly; retain full precision in the underlying facts.",
+      "blocked_claims": [
+        "These EU27-only facts support member-country rankings",
+        "The four indicators share one denominator or can be summed or averaged into a single renewable share",
+        "The 2020-2021 change is a like-for-like trend",
+        "The available 2025 values form a complete non-provisional four-category comparison"
+      ],
+      "required_checks": [
+        "Assert EU27_2020, freq=A, unit=PC, the exact four nrg_bal categories and all four 2024/2021 observations.",
+        "Fail on any non-empty unreviewed status flag or missing required observation.",
+        "Explain the 2021 RED I/RED II break and distinct category denominators.",
+        "Recheck live asset-level rights and source freshness before any draft can be approved."
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "brief_revision": "2.0.0",
+      "decision": "approved_for_scoped_calculation",
+      "step_8_scope": "EU27_2020 only, annual frequency A, unit RCH_A_AVG, classification TOTAL, 2018-2025. Treat the values as annual-average HICP rates of change, not index levels. Use 2025 only as the latest observation in the reviewed snapshot.",
+      "permitted_formulas": [
+        "Change in annual-average inflation rate, in percentage points = 2025 rate minus 2024 rate, using unrounded source facts and linked input fact IDs."
+      ],
+      "display_policy": "Rates and percentage-point difference: one decimal, calculated before rounding. Say 'annual-average rate of change' on every figure or nearby label.",
+      "blocked_claims": [
+        "The pack supports country or euro-area comparisons",
+        "The annual-average rate is a price index level or monthly year-on-year rate",
+        "A lower positive rate means prices fell",
+        "Adding annual rates yields cumulative price change",
+        "The EU aggregate describes the inflation experienced by an individual household"
+      ],
+      "required_checks": [
+        "Assert the four exact dimension values, both 2024 and 2025 facts, and no unreviewed status flag.",
+        "Use Eurostat methodology to explain the rate-versus-level distinction and the 2026 classification/base-period boundary if discussed.",
+        "Recheck live asset-level rights and source freshness before any draft can be approved."
+      ]
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "brief_revision": "1.0.0",
+      "decision": "approved_for_world_only_calculation",
+      "step_8_scope": "Use only the source-provided World entity OWID_WRL, 2002-2025, four separate land-cover series: forest, savannas, shrublands_grasslands, croplands. Compare the mean of 2002-2006 with the mean of 2021-2025 within each land-cover category. Do not use countries or regional aggregates in this step.",
+      "permitted_formulas": [
+        "For each land-cover series and five-year window: arithmetic mean hectares = sum of its five annual values divided by five, only when all five are present.",
+        "Within-series absolute change = recent five-year mean minus early five-year mean. Relative change = 100 times that difference divided by the early mean, only when the early mean is positive."
+      ],
+      "display_policy": "Area and absolute change: one decimal million hectares after conversion from hectares; relative change: whole percent. Compute before rounding and retain hectares in the evidence record. Show the two five-year windows and avoid presenting either window as a single year's observation.",
+      "blocked_claims": [
+        "The four selected categories are an exhaustive total of global burned area",
+        "Burned area is fire count, intensity, emissions, damage, or individual risk",
+        "A satellite-based estimate has complete detection of all fires",
+        "Country-level or regional findings follow from the World-only calculation"
+      ],
+      "required_checks": [
+        "Assert OWID_WRL and all four source series are present for every year in both windows; reject missing values rather than replacing with zero.",
+        "Preserve the Global Wildfire Information System and OWID attributions and the satellite-underestimation caveat.",
+        "Recheck live asset-level rights and source freshness before any draft can be approved."
+      ]
+    },
+    {
+      "brief_id": "cb-005-embedding-reviewed-calculators",
+      "brief_revision": "1.0.0",
+      "decision": "hold_manual_verification",
+      "step_8_scope": "No numerical analysis or drafting. The calculator workflow guide stays on hold until all live checks in the creator verification pack are performed and recorded.",
+      "permitted_formulas": [],
+      "display_policy": "None.",
+      "blocked_claims": [
+        "Calculator output is verified source data",
+        "A prepared checklist is a passed live test"
+      ],
+      "required_checks": [
+        "Complete the current rights, route, embed-functionality, attribution, keyboard and mobile checks for each creator asset.",
+        "Do not reuse calculator output as article evidence."
+      ]
+    }
+  ],
+  "global_step_8_constraints": [
+    "Do not write or publish articles, change assets or rights, change indexability, commit, or deploy.",
+    "Every derived fact must store formula name/version, input fact IDs, cohort or dimension contract, units, precision, missing/status policy, and reproducible tests.",
+    "Do not promote snapshot-based rights summaries or this analytical approval into final legal or publication approval.",
+    "Fail closed when any dimension, method, value, status, checksum, or rights precondition differs from this decision."
+  ]
+}

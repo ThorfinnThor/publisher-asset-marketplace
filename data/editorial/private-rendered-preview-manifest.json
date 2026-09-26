@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "step": 14,
+  "stage": "private_revisions_and_rendering_prepared",
+  "workflow_role": "Luna",
+  "reviewed_at": "2026-09-25T07:04:40Z",
+  "publication_effect": "none",
+  "indexable": false,
+  "public_route_created": false,
+  "sitemap_changed": false,
+  "artifacts": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "draft_path": "content/editorial/drafts/internet-use-grew-at-different-speeds.json",
+      "draft_sha256": "3fa95379ac5bc01d0b1d0e4ef37ab805a2f2a9b9d021e8a59df0452075bd3799",
+      "markdown_preview_path": "docs/editorial/previews/cb-001-internet-use-private-preview.md",
+      "rendered_preview_path": "docs/editorial/previews/cb-001-internet-use-private-rendered.html",
+      "rendered_preview_sha256": "1d07da2f16d5900c9e8b65d3d6e7b5e899bbe93966d673ad29686464d85fcdbd",
+      "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+      "fact_pack_sha256": "5ed6e9077697acce46de3e1da63b5737684ff32cbe77970961a2a6f11a3bd0ab",
+      "displayed_metric_refs": [
+        "internet-distribution-p25:2000-2024",
+        "internet-distribution-p50:2000-2024",
+        "internet-distribution-p75:2000-2024",
+        "coverage:paired_entity_count"
+      ],
+      "source_lineage": "Our World in Data chart; data from International Telecommunication Union via World Bank; UN M49 country-or-area reference",
+      "state": "private_rendered_review_ready"
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_path": "content/editorial/drafts/reading-eu-renewables-by-energy-use.json",
+      "draft_sha256": "3689fe0e70f877fdfaba5409fe5239c839a0501fc62cea9532a2f4d5304052ae",
+      "state": "revised_validator_passed",
+      "notes": [
+        "Opening no longer makes an unreferenced numeric claim.",
+        "The sector explanation now cites Eurostat's RED II metadata and its 2024 heating-and-cooling explainer rather than relying on the later draft SHARES manual for the key interpretation."
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_path": "content/editorial/drafts/what-eu-hicp-inflation-rate-means.json",
+      "draft_sha256": "0c3ba93e55f01cc49ef4ae485d5af3418a4ef2e2b539ce2969b550b2f0c3f3ca",
+      "state": "revised_validator_passed",
+      "notes": [
+        "Opening 2.5% now references hicp-rate:2025.",
+        "The explanation says selected rates alone do not identify an absolute index level without a base/reference index observation."
+      ]
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "draft_path": "content/editorial/drafts/world-burned-area-across-four-land-cover-types.json",
+      "draft_sha256": "dc5b2b03afb56930c18febcc3d4f8074c1bde78ea2064c1c9aa46c418be6f38c",
+      "preview_path": "docs/editorial/previews/cb-004-wildfire-private-preview.md",
+      "preview_sha256": "ce3dbe9ad9b0ff57a5d3b3d897b23e669ae30cb2680614cd2028755218f0f276",
+      "state": "preview_revised_source_lineage_unresolved",
+      "displayed_metric_mappings": [
+        [
+          "wildfire-mean:forest:early_2002_2006",
+          "wildfire-mean:forest:recent_2021_2025",
+          "wildfire-mean-difference:forest:early-v-recent"
+        ],
+        [
+          "wildfire-mean:savannas:early_2002_2006",
+          "wildfire-mean:savannas:recent_2021_2025",
+          "wildfire-mean-difference:savannas:early-v-recent"
+        ],
+        [
+          "wildfire-mean:shrublands_grasslands:early_2002_2006",
+          "wildfire-mean:shrublands_grasslands:recent_2021_2025",
+          "wildfire-mean-difference:shrublands_grasslands:early-v-recent"
+        ],
+        [
+          "wildfire-mean:croplands:early_2002_2006",
+          "wildfire-mean:croplands:recent_2021_2025",
+          "wildfire-mean-difference:croplands:early-v-recent"
+        ]
+      ],
+      "source_lineage_conflict": {
+        "owid_grapher_column_timespan": "2002-2025",
+        "owid_indicator_origin_description": "2002-2024",
+        "gwis_public_page_coverage": "2001-2023",
+        "owid_origin_date_accessed": "2026-09-11",
+        "owid_column_last_updated": "2026-09-11",
+        "snapshot_retrieved_at": "2026-09-23T10:26:24.353Z",
+        "owid_grapher_metadata_sha256": "af8d91eda5a30d68e92407cc0fe69991ae3c38003616f861d0520a2078622000",
+        "owid_csv_sha256": "97704c3480477739ec1ad280ebe4bc7e392fe845b36b84b42746013dfa3657ea"
+      },
+      "next_gate": "independently verify API/release lineage and asset-level rights before public consideration"
+    }
+  ],
+  "global_gates": [
+    "All rendered content in this manifest is repository-only private review material.",
+    "No article is approved for publication, indexing, route creation, or sitemap inclusion.",
+    "Confirm exact live assets, freshness, source rights, citation placement, accessibility, and responsive rendering in a later Sol review."
+  ]
+}

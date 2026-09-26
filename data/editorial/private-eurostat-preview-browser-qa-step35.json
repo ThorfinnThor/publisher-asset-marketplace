@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0.0",
+  "step": 35,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-26T09:31:26Z",
+  "scope": ["cb-002-eu-renewable-share-patterns", "cb-003-hicp-inflation-explainer"],
+  "environment": {
+    "surface": "Cloudflare Worker local runtime through the protected route",
+    "database": "local D1 only",
+    "authentication": "temporary local admin profile and session",
+    "production_reads": false,
+    "production_writes": false,
+    "deployment": false
+  },
+  "overall_result": "pass_after_three_bounded_preview_rendering_fixes",
+  "responsive_matrix": {
+    "viewports": ["390x844", "768x1024", "1280x800", "1440x900"],
+    "article_viewport_combinations": 8,
+    "http_200": 8,
+    "root_horizontal_overflow": 0,
+    "one_h1": 8,
+    "heading_order_errors": 0,
+    "empty_links": 0,
+    "non_https_links": 0,
+    "accessible_svg_title_and_description": 8,
+    "labelled_equivalent_table": 8,
+    "focusable_internal_scroll_region": 8
+  },
+  "content_depth": {
+    "counting_method": "visible browser text including preview notice, chart labels, tables, sources, and the pinned-analysis identifier",
+    "cb-002-eu-renewable-share-patterns": 901,
+    "cb-003-hicp-inflation-explainer": 1007,
+    "minimum_substantive_article_words_checked_separately": 500
+  },
+  "keyboard": {
+    "figure_focus_indicator": "3px solid rgb(23, 77, 189)",
+    "link_focus_indicator": "3px solid rgb(23, 77, 189)",
+    "horizontal_arrow_scroll": "pass",
+    "sequential_link_focus": "pass"
+  },
+  "accessibility_tree": {
+    "result": "pass",
+    "observations": [
+      "one level-1 heading and ordered level-2 sections",
+      "figure name exposed from figcaption",
+      "SVG name and long description exposed",
+      "table name, rows, row headers, and column headers exposed",
+      "source links have descriptive names"
+    ]
+  },
+  "contrast_ratios": {
+    "body_text": 16.37,
+    "dek_text": 7.3,
+    "private_notice": 10.02,
+    "links_on_white": 7.41,
+    "result": "pass_wcag_aa_normal_text"
+  },
+  "browser_runtime": {
+    "console_errors_or_warnings": 0,
+    "scripts": 0,
+    "iframes": 0,
+    "images": 0,
+    "inline_stylesheets": 1
+  },
+  "external_links": {
+    "unique_links": 8,
+    "reachable": 8,
+    "failed": 0,
+    "verification_surface": "web fetch with valid TLS validation because the local curl CA store could not validate ec.europa.eu",
+    "urls": [
+      "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "https://ec.europa.eu/eurostat/cache/metadata/en/nrg_ind_share_esmsip2.htm",
+      "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260121-1",
+      "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260126-1",
+      "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm",
+      "https://ec.europa.eu/eurostat/databrowser-backend/api/public/explanatory-notes/get/Info_note_HICP_COICOP18_20260128.pdf"
+    ]
+  },
+  "route_and_headers": {
+    "authenticated_known_previews": "200",
+    "anonymous_known_previews": "404",
+    "anonymous_encoded_private_path": "404",
+    "anonymous_double_encoded_private_path": "404",
+    "headers_present_on_success_and_failure": [
+      "Cache-Control: private, no-store",
+      "X-Robots-Tag: noindex, nofollow, noarchive",
+      "Referrer-Policy: no-referrer",
+      "X-Frame-Options: DENY",
+      "strict private Content-Security-Policy"
+    ]
+  },
+  "amendments": ["S35-01", "S35-02", "S35-03"],
+  "artifact_hashes": {
+    "renewables_preview": "09dfddbfc124b17f9de74e8b3e446c106a83b22662e20213a94806db006a754a",
+    "hicp_preview": "bdb290abb4b04b27a0c1a4477702c74700b4aeaf9c24b0790bd0982f995c99af",
+    "renderer": "22f237a8ec24e111b88772ce6a1ccafa5eec1a0ede5b89d40d865fb578606122"
+  },
+  "automated_verification": {
+    "targeted_vitest": "3 files, 13 tests passed",
+    "full_vitest": "67 files, 372 tests passed",
+    "editorial_static_preview_check": "pass",
+    "draft_schema_check": "pass",
+    "minimum_depth_check": "pass for both release candidates",
+    "wrangler_typegen_check": "pass",
+    "lint": "pass",
+    "typecheck": "pass",
+    "production_build": "pass; /_editorial/preview/:briefId detected",
+    "scoped_prettier": "pass",
+    "json_parse": "pass",
+    "git_diff_check": "pass"
+  },
+  "non_blocking_observations": [
+    "Wrangler reported the host file-watcher limit (EMFILE) and disabled asset hot reload. Every browser evidence run used an explicit full build, Worker restart, and route reload, so no result depended on hot reload.",
+    "The local curl CA store could not validate ec.europa.eu. TLS verification was not disabled; the eight links were checked through the TLS-validating web fetch instead."
+  ],
+  "release": "blocked_pending_step_36_final_release_review"
+}

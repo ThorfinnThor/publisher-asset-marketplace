@@ -1,0 +1,304 @@
+{
+  "schema_version": "2.1.0",
+  "step": 28,
+  "workflow_role": "Luna",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "read_only": true,
+  "supersedes": "data/editorial/private-eurostat-external-gate-inventory-v2.json",
+  "resolves_review": "data/editorial/private-eurostat-external-gate-inventory-v2-review-decisions.json",
+  "global_status": "blocked_pending_external_gates",
+  "release_policy": "No article may advance until every required gate is independently executed and has a reproducible HTTPS or read-only production-D1 evidence record.",
+  "asset_identity_contract": {
+    "purpose": "Resolve a public slug to exactly one persistent production asset row and its active Eurostat source without changing state.",
+    "execution_context": "Production D1 read-only query, aligned with src/lib/assets/get-asset.ts and the assets/sources schema.",
+    "sql": "SELECT a.id, a.source_id, a.slug, a.external_id, a.status, a.asset_type, a.canonical_url, a.embed_url, a.preview_url, a.attribution_name, a.attribution_url, a.attribution_terms, a.embed_origin, a.source_updated_at, a.last_checked_at, a.license_code, a.rights_status, a.rights_json, a.metadata_json, a.search_indexable, s.key AS source_key, s.name AS source_name, s.base_url AS source_base_url, s.policy_url AS source_policy_url, s.active AS source_active FROM assets a LEFT JOIN sources s ON s.id = a.source_id WHERE a.slug = ? AND a.status = 'published' AND a.rights_status IN ('safe', 'restricted') LIMIT 1",
+    "bind_parameter": "article_asset_slug",
+    "required_columns": [
+      "a.id",
+      "a.source_id",
+      "a.slug",
+      "a.external_id",
+      "a.status",
+      "a.canonical_url",
+      "a.attribution_name",
+      "a.attribution_url",
+      "a.attribution_terms",
+      "a.embed_origin",
+      "a.source_updated_at",
+      "a.last_checked_at",
+      "a.rights_status",
+      "a.rights_json",
+      "a.metadata_json",
+      "s.key",
+      "s.name",
+      "s.policy_url",
+      "s.active"
+    ],
+    "acceptance": {
+      "row_count": "exactly_one",
+      "id": "non_empty_persistent_id",
+      "slug": "must_equal_bound_slug",
+      "external_id": "must_equal_expected_eurostat_dataset",
+      "source_id": "must_equal_expected_source_id",
+      "source_key": "eurostat",
+      "source_active": 1,
+      "status": "published",
+      "rights_status": ["safe", "restricted"],
+      "canonical_url": "HTTPS and equal to the pinned asset canonical URL",
+      "source_policy_url": "HTTPS and equal to https://ec.europa.eu/eurostat/help/copyright-notice"
+    },
+    "schema_invariants": [
+      "assets.slug is UNIQUE COLLATE NOCASE",
+      "(source_id, external_id) is unique when external_id is not null"
+    ],
+    "fail_closed_if": [
+      "zero rows, more than one row, a missing persistent id, or a non-published status",
+      "the dataset external_id, source_id, source_key, source_active, canonical URL, or policy URL does not match the brief",
+      "the query is run with a write-capable statement or a result is inferred from a public page alone"
+    ]
+  },
+  "rights_evidence_contract": {
+    "principle": "A Cite Supply rights declaration, its persisted review provenance, the dataset identity page, and Eurostat's reuse policy are separate evidence items.",
+    "live_asset_capture": [
+      "dataset/external id and canonical source URL",
+      "commercial use, modification, marketplace-rendered embed, source-hosted embed, attribution, citation, and raw-data redistribution states",
+      "last checked and source updated timestamps",
+      "response timestamp and page-content SHA-256"
+    ],
+    "required_database_assertions": {
+      "assets": {
+        "rights_status": ["safe", "restricted"],
+        "license_code": "EU_COMMISSION_REUSE_2011",
+        "attribution_name": "Eurostat",
+        "attribution_url": "must_equal_dataset_evidence_url",
+        "attribution_terms": "non-empty and consistent with the Eurostat reuse notice",
+        "embed_origin": "https://citesupply.com"
+      },
+      "rights_json": {
+        "embed_allowed": false,
+        "marketplace_rendered_embed_allowed": true,
+        "embed_provenance": "marketplace_rendered",
+        "commercial_use": true,
+        "modification_allowed": true,
+        "attribution_required": true,
+        "citation_required": true,
+        "raw_data_redistribution": true,
+        "evidence_url": "must_equal_dataset_evidence_url",
+        "evidence_checked_at": "valid ISO-8601 timestamp",
+        "share_alike": false,
+        "automated_review_completed": true,
+        "automated_review_version": "eurostat-automated-policy-v1",
+        "embed_review_version": "eurostat-marketplace-embed-v2",
+        "evidence_conflict": false,
+        "chart_reuse_prohibited": false
+      },
+      "metadata_json_rights_evidence": {
+        "source": "eurostat",
+        "chart_owner": "third_party",
+        "chart_license_code": "EU_COMMISSION_REUSE_2011",
+        "chart_license_explicit": true,
+        "chart_license_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+        "manual_review_completed": false,
+        "automated_review_completed": true,
+        "automated_review_version": "eurostat-automated-policy-v1",
+        "marketplace_rendered_embed_allowed": true,
+        "embed_review_version": "eurostat-marketplace-embed-v2",
+        "chart_reuse_prohibited": false,
+        "evidence_conflict": false,
+        "evidence_url": "must_equal_dataset_evidence_url",
+        "indicator_evidence": "non-empty; every origin has the Eurostat license code, policy URL, and non_redistributable=false"
+      }
+    },
+    "source_policy_evidence": {
+      "url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "required_checks": [
+        "HTTP 200 over HTTPS",
+        "current reuse terms, attribution requirement, exceptions, and modified-data disclaimer are captured",
+        "response timestamp and page-content SHA-256 are recorded"
+      ],
+      "not_an_automatic_grant": "The general notice does not erase item-level exceptions; the exact asset declaration and source policy must remain consistent."
+    },
+    "dataset_evidence": {
+      "nrg_ind_ren": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "tec00118": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "role": "Confirms dataset identity and the source's live presentation; it is not by itself the full rights policy."
+    },
+    "gate_state": "not_run",
+    "fail_closed_if": [
+      "the live asset rights panel, persisted JSON evidence, dataset page, and source policy disagree or cannot be paired to the same dataset",
+      "any required rights_json or metadata_json assertion is missing, stale, unknown, restricted, or inconsistent",
+      "the source notice has an exception that the article does not disclose"
+    ]
+  },
+  "source_freshness_contract": {
+    "request_requirements": [
+      "Fetch the exact API URL recorded for the preview; do not use a bounded marketplace sample as a substitute.",
+      "Require HTTP 200, application/json, a valid JSON-stat response, and the expected dataset code.",
+      "Record Content-Type, decoded body byte length, retrieval timestamp, response updated value, status flags, and response SHA-256.",
+      "Compare dimensions, periods, observations, and flags with the pinned fact-pack claims; a change requires a reviewed revision."
+    ],
+    "hash_definition": {
+      "algorithm": "SHA-256",
+      "input": "exact decoded HTTP response-body bytes before JSON parsing or re-serialisation",
+      "required_metadata": [
+        "content_type",
+        "content_length_bytes",
+        "retrieved_at",
+        "response_sha256"
+      ],
+      "semantic_validation": "Run after hashing against the parsed JSON-stat document; do not hash re-serialised JSON."
+    },
+    "status_flag_policy": "Record Eurostat status flags exactly. Provisional or estimated observations cannot silently be presented as final; the article must either label them or exclude them under the preview's declared period policy.",
+    "gate_state": "not_run",
+    "fail_closed_if": [
+      "the API cannot be fetched or the response is not verifiable",
+      "dataset, dimensions, units, classification, time range, observations, or flags differ from the reviewed brief without a new revision",
+      "the source update is newer than the pinned analysis and the article has not been recalculated"
+    ]
+  },
+  "private_article_preview_contract": {
+    "current_route": null,
+    "current_route_status": "required_not_present",
+    "important_boundary": "The public /asset/<slug> and /embed/<slug> routes are not article previews. The checked repository has no editorial article route, so no browser or accessibility result may be claimed for the article from those pages.",
+    "required_future_route": {
+      "transport": "HTTPS only",
+      "access_model": "authenticated reviewer session OR signed single-purpose token; a merely unguessable static URL is forbidden",
+      "token_requirements": {
+        "algorithm": "server-validated signed token",
+        "max_age_seconds": 300,
+        "single_use": true,
+        "bind_to": [
+          "brief_id",
+          "draft_sha256",
+          "rendered_preview_sha256",
+          "analysis_results_sha256",
+          "asset ids and slugs"
+        ],
+        "replay": "deny after first successful use or expiry",
+        "invalid_token_response": 404
+      },
+      "candidate_shape": "https://citesupply.com/_editorial/preview/<brief-id>/<token>",
+      "candidate_shape_status": "contract_only_not_implemented",
+      "response_requirements": [
+        "Cache-Control: private, no-store",
+        "X-Robots-Tag: noindex, nofollow, noarchive",
+        "Referrer-Policy: no-referrer",
+        "frame-ancestors 'none'",
+        "no indexable canonical URL",
+        "not included in sitemap or public navigation",
+        "served artifact hash must match the manifest before QA is accepted"
+      ],
+      "qa_viewports": [
+        { "name": "smartphone", "width": 390, "height": 844 },
+        { "name": "tablet", "width": 768, "height": 1024 },
+        { "name": "small_desktop", "width": 1280, "height": 800 },
+        { "name": "large_desktop", "width": 1440, "height": 900 }
+      ],
+      "qa_evidence": [
+        "screenshots per viewport",
+        "console errors and failed network requests",
+        "keyboard/focus order, heading order, accessible chart names, and equivalent table or text",
+        "served response headers and the preview artifact hash"
+      ]
+    },
+    "gate_state": "not_run",
+    "fail_closed_if": [
+      "no approved HTTPS article preview exists",
+      "the preview is public, indexable, replayable, absent from the manifest, or served content does not match its hashes",
+      "QA is performed on an asset detail page, local file, or local development server instead of the exact article artifact"
+    ]
+  },
+  "previews": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "article_asset_slug": "eurostat-nrg_ind_ren",
+      "expected_external_id": "nrg_ind_ren",
+      "expected_source_id": "source_eurostat",
+      "expected_source_key": "eurostat",
+      "pinned_canonical_url": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+      "draft_sha256": "297519e9b1e754432f5db6d1d4041730911d7c3244b91b8587d1095ddde6f4f8",
+      "rendered_preview_sha256": "15f5560b8617a0edb6349ec23f973f80811cec4fa5106261dfb66cdf55a6e1a9",
+      "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+      "source_query": {
+        "method": "GET",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_ind_ren?lang=en&sinceTimePeriod=2020&geo=EU27_2020",
+        "expected_dimensions": {
+          "geo": ["EU27_2020"],
+          "freq": ["A"],
+          "unit": ["PC"],
+          "nrg_bal": ["REN", "REN_ELC", "REN_TRA", "REN_HEAT_CL"],
+          "time": ["2020", "2021", "2022", "2023", "2024"]
+        },
+        "period_policy": "Use 2020–2024 for this article. Exclude any 2025 provisional or later observation unless the article is revised and the status is explicitly labelled.",
+        "response_sha256": null,
+        "content_length_bytes": null,
+        "content_type": null,
+        "retrieved_at": null,
+        "state": "not_run"
+      },
+      "source_evidence_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "rights_policy_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "methodology_urls": [
+        "https://ec.europa.eu/eurostat/cache/metadata/en/nrg_ind_share_esmsip2.htm",
+        "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260121-1",
+        "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260126-1"
+      ],
+      "gate_states": {
+        "live_asset_identity": "not_run",
+        "asset_level_rights": "not_run",
+        "source_freshness": "not_run",
+        "private_article_preview": "not_run",
+        "responsive_and_assistive_qa": "not_run"
+      },
+      "release_decision": "blocked"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "article_asset_slug": "eurostat-tec00118",
+      "expected_external_id": "tec00118",
+      "expected_source_id": "source_eurostat",
+      "expected_source_key": "eurostat",
+      "pinned_canonical_url": "https://citesupply.com/asset/eurostat-tec00118",
+      "draft_sha256": "dfd79de90f9e9f5336f6e3e4ff7543ab0f07d7af94edcddbeee14ccd590f13b1",
+      "rendered_preview_sha256": "7a1d1c17e842b9fdd178cf3bd2c94c46c9f326430fbbf10d6ff35722c2ffadce",
+      "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+      "source_query": {
+        "method": "GET",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00118?lang=en&sinceTimePeriod=2018&geo=EU27_2020",
+        "expected_dimensions": {
+          "geo": ["EU27_2020"],
+          "freq": ["A"],
+          "unit": ["RCH_A_AVG"],
+          "coicop18": ["TOTAL"],
+          "time": ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"]
+        },
+        "period_policy": "Use 2018–2025 for this article. Preserve Eurostat status flags and verify the ECOICOP version-2 mapping before release.",
+        "response_sha256": null,
+        "content_length_bytes": null,
+        "content_type": null,
+        "retrieved_at": null,
+        "state": "not_run"
+      },
+      "source_evidence_url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "rights_policy_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "methodology_urls": [
+        "https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm",
+        "https://ec.europa.eu/eurostat/databrowser-backend/api/public/explanatory-notes/get/Info_note_HICP_COICOP18_20260128.pdf"
+      ],
+      "gate_states": {
+        "live_asset_identity": "not_run",
+        "asset_level_rights": "not_run",
+        "source_freshness": "not_run",
+        "private_article_preview": "not_run",
+        "responsive_and_assistive_qa": "not_run"
+      },
+      "release_decision": "blocked"
+    }
+  ],
+  "next_step": {
+    "step": 29,
+    "workflow_role": "Sol",
+    "task": "Independently review v2.1 against the five Step-27 findings and confirm that the contracts are executable before any external gate run."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "review_date": "2026-09-23",
+  "reviewed_by": "Sol",
+  "publication_effect": "none",
+  "revisions": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "from_revision": "1.0.0",
+      "revision": "2.0.0",
+      "working_title": "How renewable energy shares differ across EU energy uses",
+      "question": "How did renewable energy shares differ across the EU's total energy use, electricity, transport, and heating and cooling through 2024?",
+      "thesis": "The EU-level shares vary by consumption sector; these are separate indicators with distinct denominators and should not be collapsed into a single progress measure.",
+      "reader_value": "Shows publishers how to compare the selected EU27 sector indicators while stating the common period and the 2021 methodology break.",
+      "asset_slugs": ["eurostat-nrg_ind_ren"],
+      "eurostat_scope": {
+        "allowed_dimension_values": {
+          "nrg_bal": ["REN", "REN_ELC", "REN_TRA", "REN_HEAT_CL"]
+        },
+        "excluded_periods": ["2025"],
+        "interpretation": "EU27_2020 only; retain annual observations from 2020 through 2024 for these four categories. Treat 2020–2021 as a methodology break, so any trend calculation must use 2021 onward or explain the discontinuity. 2025 is excluded from comparisons because it is provisional and the transport observation is absent."
+      },
+      "dropped_asset_slugs": ["eurostat-sdg_07_40"],
+      "reason": "The Step 4 pack contains only the EU aggregate and does not establish compatibility with the secondary SDG indicator."
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "from_revision": "1.0.0",
+      "revision": "2.0.0",
+      "working_title": "What the EU's annual HICP inflation rate tells publishers",
+      "question": "How should publishers interpret the EU27 annual-average HICP rate of change, and what does it not tell them about price levels or individual households?",
+      "thesis": "The annual-average HICP rate describes change in a harmonised consumer-price index; it is distinct from the index level, monthly inflation measures, and any one household's cost of living.",
+      "reader_value": "Provides a careful guide to the EU aggregate's measure and limits without implying that this fact pack supports country comparisons.",
+      "asset_slugs": ["eurostat-tec00118"],
+      "eurostat_scope": {
+        "allowed_dimension_values": {},
+        "excluded_periods": [],
+        "interpretation": "EU27_2020 aggregate only; retain the annual frequency, RCH_A_AVG unit, and COICOP TOTAL classification from 2018 through 2025. Do not present it as a country comparison or household-specific inflation measure."
+      },
+      "reason": "The Step 4 pack contains one EU27 aggregate and does not support the original country-comparison framing."
+    }
+  ]
+}

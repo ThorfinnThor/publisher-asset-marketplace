@@ -1,0 +1,167 @@
+{
+  "schema_version": "1.0.0",
+  "slug": "reading-eu-renewables-by-energy-use",
+  "status": "draft",
+  "indexable": false,
+  "language": "en",
+  "format": "indicator-reading-guide",
+  "title": "What four EU renewable-energy shares actually measure",
+  "seo_title": "EU Renewable Energy Shares Explained",
+  "seo_description": "A source-led guide to the EU27's four renewable-energy shares: what each covers, why the percentages differ, and how the 2021–2024 changes compare.",
+  "dek": "Electricity, transport, heating and cooling, and the overall share are related indicators—not four pieces of one pie.",
+  "thesis": "Eurostat's four EU27 renewable-energy indicators use separate sector scopes and accounting rules, so each percentage answers its own question and should be compared only with the same indicator over time.",
+  "metadata_claim_refs": ["renewable:2024:REN"],
+  "date_created": "2026-09-24T21:06:32.000Z",
+  "date_modified": "2026-09-25T07:21:38.000Z",
+  "date_published": null,
+  "brief_id": "cb-002-eu-renewable-share-patterns",
+  "fact_pack_id": "cb-002-eu-renewable-share-patterns",
+  "fact_pack_sha256": "ba03848c94751576ee31b3ebebf38532a6eaa65ac22402623fa64eda3ca90345",
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "draft_decisions_sha256": "1a30a3e7a4d95d9c102c43ed5cd0db232aa61260c2c30539489e611565440912",
+  "asset_slugs": ["eurostat-nrg_ind_ren"],
+  "citations": [
+    {
+      "id": "eurostat-renewables-table",
+      "title": "Share of energy from renewable sources",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "accessed_at": "2026-09-23T10:01:40.592Z"
+    },
+    {
+      "id": "eurostat-renewables-methodology",
+      "title": "Renewable energy statistics metadata",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/cache/metadata/en/nrg_ind_share_esmsip2.htm",
+      "accessed_at": "2026-09-23T10:26:00.000Z"
+    },
+    {
+      "id": "eurostat-reuse-terms",
+      "title": "Eurostat copyright notice and reuse policy",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "accessed_at": "2026-09-23T10:01:40.679Z"
+    },
+    {
+      "id": "eurostat-transport-2024",
+      "title": "Renewables cover 11% of the energy used for transport",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260121-1",
+      "accessed_at": "2026-09-25T07:21:38.000Z"
+    },
+    {
+      "id": "eurostat-renewable-heating-2024",
+      "title": "Small increase in renewable heating & cooling in 2024",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260126-1",
+      "accessed_at": "2026-09-25T06:55:00.000Z"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "opening",
+      "type": "prose",
+      "text": "A percentage labelled ‘renewables’ sounds self-explanatory until two sectors show very different values. Eurostat publishes four related indicators, each built for a different part of the energy system. Read them as separate ratios under a shared policy framework, not as pieces of one pie.",
+      "claim_refs": []
+    },
+    {
+      "id": "four-questions",
+      "type": "finding",
+      "heading": "Start with the question each indicator answers",
+      "text": "The overall RES share is the headline across energy use; RES-E concerns electricity; RES-T concerns transport; and RES-H&C concerns heating and cooling. Their 2024 EU27 values are 25.2%, 47.5%, 11.2%, and 26.7%, respectively. Those labels are not interchangeable: the scope and calculation rules change with the sector.",
+      "claim_refs": [
+        "renewable:2024:REN",
+        "renewable:2024:REN_ELC",
+        "renewable:2024:REN_TRA",
+        "renewable:2024:REN_HEAT_CL"
+      ]
+    },
+    {
+      "id": "reading-table",
+      "type": "data_table",
+      "heading": "A comparison that keeps the categories separate",
+      "caption": "EU27_2020 aggregate; annual percentage in 2024 and percentage-point change within the same indicator from 2021 to 2024.",
+      "columns": ["Indicator", "2024 share", "Change since 2021"],
+      "rows": [
+        {
+          "label": "Overall RES",
+          "metric_refs": ["renewable:2024:REN", "renewable-change:2021-2024:REN"]
+        },
+        {
+          "label": "Electricity (RES-E)",
+          "metric_refs": ["renewable:2024:REN_ELC", "renewable-change:2021-2024:REN_ELC"]
+        },
+        {
+          "label": "Transport (RES-T)",
+          "metric_refs": ["renewable:2024:REN_TRA", "renewable-change:2021-2024:REN_TRA"]
+        },
+        {
+          "label": "Heating and cooling (RES-H&C)",
+          "metric_refs": ["renewable:2024:REN_HEAT_CL", "renewable-change:2021-2024:REN_HEAT_CL"]
+        }
+      ]
+    },
+    {
+      "id": "electricity-denominator",
+      "type": "method",
+      "heading": "Electricity has a defined grid-oriented denominator",
+      "text": "For RES-E, Eurostat describes renewable electricity production in the numerator and gross final electricity consumption in the denominator. In the SHARES calculation, that denominator is gross electricity production from all sources plus imports minus exports. This production-and-trade accounting is why the percentage is not simply the fraction of power generated domestically that was renewable.",
+      "claim_refs": ["renewable:2024:REN_ELC"]
+    },
+    {
+      "id": "transport-scope",
+      "type": "prose",
+      "text": "Eurostat reports 11.2% for the EU27 transport indicator in 2024. Its reporting note defines transport as energy used in all transport activities, irrespective of the economic sector carrying out the activity. It identifies qualifying renewable inputs including liquid biofuels that meet the relevant sustainability and greenhouse-gas criteria, biomethane, and part of the renewable electricity consumed mostly in road and rail transport. The practical reading rule is therefore simple: use RES-T to describe the renewable share of Eurostat's defined transport-energy measure, not the share of vehicles, trips, or distance that happen to be electric or biofuel-powered. The 2024 note is the reporting-year source for this summary; the dataset metadata should be checked alongside it when the series is updated.",
+      "claim_refs": ["renewable:2024:REN_TRA"]
+    },
+    {
+      "id": "heating-cooling-scope",
+      "type": "prose",
+      "text": "Heating and cooling has a different sector boundary. Eurostat's 2024 explanation identifies renewable contributions including solar thermal and geothermal energy, qualifying biofuels, ambient heat captured by heat pumps, and renewable cooling. Renewable electricity used to drive a heat pump is counted under the electricity indicator rather than counted again as renewable heating and cooling. That avoids one obvious form of double counting, but it does not make RES-H&C a count of renewable appliances or households. Before comparing its percentage with another sector's share, read the source definition and keep the denominator in view.",
+      "claim_refs": ["renewable:2024:REN_HEAT_CL"]
+    },
+    {
+      "id": "overall-denominator",
+      "type": "method",
+      "heading": "The headline has its own whole-system denominator",
+      "text": "The overall RES share compares renewable energy counted under the directive with gross final energy consumption across the covered uses. Eurostat’s SHARES calculation applies adjustments and accounting conventions, so this is not the arithmetic average of the three sector percentages. It is a separately defined system-wide ratio, built from the energy balance and supplementary national reporting.",
+      "claim_refs": ["renewable:2024:REN"]
+    },
+    {
+      "id": "trend-reading",
+      "type": "finding",
+      "heading": "The time comparison is safest within one row",
+      "text": "From 2021 to 2024, the electricity share rose by 9.7 percentage points in this EU27 series, while the transport share rose by 2.1 points. Each change compares a category with itself; neither value is a percentage growth rate, and subtracting the two changes would not measure a policy-performance gap.",
+      "claim_refs": ["renewable-change:2021-2024:REN_ELC", "renewable-change:2021-2024:REN_TRA"]
+    },
+    {
+      "id": "break-and-method",
+      "type": "method",
+      "heading": "Why this comparison starts at 2021",
+      "text": "The reviewed extract uses EU27_2020, the common annual observation for 2024, and the same four nrg_bal categories throughout. Eurostat says the legal basis changed from RED I through 2020 to RED II from 2021, creating a break between those years. This article uses 2021 as its comparison baseline and does not present 2020–2021 as an ordinary like-for-like step.",
+      "claim_refs": ["renewable:2024:REN"]
+    },
+    {
+      "id": "limits",
+      "type": "limitation",
+      "heading": "What these percentages cannot tell you",
+      "text": "This EU aggregate does not rank member states, identify what caused the changes, or give the absolute amount of renewable energy in each sector. Do not add or average the four shares: category overlap, different scopes, and separate denominators make that arithmetic meaningless. National data quality and the availability of particular components can also vary.",
+      "claim_refs": []
+    },
+    {
+      "id": "reuse-note",
+      "type": "prose",
+      "text": "This presentation uses Eurostat data and includes modifications. Eurostat is not responsible for any use that may be made of this information. Its reuse notice, source metadata, and the reporting-year methodology should be checked alongside the linked table before republishing the figures.",
+      "claim_refs": []
+    },
+    {
+      "id": "asset-context",
+      "type": "asset_link",
+      "asset_slug": "eurostat-nrg_ind_ren",
+      "label": "Open the Eurostat renewable-energy table",
+      "context": "Inspect the reviewed Cite Supply presentation and follow its source link for the underlying annual series and Eurostat definitions.",
+      "claim_refs": []
+    }
+  ],
+  "creator_guide_included": false
+}

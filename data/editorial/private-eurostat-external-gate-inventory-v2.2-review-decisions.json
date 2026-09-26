@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "step": 31,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-26",
+  "subject": "data/editorial/private-eurostat-external-gate-inventory-v2.2.json",
+  "publication_effect": "none",
+  "read_only_review": true,
+  "overall_decision": "approved_for_read_only_external_gate_execution",
+  "review_amendment": {
+    "type": "mechanical_projection_correction",
+    "finding": "The article-attribution gate required citation_text to be non-empty, but the identity SELECT did not project a.citation_text.",
+    "change": "Added a.citation_text to the SELECT and required_columns list before approval.",
+    "policy_effect": "none"
+  },
+  "verified": [
+    {
+      "check": "S29-01_asset_rights_shape",
+      "result": "pass",
+      "evidence": "rights_json contains only AssetRights fields. evidence_conflict and chart_reuse_prohibited are required exclusively below metadata_json.$.rights_evidence."
+    },
+    {
+      "check": "S29-02_executable_metadata_paths",
+      "result": "pass",
+      "evidence": "The contract separates $.source from $.rights_evidence and specifies each persisted rights-evidence assertion with an exact JSON path."
+    },
+    {
+      "check": "S29-03_pipeline_compatible_attribution",
+      "result": "pass",
+      "evidence": "attribution_terms is captured without a non-empty requirement. The executable projection now includes citation_text, attribution_name, attribution_url, and the policy fields needed by the article-attribution gate."
+    },
+    {
+      "check": "S29-04_observed_embed_origin",
+      "result": "pass",
+      "evidence": "The observed HTTPS embed_origin must equal origin(embed_url) and match one of the two explicitly reviewed Cite Supply production origins."
+    },
+    {
+      "check": "S29-05_safe_only_release",
+      "result": "pass",
+      "evidence": "Identity lookup may resolve safe or restricted rows for diagnosis, but the release rights contract requires rights_status=safe and blocks restricted rows."
+    },
+    {
+      "check": "artifact_hash_binding",
+      "result": "pass",
+      "evidence": "Both draft hashes, both rendered-preview hashes, and the shared analysis-results hash match the current files."
+    },
+    {
+      "check": "private_preview_contract",
+      "result": "pass_contract_only",
+      "evidence": "The proposed route is non-indexable, no-store, token-bound, five-minute, single-use, replay-denying, and absent from sitemap/navigation. Implementation and browser QA remain intentionally not run."
+    },
+    {
+      "check": "source_response_hash_contract",
+      "result": "pass_contract_only",
+      "evidence": "The response SHA-256 is defined over exact decoded response-body bytes before parsing or re-serialisation, with content type, decoded byte length, and retrieval time recorded."
+    }
+  ],
+  "blocking_findings": [],
+  "non_blocking_observations": [
+    "The identity query is read-only, parameterized by article asset slug, and returns the asset/source fields required for identity, rights, attribution, and origin checks.",
+    "No production D1 query, Eurostat HTTP request, source-policy fetch, private preview, browser QA, asset mutation, rights mutation, commit, or deployment was performed in this review.",
+    "Approval authorizes only the read-only production and external-source gates in Step 32; it does not approve either article for release."
+  ],
+  "gate_state_after_review": {
+    "live_asset_identity": "not_run",
+    "asset_level_rights": "not_run",
+    "source_freshness": "not_run",
+    "private_article_preview": "not_run",
+    "responsive_and_assistive_qa": "not_run",
+    "release": "blocked"
+  },
+  "next_step": {
+    "step": 32,
+    "workflow_role": "Sol",
+    "task": "Execute the approved read-only production-D1 identity and rights gates plus official Eurostat dataset-freshness and source-policy HTTPS gates. Record reproducible evidence and make no production writes."
+  }
+}

@@ -1,0 +1,2027 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-23T09:15:00.000Z",
+  "provenance": {
+    "environment": "production",
+    "method": "public production /search browse export with source filters; asset detail pages read for rights evidence",
+    "direct_d1_read": "not_completed",
+    "direct_d1_read_reason": "Wrangler authentication expired in the non-interactive environment; no write or mutation was attempted.",
+    "public_endpoints": [
+      "https://citesupply.com/search?source=source_owid",
+      "https://citesupply.com/search?source=source_eurostat",
+      "https://citesupply.com/search?source=source_worldbank",
+      "https://citesupply.com/search?type=calculator"
+    ],
+    "scope": "published assets returned by the production search eligibility query"
+  },
+  "inventory_counts": {
+    "total_assets": 10459,
+    "by_source": {
+      "source_owid": 4254,
+      "source_eurostat": 3602,
+      "source_worldbank": 2600,
+      "creator": 3
+    },
+    "by_asset_type": {
+      "chart": 4254,
+      "dataset": 6202,
+      "calculator": 3
+    },
+    "rights_badges_in_search_export": {
+      "source_owid": {
+        "commercial_use_badge": 4248,
+        "embedding_badge": 4254,
+        "citation_ready_badge": 4251
+      },
+      "source_eurostat": {
+        "commercial_use_badge": 3602,
+        "embedding_badge": 3602,
+        "citation_ready_badge": 3602
+      },
+      "source_worldbank": {
+        "commercial_use_badge": 2600,
+        "embedding_badge": 2599,
+        "citation_ready_badge": 2600
+      },
+      "creator": {
+        "commercial_use_badge": 3,
+        "embedding_badge": 3,
+        "citation_ready_badge": 3
+      }
+    }
+  },
+  "data_completeness_policy": {
+    "owid": {
+      "status": "fetchable_documented_endpoint",
+      "stored_observations": false,
+      "current_marketplace_data": "metadata, rights evidence, and preview only",
+      "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+    },
+    "eurostat": {
+      "status": "fetchable_documented_endpoint",
+      "stored_observations": "bounded_presentation_sample",
+      "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+      "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+    },
+    "world_bank": {
+      "status": "fetchable_documented_endpoint",
+      "stored_observations": "bounded_presentation_sample",
+      "current_marketplace_data": "World Bank preview capped at 25 rows",
+      "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+    },
+    "creator": {
+      "status": "not_a_fact_input",
+      "stored_observations": false,
+      "current_marketplace_data": "reviewed calculator metadata and embed evidence; no machine-readable observation contract",
+      "editorial_requirement": "Discuss calculator functionality only; do not harvest outputs as factual data without a separately validated, versioned contract."
+    }
+  },
+  "candidate_count": 43,
+  "pilot_recommendations": [
+    "c-001-digital-adoption",
+    "c-003-renewable-share-eurostat",
+    "c-006-carbon-emissions-per-capita",
+    "c-018-youth-unemployment",
+    "c-027-urban-housing-adequacy"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "c-001-digital-adoption",
+      "working_question": "How has internet use changed across countries, and where is coverage still uneven?",
+      "possible_thesis": "Internet adoption is broad but uneven; the useful story is the pace and distribution of change, not one global average.",
+      "format": "trend_analysis",
+      "asset_slugs": ["share-of-individuals-using-the-internet"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "digital-access",
+      "recommended_for_pilot": true
+    },
+    {
+      "candidate_id": "c-002-solar-capacity",
+      "working_question": "Where has installed solar capacity grown fastest, and how should capacity be compared?",
+      "possible_thesis": "Solar capacity growth needs a clear denominator and a stated time window.",
+      "format": "trend_analysis",
+      "asset_slugs": ["installed-solar-pv-capacity"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/installed-solar-pv-capacity.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://ourworldindata.org/grapher/installed-solar-pv-capacity"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "solar-energy",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-003-renewable-share-eurostat",
+      "working_question": "How has renewable energy changed across EU sectors?",
+      "possible_thesis": "The renewable-energy story differs by sector; an aggregate can hide where progress is concentrated.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["eurostat-nrg_ind_ren", "eurostat-sdg_07_40"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_ind_ren?lang=en",
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sdg_07_40?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+          "https://ec.europa.eu/eurostat/databrowser/view/sdg_07_40/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "renewable-energy",
+      "recommended_for_pilot": true
+    },
+    {
+      "candidate_id": "c-004-electricity-access-gap",
+      "working_question": "How large is the rural–urban electricity-access gap?",
+      "possible_thesis": "National access rates can conceal a persistent rural–urban divide.",
+      "format": "geographic_comparison",
+      "asset_slugs": [
+        "worldbank-eg.elc.accs.zs",
+        "worldbank-eg.elc.accs.ru.zs",
+        "worldbank-eg.elc.accs.ur.zs"
+      ],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/EG.ELC.ACCS.ZS?format=json&per_page=1000",
+        "https://api.worldbank.org/v2/country/all/indicator/EG.ELC.ACCS.RU.ZS?format=json&per_page=1000",
+        "https://api.worldbank.org/v2/country/all/indicator/EG.ELC.ACCS.UR.ZS?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS",
+          "https://data.worldbank.org/indicator/EG.ELC.ACCS.RU.ZS",
+          "https://data.worldbank.org/indicator/EG.ELC.ACCS.UR.ZS"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "electricity-access",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-005-electricity-fuel-mix",
+      "working_question": "How does the electricity mix change by fuel type?",
+      "possible_thesis": "Fuel-specific generation shows whether a changing total reflects renewables, fossil fuels, or other sources.",
+      "format": "trend_analysis",
+      "asset_slugs": ["eurostat-nrg_cb_pem"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_cb_pem?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/nrg_cb_pem/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "electricity-mix",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-006-carbon-emissions-per-capita",
+      "working_question": "How do per-capita carbon emissions differ across countries?",
+      "possible_thesis": "Per-capita emissions answer a different question from total emissions.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["worldbank-en.ghg.co2.pc.ce.ar5"],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/EN.GHG.CO2.PC.CE.AR5?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://data.worldbank.org/indicator/EN.GHG.CO2.PC.CE.AR5"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "carbon-emissions",
+      "recommended_for_pilot": true
+    },
+    {
+      "candidate_id": "c-007-carbon-intensity",
+      "working_question": "What does carbon intensity of GDP measure?",
+      "possible_thesis": "Carbon intensity links emissions to output but is not absolute emissions or climate impact alone.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["worldbank-en.ghg.co2.rt.gdp.pp.kd"],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/EN.GHG.CO2.RT.GDP.PP.KD?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://data.worldbank.org/indicator/EN.GHG.CO2.RT.GDP.PP.KD"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "carbon-intensity",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-008-economic-growth",
+      "working_question": "Which countries experienced the largest changes in annual GDP growth?",
+      "possible_thesis": "Annual growth is a volatile snapshot, not a long-run trend.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["annual-gdp-growth"],
+      "source_families": ["owid"],
+      "required_source_requests": ["https://ourworldindata.org/grapher/annual-gdp-growth.csv"],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://ourworldindata.org/grapher/annual-gdp-growth"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "economic-growth",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-009-import-growth",
+      "working_question": "How has import growth varied across countries and time?",
+      "possible_thesis": "Import growth can move with the cycle and trade composition; rate is not absolute value.",
+      "format": "trend_analysis",
+      "asset_slugs": ["annual-growth-of-imports-of-goods-and-services"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/annual-growth-of-imports-of-goods-and-services.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/annual-growth-of-imports-of-goods-and-services"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "trade-growth",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-010-electricity-urban-rural",
+      "working_question": "Does electricity access differ between urban and rural populations?",
+      "possible_thesis": "The same access indicator can mask different urban and rural conditions.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["access-to-electricity-urban-vs-rural"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/access-to-electricity-urban-vs-rural.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/access-to-electricity-urban-vs-rural"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "electricity-access",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-011-school-electricity",
+      "working_question": "How widespread is electricity access in schools?",
+      "possible_thesis": "School access is a service-delivery measure, not household access.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["schools-access-to-electricity"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/schools-access-to-electricity.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://ourworldindata.org/grapher/schools-access-to-electricity"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "education-infrastructure",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-012-fertility-and-labour",
+      "working_question": "What relationship appears between fertility and female labour participation?",
+      "possible_thesis": "The chart invites comparison, but correlation is not causation and definitions differ.",
+      "format": "cross_source_comparison",
+      "asset_slugs": ["fertility-and-female-labor-force-participation"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/fertility-and-female-labor-force-participation.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/fertility-and-female-labor-force-participation"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication.",
+        "Cross-source comparability is unproven until units, geography, population, frequency, and methodology match."
+      ],
+      "risk_flags": ["definition_mismatch_risk", "owid_observations_not_stored_locally"],
+      "duplicate_group": "fertility-labour",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-013-total-fertility-wb",
+      "working_question": "How has total fertility changed across countries?",
+      "possible_thesis": "Fertility trends require consistent country, period, and births-per-woman definitions.",
+      "format": "trend_analysis",
+      "asset_slugs": ["worldbank-sp.dyn.tfrt.in"],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.TFRT.IN?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://data.worldbank.org/indicator/SP.DYN.TFRT.IN"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "fertility",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-014-total-fertility-eurostat",
+      "working_question": "How does total fertility vary across EU countries?",
+      "possible_thesis": "Comparisons require the same reference year and population definition.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["eurostat-tps00199"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tps00199?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/tps00199/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "fertility",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-015-life-expectancy-gender-gap",
+      "working_question": "How large is the female–male life-expectancy gap?",
+      "possible_thesis": "This is a descriptive population statistic, not an individual health prediction.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["worldbank-sp.dyn.le00.fe.in", "worldbank-sp.dyn.le00.ma.in"],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.LE00.FE.IN?format=json&per_page=1000",
+        "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.LE00.MA.IN?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://data.worldbank.org/indicator/SP.DYN.LE00.FE.IN",
+          "https://data.worldbank.org/indicator/SP.DYN.LE00.MA.IN"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "life-expectancy",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-016-life-expectancy-eu",
+      "working_question": "What does Eurostat life expectancy at birth measure?",
+      "possible_thesis": "It supports population comparison but does not predict an individual lifespan.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["eurostat-tps00208"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tps00208?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/tps00208/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "life-expectancy",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-017-unemployment-by-sex",
+      "working_question": "How does unemployment differ by sex across EU countries?",
+      "possible_thesis": "The survey definition, age scope, and reference period must remain visible.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["eurostat-teilm010"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/teilm010?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/teilm010/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "labour-market",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-018-youth-unemployment",
+      "working_question": "Where is youth unemployment highest, and what does the measure include?",
+      "possible_thesis": "The rate describes people in the labour force, not all young people.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["eurostat-teilm011"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/teilm011?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/teilm011/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "labour-market",
+      "recommended_for_pilot": true
+    },
+    {
+      "candidate_id": "c-019-gender-services-employment",
+      "working_question": "How does the gender composition of service employment differ?",
+      "possible_thesis": "Sector-specific shares reveal a different pattern from economy-wide totals.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["share-of-male-vs-female-employment-in-services"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/share-of-male-vs-female-employment-in-services.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/share-of-male-vs-female-employment-in-services"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "gender-employment",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-020-manufacturing-employment",
+      "working_question": "How important is manufacturing employment across countries?",
+      "possible_thesis": "The share is structural and is not a productivity measure.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["manufacturing-share-of-total-employment"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/manufacturing-share-of-total-employment.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/manufacturing-share-of-total-employment"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "employment-structure",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-021-female-stem-graduates",
+      "working_question": "Where is the female share of tertiary STEM graduates highest?",
+      "possible_thesis": "The indicator covers selected fields and is not a complete STEM-participation measure.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["worldbank-se.ter.grad.fe.en.zs"],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/SE.TER.GRAD.FE.EN.ZS?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://data.worldbank.org/indicator/SE.TER.GRAD.FE.EN.ZS"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "education-gender",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-022-preprimary-enrolment",
+      "working_question": "How does pre-primary enrolment differ between boys and girls?",
+      "possible_thesis": "Parity is best read with the age range, level, and national coverage.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["net-enrollment-pre-primary-boys-vs-girls"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/net-enrollment-pre-primary-boys-vs-girls.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/net-enrollment-pre-primary-boys-vs-girls"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "education-gender",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-023-international-students",
+      "working_question": "Which countries host the largest shares of students from abroad?",
+      "possible_thesis": "The share describes international participation, not total students or quality.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["share-of-students-from-abroad"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/share-of-students-from-abroad.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://ourworldindata.org/grapher/share-of-students-from-abroad"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "international-education",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-024-tourism-gdp",
+      "working_question": "How large is tourism’s contribution to GDP?",
+      "possible_thesis": "Coverage and accounting method must be cited with the sectoral estimate.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["tourism-gdp-proportion-of-total-gdp"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/tourism-gdp-proportion-of-total-gdp.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://ourworldindata.org/grapher/tourism-gdp-proportion-of-total-gdp"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "tourism",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-025-tourism-employment",
+      "working_question": "How does tourism employment compare across EU countries?",
+      "possible_thesis": "Comparison requires the same industries, contract definitions, and quarter.",
+      "format": "geographic_comparison",
+      "asset_slugs": [
+        "number-of-individuals-employed-in-tourism-related-industries-per-1000-people",
+        "eurostat-tour_lfsq4r2"
+      ],
+      "source_families": ["owid", "eurostat"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/number-of-individuals-employed-in-tourism-related-industries-per-1000-people.csv",
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_lfsq4r2?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed", "Not allowed"],
+        "marketplace_rendered_embed": ["not_exposed", "Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown", "Allowed"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/number-of-individuals-employed-in-tourism-related-industries-per-1000-people",
+          "https://ec.europa.eu/eurostat/databrowser/view/tour_lfsq4r2/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "mixed_source_fetch_required",
+        "inputs": [
+          {
+            "status": "fetchable_documented_endpoint",
+            "stored_observations": false,
+            "current_marketplace_data": "metadata, rights evidence, and preview only",
+            "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+          },
+          {
+            "status": "fetchable_documented_endpoint",
+            "stored_observations": "bounded_presentation_sample",
+            "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+            "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+          }
+        ],
+        "editorial_requirement": "Validate definitions, dimensions, and rights independently before comparison."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": [
+        "eurostat_dimension_and_status_flags_required",
+        "owid_observations_not_stored_locally"
+      ],
+      "duplicate_group": "tourism",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-026-tourism-spending",
+      "working_question": "What does international tourism spending reveal?",
+      "possible_thesis": "Expenditure is a monetary flow, not visitor counts or GDP share.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["worldbank-st.int.tvlx.cd"],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/ST.INT.TVLX.CD?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://data.worldbank.org/indicator/ST.INT.TVLX.CD"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "tourism",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-027-urban-housing-adequacy",
+      "working_question": "How widespread is inadequate housing in urban populations?",
+      "possible_thesis": "Housing adequacy is distinct from overcrowding, affordability, and homelessness.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["share-of-urban-population-living-in-inadequate-housing"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/share-of-urban-population-living-in-inadequate-housing.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/share-of-urban-population-living-in-inadequate-housing"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "housing",
+      "recommended_for_pilot": true
+    },
+    {
+      "candidate_id": "c-028-urban-slums",
+      "working_question": "How has the share of people living in urban slums changed?",
+      "possible_thesis": "The defined slum methodology is not a complete housing-quality score.",
+      "format": "trend_analysis",
+      "asset_slugs": ["share-of-urban-population-living-in-slums"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/share-of-urban-population-living-in-slums.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/share-of-urban-population-living-in-slums"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "housing",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-029-housing-benefits",
+      "working_question": "How is housing expenditure support distributed across EU populations?",
+      "possible_thesis": "Benefit coverage and means-testing categories matter.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["eurostat-spr_exp_fho"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_fho?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/spr_exp_fho/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "housing",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-030-construction-activity",
+      "working_question": "What does the EU monthly construction index show?",
+      "possible_thesis": "An index tracks change from a base period, not a physical volume or price level.",
+      "format": "trend_analysis",
+      "asset_slugs": ["eurostat-ei_isbu_m"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ei_isbu_m?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/ei_isbu_m/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "construction",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-031-business-registration",
+      "working_question": "How do business registrations and bankruptcies move through the cycle?",
+      "possible_thesis": "They need separate interpretation; the label does not establish causality.",
+      "format": "trend_analysis",
+      "asset_slugs": ["eurostat-sts_rb_m"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sts_rb_m?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/sts_rb_m/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "business-dynamics",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-032-labour-costs",
+      "working_question": "How have labour costs and wages changed by industry?",
+      "possible_thesis": "Labour costs include more than take-home pay.",
+      "format": "trend_analysis",
+      "asset_slugs": ["eurostat-lc_ncostot_r2"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lc_ncostot_r2?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/lc_ncostot_r2/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "labour-costs",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-033-inflation-definition",
+      "working_question": "How should readers interpret the Eurostat HICP inflation rate?",
+      "possible_thesis": "HICP is harmonised price change, not every household’s cost of living.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["eurostat-tec00118"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00118?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "inflation",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-034-inflation-cross-source",
+      "working_question": "Why can Eurostat HICP and World Bank CPI growth differ?",
+      "possible_thesis": "Basket, coverage, base, and release timing can explain divergence.",
+      "format": "cross_source_comparison",
+      "asset_slugs": ["eurostat-tec00118", "worldbank-fp.cpi.totl.zg"],
+      "source_families": ["eurostat", "world_bank"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00118?lang=en",
+        "https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed", "Unknown"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+          "https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "mixed_source_fetch_required",
+        "inputs": [
+          {
+            "status": "fetchable_documented_endpoint",
+            "stored_observations": "bounded_presentation_sample",
+            "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+            "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+          },
+          {
+            "status": "fetchable_documented_endpoint",
+            "stored_observations": "bounded_presentation_sample",
+            "current_marketplace_data": "World Bank preview capped at 25 rows",
+            "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+          }
+        ],
+        "editorial_requirement": "Validate definitions, dimensions, and rights independently before comparison."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication.",
+        "Cross-source comparability is unproven until units, geography, population, frequency, and methodology match."
+      ],
+      "risk_flags": [
+        "definition_mismatch_risk",
+        "world_bank_scoped_api_fetch_required",
+        "eurostat_dimension_and_status_flags_required"
+      ],
+      "duplicate_group": "inflation",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-035-freshwater-withdrawals",
+      "working_question": "How large are freshwater withdrawals relative to resources?",
+      "possible_thesis": "The ratio is a pressure indicator, not water scarcity by itself.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["freshwater-withdrawals-as-a-share-of-internal-resources"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/freshwater-withdrawals-as-a-share-of-internal-resources.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/freshwater-withdrawals-as-a-share-of-internal-resources"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "water",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-036-freshwater-worldbank",
+      "working_question": "How does the World Bank freshwater indicator vary?",
+      "possible_thesis": "Comparisons need the same denominator and observation year.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["worldbank-er.h2o.fwtl.zs"],
+      "source_families": ["world_bank"],
+      "required_source_requests": [
+        "https://api.worldbank.org/v2/country/all/indicator/ER.H2O.FWTL.ZS?format=json&per_page=1000"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://data.worldbank.org/indicator/ER.H2O.FWTL.ZS"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "World Bank preview capped at 25 rows",
+        "editorial_requirement": "Fetch the scoped official World Bank API series; never calculate from the preview sample."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["world_bank_scoped_api_fetch_required"],
+      "duplicate_group": "water",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-037-wildfire-area",
+      "working_question": "How has wildfire area changed by land-cover type?",
+      "possible_thesis": "Burned area is not emissions or fire intensity.",
+      "format": "trend_analysis",
+      "asset_slugs": ["area-burned-wildfires-by-type"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/area-burned-wildfires-by-type.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": ["https://ourworldindata.org/grapher/area-burned-wildfires-by-type"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "wildfires",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-038-forest-change",
+      "working_question": "Where is forest area changing fastest?",
+      "possible_thesis": "Annual area change does not by itself explain causes or biodiversity outcomes.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["forest-area-net-change-rate"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/forest-area-net-change-rate.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": ["https://ourworldindata.org/grapher/forest-area-net-change-rate"],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "forests",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-039-bathing-water",
+      "working_question": "Which EU locations report excellent bathing-water quality?",
+      "possible_thesis": "The classification is a dated regulatory category.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["eurostat-sdg_14_40"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sdg_14_40?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/sdg_14_40/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "water-quality",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-040-ammonia-agriculture",
+      "working_question": "How important is agriculture in national ammonia emissions?",
+      "possible_thesis": "The share is an emissions-accounting indicator, not a farm-level estimate.",
+      "format": "geographic_comparison",
+      "asset_slugs": ["eurostat-sdg_02_60"],
+      "source_families": ["eurostat"],
+      "required_source_requests": [
+        "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sdg_02_60?lang=en"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Not allowed"],
+        "marketplace_rendered_embed": ["Allowed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Allowed"],
+        "evidence_urls": [
+          "https://ec.europa.eu/eurostat/databrowser/view/sdg_02_60/default/table?lang=en"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": "bounded_presentation_sample",
+        "current_marketplace_data": "reviewed selector and up to 50 non-empty observations",
+        "editorial_requirement": "Fetch the complete Eurostat response with all dimensions and status flags."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["eurostat_dimension_and_status_flags_required"],
+      "duplicate_group": "agriculture-emissions",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-041-material-footprint",
+      "working_question": "How does material footprint change per person and per GDP?",
+      "possible_thesis": "The two denominators answer different questions and are not interchangeable.",
+      "format": "cross_source_comparison",
+      "asset_slugs": ["material-footprint-per-capita", "material-footprint-per-unit-of-gdp"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/material-footprint-per-capita.csv",
+        "https://ourworldindata.org/grapher/material-footprint-per-unit-of-gdp.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/material-footprint-per-capita",
+          "https://ourworldindata.org/grapher/material-footprint-per-unit-of-gdp"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication.",
+        "Cross-source comparability is unproven until units, geography, population, frequency, and methodology match."
+      ],
+      "risk_flags": ["definition_mismatch_risk", "owid_observations_not_stored_locally"],
+      "duplicate_group": "material-footprint",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-042-data-centres-energy",
+      "working_question": "How much electricity demand is associated with data centres?",
+      "possible_thesis": "The modeled share needs its scenario, geography, and period stated.",
+      "format": "indicator_explainer",
+      "asset_slugs": ["data-centers-share-electricity-demand"],
+      "source_families": ["owid"],
+      "required_source_requests": [
+        "https://ourworldindata.org/grapher/data-centers-share-electricity-demand.csv"
+      ],
+      "compatible_dimensions": {
+        "geography": "must be explicitly selected and consistent across facts",
+        "period": "use a common period or report source-specific periods",
+        "unit": "validate per input; no silent conversion",
+        "frequency": "do not combine annual, quarterly, monthly, or modeled series without a declared method"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://ourworldindata.org/grapher/data-centers-share-electricity-demand"
+        ],
+        "note": "Rights are recorded per asset; mixed statuses require article-level review."
+      },
+      "data_completeness": {
+        "status": "fetchable_documented_endpoint",
+        "stored_observations": false,
+        "current_marketplace_data": "metadata, rights evidence, and preview only",
+        "editorial_requirement": "Fetch and checksum the documented OWID data endpoint before calculating facts."
+      },
+      "limitations": [
+        "Marketplace Eurostat and World Bank data are bounded samples and OWID observations are not stored locally; no fact may be calculated from previews.",
+        "A source update, changed definition, missing observation, or rights downgrade must block publication."
+      ],
+      "risk_flags": ["owid_observations_not_stored_locally"],
+      "duplicate_group": "data-centres",
+      "recommended_for_pilot": false
+    },
+    {
+      "candidate_id": "c-043-creator-calculator-guide",
+      "working_question": "How can a publisher embed a reviewed calculator without treating its output as source data?",
+      "possible_thesis": "A reviewed creator calculator can be a useful tool link, but its outputs are not a validated research dataset unless a separate data contract exists.",
+      "format": "tool_supported_guide",
+      "asset_slugs": [
+        "creator-gartenhaus-planer-42548e486192",
+        "creator-luftentfeuchter-nach-raumgro-e-berechnen-passendplanen-20625826fea7",
+        "creator-mahroboter-rechner-fur-flache-steigung-und-engstellen-passendplanen-1b9f7050d534"
+      ],
+      "source_families": ["creator"],
+      "required_source_requests": [
+        "https://www.passendplanen.de/garten/gartenhaus-planer/",
+        "https://www.passendplanen.de/haus/raumklima/luftentfeuchter-rechner/",
+        "https://www.passendplanen.de/garten/maehroboter-rechner/"
+      ],
+      "compatible_dimensions": {
+        "geography": "not applicable to the guide; preserve the creator tool scope",
+        "period": "not applicable; show the tool version and checked date",
+        "unit": "do not infer or normalise the calculator output",
+        "frequency": "not applicable"
+      },
+      "rights_summary": {
+        "published": true,
+        "commercial_use": ["Allowed"],
+        "modification": ["Not allowed"],
+        "source_hosted_embed": ["Allowed"],
+        "marketplace_rendered_embed": ["not_exposed"],
+        "citation": ["Required"],
+        "raw_data_redistribution": ["Unknown"],
+        "evidence_urls": [
+          "https://www.passendplanen.de/garten/gartenhaus-planer/nutzungsrechte/",
+          "https://www.passendplanen.de/ueber-passendplanen/"
+        ],
+        "note": "Creator rights are asset-specific; the creator declarations do not authorise data harvesting."
+      },
+      "data_completeness": {
+        "status": "not_a_fact_input",
+        "current_marketplace_data": "interactive tool metadata and reviewed embed evidence; no machine-readable observation contract",
+        "editorial_requirement": "Discuss functionality only unless a stable, versioned, machine-readable data contract is separately validated."
+      },
+      "limitations": [
+        "Creator calculator outputs must not be harvested as factual data.",
+        "The guide must preserve the creator attribution and link to the calculator rather than imply source-data licensing."
+      ],
+      "risk_flags": ["creator_output_not_validated_as_dataset", "creator_rights_asset_specific"],
+      "duplicate_group": "creator-tools",
+      "recommended_for_pilot": false
+    }
+  ],
+  "creator_assets": [
+    {
+      "slug": "creator-gartenhaus-planer-42548e486192",
+      "title": "Gartenhaus-Planer",
+      "description": "Berechnet den individuellen Platzbedarf für ein Gartenhaus und prüft Stellfläche, Zugang, Ausstattung und Budget.",
+      "asset_type": "Calculator",
+      "source_name": "PassendPlanen",
+      "source_url": "https://www.passendplanen.de/garten/gartenhaus-planer/",
+      "preview_url": "https://www.passendplanen.de/previews/gartenhaus-planer.png",
+      "rights": {
+        "source_hosted_embed": "Allowed",
+        "marketplace_rendered_embed": "not_exposed",
+        "commercial_use": "Allowed",
+        "modification": "Not allowed",
+        "citation": "Required",
+        "raw_data_redistribution": "Unknown",
+        "evidence_url": "https://www.passendplanen.de/garten/gartenhaus-planer/nutzungsrechte/"
+      }
+    },
+    {
+      "slug": "creator-luftentfeuchter-nach-raumgro-e-berechnen-passendplanen-20625826fea7",
+      "title": "Luftentfeuchter nach Raumgröße berechnen | PassendPlanen",
+      "description": "Passende Luftentfeuchter nach Raumfläche, Volumen, Temperatur, Feuchtebelastung, Ablauf und Geräusch auswählen.",
+      "asset_type": "Calculator",
+      "source_name": "PassendPlanen",
+      "source_url": "https://www.passendplanen.de/haus/raumklima/luftentfeuchter-rechner/",
+      "preview_url": "https://publisher-asset-marketplace.shuu9599.workers.dev/api/submission-previews/8ff39538-671a-48a7-be68-e1865ae01438",
+      "rights": {
+        "source_hosted_embed": "Allowed",
+        "marketplace_rendered_embed": "not_exposed",
+        "commercial_use": "Allowed",
+        "modification": "Not allowed",
+        "citation": "Required",
+        "raw_data_redistribution": "Unknown",
+        "evidence_url": "https://www.passendplanen.de/ueber-passendplanen/"
+      }
+    },
+    {
+      "slug": "creator-mahroboter-rechner-fur-flache-steigung-und-engstellen-passendplanen-1b9f7050d534",
+      "title": "Mähroboter Rechner für Fläche, Steigung und Engstellen | PassendPlanen",
+      "description": "Welcher Mähroboter passt zum Garten. Rasenfläche, Steigung, Engstellen, Zonen und Navigation prüfen und geeignete Modelle vergleichen.",
+      "asset_type": "Calculator",
+      "source_name": "PassendPlanen",
+      "source_url": "https://www.passendplanen.de/garten/maehroboter-rechner/",
+      "preview_url": "https://publisher-asset-marketplace.shuu9599.workers.dev/api/submission-previews/f7edc2a1-d88a-4af7-b25e-5bded204e5aa",
+      "rights": {
+        "source_hosted_embed": "Allowed",
+        "marketplace_rendered_embed": "not_exposed",
+        "commercial_use": "Allowed",
+        "modification": "Not allowed",
+        "citation": "Required",
+        "raw_data_redistribution": "Unknown",
+        "evidence_url": "https://www.passendplanen.de/ueber-passendplanen/"
+      }
+    }
+  ]
+}

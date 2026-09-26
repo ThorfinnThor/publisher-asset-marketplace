@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "step": 25,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "reviewed_inventory": "data/editorial/private-eurostat-external-gate-inventory.json",
+  "decision": "revision_required_before_external_gate_execution",
+  "https_path_checks": [
+    {
+      "path": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+      "state": "reachable_in_browser",
+      "observed_identity": "Eurostat dataset nrg_ind_ren",
+      "observed_rights": {
+        "source_hosted_embed": "Not allowed",
+        "marketplace_rendered_embed": "Allowed",
+        "commercial_use": "Allowed",
+        "modification": "Allowed",
+        "attribution": "Required",
+        "citation": "Required",
+        "raw_data_redistribution": "Allowed"
+      },
+      "limitation": "The page does not expose the persistent database asset ID. Its View rights evidence link points to the Eurostat dataset page, not the Eurostat reuse notice."
+    },
+    {
+      "path": "https://citesupply.com/asset/eurostat-tec00118",
+      "state": "reachable_in_browser",
+      "observed_identity": "Eurostat dataset tec00118 / HICP - inflation rate",
+      "observed_rights": {
+        "source_hosted_embed": "Not allowed",
+        "marketplace_rendered_embed": "Allowed",
+        "commercial_use": "Allowed",
+        "modification": "Allowed",
+        "attribution": "Required",
+        "citation": "Required",
+        "raw_data_redistribution": "Allowed"
+      },
+      "limitation": "The page does not expose the persistent database asset ID. Its View rights evidence link points to the Eurostat dataset page, not the Eurostat reuse notice."
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "state": "reachable",
+      "observed_scope": "General commercial and non-commercial reuse subject to attribution, modification notice, disclaimer, and listed exceptions."
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "state": "reachable"
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "state": "reachable"
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/cache/metadata/en/nrg_ind_share_esmsip2.htm",
+      "state": "reachable"
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm",
+      "state": "reachable"
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260121-1",
+      "state": "reachable"
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260126-1",
+      "state": "reachable"
+    },
+    {
+      "path": "https://ec.europa.eu/eurostat/databrowser-backend/api/public/explanatory-notes/get/Info_note_HICP_COICOP18_20260128.pdf",
+      "state": "reachable_in_browser",
+      "limitation": "The generic web reader did not parse the PDF; the browser loaded the direct HTTPS PDF URL."
+    }
+  ],
+  "required_revisions": [
+    {
+      "gate": "live_asset_identity",
+      "problem": "The public detail pages do not expose the persistent asset ID, so the proposed path cannot satisfy the inventory's own identity requirement.",
+      "required_change": "Add an exact read-only production lookup path, query, or authenticated API response that resolves slug to persistent asset ID and published status. Record the expected fields and fail if more or fewer than one row is returned."
+    },
+    {
+      "gate": "asset_level_rights",
+      "problem": "The live rights-evidence links point to the dataset pages rather than the Eurostat reuse notice used to justify the rights declarations.",
+      "required_change": "Require both the live rights panel and the Eurostat reuse notice, record their URLs separately, and fail if the asset's evidence chain does not expose or explicitly pair the applicable reuse policy."
+    },
+    {
+      "gate": "source_freshness",
+      "problem": "The inventory describes a complete re-fetch but omits the exact parameterised API URLs and expected dimension constraints.",
+      "required_change": "Add the exact Eurostat API URL for each article, expected dimensions, excluded/provisional periods, status-flag policy, checksum procedure, and comparison target."
+    },
+    {
+      "gate": "responsive_and_assistive_qa",
+      "problem": "The Cite Supply asset detail URL is not a rendering of the article under review, and no permitted HTTPS article-preview route is specified.",
+      "required_change": "Define an approved, access-controlled HTTPS preview route for the exact article artifact, bind it to the reviewed draft/preview hashes, and fail if the rendered artifact differs. Do not use a public indexable route or local server workaround."
+    }
+  ],
+  "additional_fail_closed_conditions": [
+    "The read-only asset lookup returns zero rows, duplicate rows, or a non-published record.",
+    "The live asset source code or dataset mapping differs from the article input.",
+    "The live rights panel and source reuse policy do not form a traceable evidence chain.",
+    "The official API query is not fully reproducible from the recorded URL and dimensions.",
+    "The HTTPS browser route does not render the exact reviewed article hashes.",
+    "The browser route is publicly indexable before the release decision."
+  ],
+  "global_release_status": "blocked",
+  "next_step": {
+    "step": 26,
+    "workflow_role": "Luna",
+    "task": "Revise the external-gate inventory with exact read-only identity resolution, separate rights evidence, parameterised API paths, and a private HTTPS article-preview contract."
+  }
+}

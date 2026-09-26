@@ -1,0 +1,252 @@
+{
+  "schema_version": "1.0.0",
+  "id": "cb-003-hicp-inflation-explainer",
+  "topic": "EU27 annual-average HICP rate of change, 2018–2025; an aggregate indicator explainer, not a country comparison.",
+  "generated_at": "2026-09-26T10:02:57.838Z",
+  "source_fetched_at": "2026-09-23T10:01:40.840Z",
+  "method_version": "citesupply-editorial-fetch/1.0.0",
+  "brief_revision": "2.0.0",
+  "scope_note": "EU27_2020 aggregate only; retain the annual frequency, RCH_A_AVG unit, and COICOP TOTAL classification from 2018 through 2025. Do not present it as a country comparison or household-specific inflation measure.",
+  "status": "ready_for_sol_review",
+  "input_assets": [
+    {
+      "asset_id": null,
+      "asset_id_resolution": "public_route_only",
+      "slug": "eurostat-tec00118",
+      "source_id": "source_eurostat",
+      "canonical_url": "https://citesupply.com/asset/eurostat-tec00118",
+      "evidence_url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "evidence_checked_at": "2026-09-23T09:15:00.000Z",
+      "licence_code": "Eurostat re-use policy (exceptions apply)",
+      "commercial_use": "Allowed",
+      "modification_allowed": "Allowed",
+      "raw_data_redistribution": "Allowed",
+      "attribution_required": true
+    }
+  ],
+  "source_requests": [
+    {
+      "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00118?lang=en&sinceTimePeriod=2018&geo=EU27_2020",
+      "final_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00118?lang=en&sinceTimePeriod=2018&geo=EU27_2020",
+      "parameters": {
+        "geo": "EU27_2020",
+        "lang": "en",
+        "sinceTimePeriod": "2018"
+      },
+      "http_status": 200,
+      "content_type": "application/json",
+      "response_sha256": "f507370fe6a6b782654faf59775f16cd95e16843e890b753a4efc4dbc104659e",
+      "retrieved_at": "2026-09-23T10:01:40.840Z",
+      "snapshot_path": "data/editorial/source-snapshots/cb-003-hicp-inflation-explainer/f507370fe6a6b782654faf59775f16cd95e16843e890b753a4efc4dbc104659e/tec00118.json",
+      "parser_version": "citesupply-editorial-fetch/1.0.0"
+    },
+    {
+      "url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "final_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "parameters": {},
+      "http_status": 200,
+      "content_type": "text/html;charset=UTF-8",
+      "response_sha256": "bc1c8cc51dc4b3883526e67f6fbdb7ee3266a792b497e57dcd294bca1d8856d0",
+      "retrieved_at": "2026-09-23T10:01:41.054Z",
+      "snapshot_path": "data/editorial/source-snapshots/cb-003-hicp-inflation-explainer/bc1c8cc51dc4b3883526e67f6fbdb7ee3266a792b497e57dcd294bca1d8856d0/eurostat-copyright-notice.html",
+      "parser_version": "citesupply-editorial-fetch/1.0.0"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2018:0",
+      "value": 1.8,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2018",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:0",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2018"
+      }
+    },
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2019:1",
+      "value": 1.4,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2019",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:1",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2019"
+      }
+    },
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2020:2",
+      "value": 0.7,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2020",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:2",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2020"
+      }
+    },
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2021:3",
+      "value": 2.9,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2021",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:3",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2021"
+      }
+    },
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2022:4",
+      "value": 9.2,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2022",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:4",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2022"
+      }
+    },
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2023:5",
+      "value": 6.4,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2023",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:5",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2023"
+      }
+    },
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2024:6",
+      "value": 2.6,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2024",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:6",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2024"
+      }
+    },
+    {
+      "fact_id": "cb-003-hicp-inflation-explainer:eu27_2020:2025:7",
+      "value": 2.5,
+      "unit": "Annual average rate of change",
+      "geography": {
+        "name": "European Union - 27 countries (from 2020)",
+        "code": "EU27_2020",
+        "classification": "source_entity_unclassified"
+      },
+      "period": "2025",
+      "frequency": "Annual",
+      "status_quality_flag": "observed_no_status_flag",
+      "missing_value": false,
+      "source_row_reference": "json-stat-index:7",
+      "dimensions": {
+        "freq": "A",
+        "unit": "RCH_A_AVG",
+        "coicop18": "TOTAL",
+        "geo": "EU27_2020",
+        "time": "2025"
+      }
+    }
+  ],
+  "derived_facts": [],
+  "source_status_labels": {},
+  "caveats": [
+    "The full response dimension and status metadata is preserved; no country or currency-area grouping is applied yet.",
+    "Only the EU27_2020 aggregate is included. Eurostat's commercial reuse policy has exceptions for third-party data and data for other countries.",
+    "Annual-average rate of change is kept separate from monthly and year-on-year monthly inflation measures.",
+    "No comparison, ranking, or derived statistic has been calculated."
+  ],
+  "source_provenance": [
+    {
+      "source_metadata_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "origin_name": "Eurostat",
+      "origin_url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "license_name": "Eurostat statistical data re-use policy (attribution; exceptions apply)",
+      "license_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "non_redistributable": false,
+      "metadata_sha256": "bc1c8cc51dc4b3883526e67f6fbdb7ee3266a792b497e57dcd294bca1d8856d0"
+    }
+  ]
+}

@@ -1,0 +1,503 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-23T09:21:10Z",
+  "step": 3,
+  "reviewer_role": "Sol",
+  "status": "candidate_thesis_gate_complete",
+  "source_inventory": "data/editorial/article-candidates.json",
+  "publication_effect": "none",
+  "selection_summary": {
+    "candidate_count": 43,
+    "selected_total": 5,
+    "selected_for_fact_pack": 4,
+    "selected_for_fact_free_verification": 1,
+    "reserve_eligible": 10,
+    "hold_rights_or_data": 23,
+    "merge_candidate": 2,
+    "rejected_methodology": 2,
+    "rework_required": 1
+  },
+  "selection_policy": [
+    "No article may be drafted from marketplace previews or screenshots.",
+    "Quantitative briefs require commercial use, modification, and raw-data redistribution rights to be Allowed for every factual input.",
+    "A creator tool may be selected only as a fact-free workflow guide; its calculated outputs are not data inputs.",
+    "Every quantitative brief remains conditional until a deterministic fact pack completes a verified HTTPS fetch, checksum, dimension check, and status-flag check.",
+    "The five briefs must cover more than one source family and more than one editorial format.",
+    "Selection does not make a page public, indexable, or sitemap-eligible."
+  ],
+  "supersedes_preliminary_recommendations": {
+    "removed": [
+      {
+        "candidate_id": "c-006-carbon-emissions-per-capita",
+        "reason": "Raw-data redistribution is Unknown; it cannot feed a quantitative article until asset-level evidence is resolved."
+      },
+      {
+        "candidate_id": "c-018-youth-unemployment",
+        "reason": "The live Eurostat dataset teilm011 is monthly unemployment in thousand persons, not an unemployment rate. The question and thesis do not match the source."
+      },
+      {
+        "candidate_id": "c-027-urban-housing-adequacy",
+        "reason": "Raw-data redistribution is Unknown; it cannot feed a quantitative article until asset-level evidence is resolved."
+      }
+    ],
+    "added": ["c-033-inflation-definition", "c-037-wildfire-area", "c-043-creator-calculator-guide"]
+  },
+  "calibration_briefs": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "candidate_id": "c-001-digital-adoption",
+      "decision": "conditional_approval_for_fact_pack",
+      "format": "trend_analysis",
+      "source_families": ["owid"],
+      "asset_slugs": ["share-of-individuals-using-the-internet"],
+      "working_title": "Internet adoption grew almost everywhere—but not at the same pace",
+      "question": "How has internet adoption changed since 2000, and where does the latest complete country distribution remain uneven?",
+      "thesis": "The useful story is not a single global average but the distribution and pace of adoption among countries with comparable observations.",
+      "reader_value": "Gives publishers a defensible way to discuss digital access without turning missing observations or regional aggregates into country rankings.",
+      "required_source_requests": [
+        {
+          "url": "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet.csv",
+          "purpose": "observation series",
+          "live_check": "HTTP 200; text/csv",
+          "fact_pack_requirement": "Store response checksum and retrieval time."
+        },
+        {
+          "url": "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet.metadata.json",
+          "purpose": "definition, unit, origin, and citation metadata",
+          "live_check": "HTTP 200; JSON parsed",
+          "fact_pack_requirement": "Store response checksum and referenced column metadata."
+        }
+      ],
+      "dimension_contract": {
+        "entity": "countries with stable ISO alpha-3 codes; aggregates must be tagged and excluded from country rankings",
+        "period": "2000 through the latest complete year available at fact-pack generation",
+        "frequency": "annual",
+        "unit": "share of population using the Internet; preserve the source unit and displayed scaling",
+        "missing_values": "No interpolation. A comparison requires observations at each cited endpoint."
+      },
+      "fact_pack_outputs": [
+        "latest complete year selected by an explicit coverage rule",
+        "country-level start and end observations",
+        "change over the selected period using a named formula",
+        "coverage and excluded-entity counts",
+        "source definition and update timestamp"
+      ],
+      "rights_plan": {
+        "commercial_use": "Allowed",
+        "modification": "Allowed",
+        "raw_data_redistribution": "Allowed",
+        "citation": "Required",
+        "presentation": "OWID source-hosted embed plus a Cite Supply analysis only after fact-pack validation"
+      },
+      "mandatory_limitations": [
+        "Internet use is defined by the source and is not the same as connection quality, affordability, or digital skill.",
+        "Country coverage changes across years; a ranking may use only the declared comparable cohort.",
+        "The article must distinguish percentage points from percentage change."
+      ],
+      "blocking_conditions": [
+        "metadata and CSV checksum are not captured",
+        "unit or definition changes within the selected period",
+        "country/aggregate classification is unresolved",
+        "any displayed value lacks a fact ID"
+      ],
+      "indexability": "not_applicable_no_article_created"
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "candidate_id": "c-003-renewable-share-eurostat",
+      "decision": "conditional_approval_for_fact_pack",
+      "format": "geographic_comparison",
+      "source_families": ["eurostat"],
+      "asset_slugs": ["eurostat-nrg_ind_ren", "eurostat-sdg_07_40"],
+      "working_title": "Renewable-energy shares differ sharply by country and sector in Europe",
+      "question": "How do renewable-energy shares differ among EU countries and end-use sectors in the latest common year?",
+      "thesis": "An EU-wide average can hide both cross-country differences and the gap between electricity, transport, and heating and cooling.",
+      "reader_value": "Explains which comparisons the Eurostat dimensions support and prevents unrelated renewable-energy measures from being blended.",
+      "required_source_requests": [
+        {
+          "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_ind_ren?lang=en&sinceTimePeriod=2020",
+          "purpose": "primary observations and dimension labels",
+          "live_check": "Endpoint returned HTTP 200 and JSON only with an insecure local transport probe; the local CA store could not verify the certificate.",
+          "fact_pack_requirement": "Repeat with verified TLS, store checksum, dimensions, all status flags, and retrieval time."
+        },
+        {
+          "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sdg_07_40?lang=en&sinceTimePeriod=2020",
+          "purpose": "definition cross-check only",
+          "live_check": "Not treated as a factual input in this step.",
+          "fact_pack_requirement": "Use only if unit, energy balance, geography, period, and status semantics match the primary dataset."
+        }
+      ],
+      "dimension_contract": {
+        "frequency": "A (Annual)",
+        "unit": "PC (Percentage)",
+        "geography": "EU27 member-country codes only; aggregates and non-EU geographies must be separately tagged",
+        "energy_balance": "REN, REN_TRA, REN_ELC, and REN_HEAT_CL; other categories require an explicit editorial reason",
+        "period": "latest year shared by the selected EU-country and sector cohort",
+        "status_flags": "retain and qualify every non-empty Eurostat status flag"
+      },
+      "fact_pack_outputs": [
+        "exact member-country cohort",
+        "latest common year per declared completeness threshold",
+        "country and sector observations",
+        "EU27 aggregate shown separately from member-country distribution",
+        "status flags and excluded observations"
+      ],
+      "rights_plan": {
+        "commercial_use": "Allowed",
+        "modification": "Allowed",
+        "raw_data_redistribution": "Allowed",
+        "citation": "Required",
+        "presentation": "Marketplace-rendered embed; source-hosted embed is Not allowed"
+      },
+      "mandatory_limitations": [
+        "The overall, electricity, transport, and heating/cooling shares use distinct energy-balance categories.",
+        "The latest available year may differ by geography or sector and cannot be silently mixed.",
+        "The SDG dataset is a cross-check, not an automatic second input."
+      ],
+      "blocking_conditions": [
+        "verified TLS retrieval is unavailable",
+        "country membership or geography selection is implicit",
+        "status flags are discarded",
+        "the two datasets do not have demonstrably compatible definitions",
+        "any displayed value lacks a fact ID"
+      ],
+      "indexability": "not_applicable_no_article_created"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "candidate_id": "c-033-inflation-definition",
+      "decision": "conditional_approval_for_fact_pack",
+      "format": "indicator_explainer",
+      "source_families": ["eurostat"],
+      "asset_slugs": ["eurostat-tec00118"],
+      "working_title": "What Eurostat's HICP inflation rate does—and does not—measure",
+      "question": "How should publishers interpret the annual HICP inflation rate when comparing European countries?",
+      "thesis": "HICP is a harmonised annual-average rate of consumer-price change; it is not the price level and not every household's personal cost-of-living change.",
+      "reader_value": "Provides a concise methodological explanation and a safe comparison scope for a frequently mislabelled indicator.",
+      "required_source_requests": [
+        {
+          "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00118?lang=en&sinceTimePeriod=2018",
+          "purpose": "observations, dimensions, labels, and status flags",
+          "live_check": "Endpoint returned HTTP 200 and JSON only with an insecure local transport probe; live dimensions were A, RCH_A_AVG, TOTAL, geo, and time.",
+          "fact_pack_requirement": "Repeat with verified TLS and store checksum, all dimensions, flags, and retrieval time."
+        }
+      ],
+      "dimension_contract": {
+        "frequency": "A (Annual)",
+        "unit": "RCH_A_AVG (Annual average rate of change)",
+        "classification": "COICOP 2018 TOTAL",
+        "geography": "country codes and currency-area aggregates must be presented as different entity classes",
+        "period": "2018 through the latest complete annual observation",
+        "status_flags": "retain and qualify every non-empty Eurostat status flag"
+      },
+      "fact_pack_outputs": [
+        "indicator definition and unit",
+        "latest complete annual observation by selected geography",
+        "coverage and missing-observation counts",
+        "clear distinction between rate of change and price level",
+        "status flags and source update timestamp"
+      ],
+      "rights_plan": {
+        "commercial_use": "Allowed",
+        "modification": "Allowed",
+        "raw_data_redistribution": "Allowed",
+        "citation": "Required",
+        "presentation": "Marketplace-rendered embed; source-hosted embed is Not allowed"
+      },
+      "mandatory_limitations": [
+        "Annual-average HICP inflation is not the same measure as month-on-month or year-on-year monthly inflation.",
+        "A harmonised aggregate does not describe an individual household's spending basket.",
+        "Euro-area compositions change over time and must not be compared as if membership were constant."
+      ],
+      "blocking_conditions": [
+        "verified TLS retrieval is unavailable",
+        "annual-average and monthly rates are mixed",
+        "entity types or changing euro-area compositions are hidden",
+        "any displayed value lacks a fact ID"
+      ],
+      "indexability": "not_applicable_no_article_created"
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "candidate_id": "c-037-wildfire-area",
+      "decision": "conditional_approval_for_fact_pack",
+      "format": "trend_analysis",
+      "source_families": ["owid"],
+      "asset_slugs": ["area-burned-wildfires-by-type"],
+      "working_title": "Burned area is not one number: wildfire trends by land-cover type",
+      "question": "How has annual burned area changed across forests, savannas, shrublands and grasslands, and croplands?",
+      "thesis": "A single burned-area total can conceal very different land-cover patterns and should not be treated as fire intensity or emissions.",
+      "reader_value": "Helps publishers use the available series without conflating burned area, severity, emissions, and damages.",
+      "required_source_requests": [
+        {
+          "url": "https://ourworldindata.org/grapher/area-burned-wildfires-by-type.csv",
+          "purpose": "land-cover observation series",
+          "live_check": "HTTP 200; text/csv with four land-cover columns",
+          "fact_pack_requirement": "Store response checksum and retrieval time."
+        },
+        {
+          "url": "https://ourworldindata.org/grapher/area-burned-wildfires-by-type.metadata.json",
+          "purpose": "definitions, units, origin, and citations",
+          "live_check": "HTTP 200; JSON parsed",
+          "fact_pack_requirement": "Store response checksum and all referenced column metadata."
+        }
+      ],
+      "dimension_contract": {
+        "entity": "explicitly selected countries or source-provided aggregates; never mix the two in rankings",
+        "period": "common period with adequate coverage, selected by a documented rule",
+        "frequency": "annual",
+        "series": "forests, savannas, shrublands and grasslands, and croplands",
+        "unit": "preserve the source unit for every column",
+        "missing_values": "No interpolation and no conversion of missing values to zero."
+      },
+      "fact_pack_outputs": [
+        "source units and definitions for all four series",
+        "selected geography and period",
+        "annual observations and named trend summaries",
+        "coverage and missing-observation counts",
+        "source update timestamp"
+      ],
+      "rights_plan": {
+        "commercial_use": "Allowed",
+        "modification": "Allowed",
+        "raw_data_redistribution": "Allowed",
+        "citation": "Required",
+        "presentation": "OWID source-hosted embed plus a Cite Supply analysis only after fact-pack validation"
+      },
+      "mandatory_limitations": [
+        "Burned area is not fire count, intensity, emissions, damage, or risk.",
+        "Land-cover classes must retain their source definitions.",
+        "Zero and missing observations must remain distinct."
+      ],
+      "blocking_conditions": [
+        "metadata and CSV checksum are not captured",
+        "column units or land-cover definitions are incomplete",
+        "missing observations are interpreted as zero",
+        "any displayed value lacks a fact ID"
+      ],
+      "indexability": "not_applicable_no_article_created"
+    },
+    {
+      "brief_id": "cb-005-embedding-reviewed-calculators",
+      "candidate_id": "c-043-creator-calculator-guide",
+      "decision": "conditional_approval_for_fact_free_brief",
+      "format": "tool_supported_guide",
+      "source_families": ["creator"],
+      "asset_slugs": [
+        "creator-gartenhaus-planer-42548e486192",
+        "creator-luftentfeuchter-nach-raumgro-e-berechnen-passendplanen-20625826fea7",
+        "creator-mahroboter-rechner-fur-flache-steigung-und-engstellen-passendplanen-1b9f7050d534"
+      ],
+      "working_title": "How to embed a reviewed calculator without presenting its output as source data",
+      "question": "What must a publisher check before embedding a creator-hosted calculator from Cite Supply?",
+      "thesis": "Embed permission, attribution, calculator functionality, and factual data rights are separate questions; a working calculator does not automatically become a reusable dataset.",
+      "reader_value": "Explains Cite Supply's rights labels and gives publishers a practical, non-technical embed checklist.",
+      "required_source_requests": [
+        {
+          "url": "https://citesupply.com/asset/creator-gartenhaus-planer-42548e486192",
+          "purpose": "reviewed asset and rights record",
+          "live_check": "HTTP 200; text/html"
+        },
+        {
+          "url": "https://citesupply.com/asset/creator-luftentfeuchter-nach-raumgro-e-berechnen-passendplanen-20625826fea7",
+          "purpose": "reviewed asset and rights record",
+          "live_check": "HTTP 200; text/html"
+        },
+        {
+          "url": "https://citesupply.com/asset/creator-mahroboter-rechner-fur-flache-steigung-und-engstellen-passendplanen-1b9f7050d534",
+          "purpose": "reviewed asset and rights record",
+          "live_check": "HTTP 200; text/html"
+        }
+      ],
+      "dimension_contract": {
+        "facts": "No calculator output, price, recommendation, performance claim, or derived value may be used as editorial evidence.",
+        "scope": "Describe only visible workflow, reviewed rights labels, attribution, and embed behaviour.",
+        "versioning": "Record the checked date and asset slug for every UI statement."
+      },
+      "fact_pack_outputs": [],
+      "verification_outputs": [
+        "asset page and source page HTTP status",
+        "current rights labels per asset",
+        "embed route behaviour in the marketplace sandbox",
+        "visible attribution and source link",
+        "keyboard and mobile usability result"
+      ],
+      "rights_plan": {
+        "commercial_use": "Allowed",
+        "modification": "Not allowed",
+        "raw_data_redistribution": "Unknown and not used",
+        "citation": "Required",
+        "presentation": "Use the approved source-hosted embed without modifying the creator tool"
+      },
+      "mandatory_limitations": [
+        "The guide does not validate the accuracy of calculator outputs.",
+        "Creator declarations are asset-specific and can be changed or revoked.",
+        "No calculator output may be harvested or presented as a Cite Supply dataset."
+      ],
+      "blocking_conditions": [
+        "any rights label no longer permits the intended embed",
+        "the embed sandbox test fails",
+        "the guide implies that Cite Supply owns or validates the calculator's data",
+        "the guide contains unsupported factual claims"
+      ],
+      "indexability": "not_applicable_no_article_created"
+    }
+  ],
+  "candidate_decisions": [
+    { "candidate_id": "c-001-digital-adoption", "decision": "selected_for_fact_pack" },
+    {
+      "candidate_id": "c-002-solar-capacity",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    { "candidate_id": "c-003-renewable-share-eurostat", "decision": "selected_for_fact_pack" },
+    {
+      "candidate_id": "c-004-electricity-access-gap",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    { "candidate_id": "c-005-electricity-fuel-mix", "decision": "reserve_eligible" },
+    {
+      "candidate_id": "c-006-carbon-emissions-per-capita",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-007-carbon-intensity",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-008-economic-growth",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-009-import-growth",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-010-electricity-urban-rural",
+      "decision": "merge_candidate",
+      "merge_into": "c-004-electricity-access-gap"
+    },
+    {
+      "candidate_id": "c-011-school-electricity",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-012-fertility-and-labour",
+      "decision": "rejected_methodology",
+      "reason": "the proposed relationship risks unsupported causal interpretation and the factual inputs lack confirmed raw-data rights"
+    },
+    {
+      "candidate_id": "c-013-total-fertility-wb",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    { "candidate_id": "c-014-total-fertility-eurostat", "decision": "reserve_eligible" },
+    {
+      "candidate_id": "c-015-life-expectancy-gender-gap",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    { "candidate_id": "c-016-life-expectancy-eu", "decision": "reserve_eligible" },
+    { "candidate_id": "c-017-unemployment-by-sex", "decision": "reserve_eligible" },
+    {
+      "candidate_id": "c-018-youth-unemployment",
+      "decision": "rework_required",
+      "reason": "teilm011 contains monthly unemployment in thousand persons, not an unemployment rate"
+    },
+    {
+      "candidate_id": "c-019-gender-services-employment",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-020-manufacturing-employment",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-021-female-stem-graduates",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-022-preprimary-enrolment",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-023-international-students",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-024-tourism-gdp",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-025-tourism-employment",
+      "decision": "hold_rights_or_data",
+      "reason": "mixed definitions and at least one factual input lacks confirmed raw-data rights"
+    },
+    {
+      "candidate_id": "c-026-tourism-spending",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-027-urban-housing-adequacy",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-028-urban-slums",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    { "candidate_id": "c-029-housing-benefits", "decision": "reserve_eligible" },
+    { "candidate_id": "c-030-construction-activity", "decision": "reserve_eligible" },
+    { "candidate_id": "c-031-business-registration", "decision": "reserve_eligible" },
+    { "candidate_id": "c-032-labour-costs", "decision": "reserve_eligible" },
+    { "candidate_id": "c-033-inflation-definition", "decision": "selected_for_fact_pack" },
+    {
+      "candidate_id": "c-034-inflation-cross-source",
+      "decision": "hold_rights_or_data",
+      "reason": "World Bank raw-data rights are Unknown and the inflation definitions require a compatibility proof"
+    },
+    {
+      "candidate_id": "c-035-freshwater-withdrawals",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    {
+      "candidate_id": "c-036-freshwater-worldbank",
+      "decision": "merge_candidate",
+      "merge_into": "c-035-freshwater-withdrawals"
+    },
+    { "candidate_id": "c-037-wildfire-area", "decision": "selected_for_fact_pack" },
+    {
+      "candidate_id": "c-038-forest-change",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    { "candidate_id": "c-039-bathing-water", "decision": "reserve_eligible" },
+    { "candidate_id": "c-040-ammonia-agriculture", "decision": "reserve_eligible" },
+    {
+      "candidate_id": "c-041-material-footprint",
+      "decision": "rejected_methodology",
+      "reason": "the proposed comparison mixes per-person and per-GDP denominators and lacks confirmed raw-data rights"
+    },
+    {
+      "candidate_id": "c-042-data-centres-energy",
+      "decision": "hold_rights_or_data",
+      "reason": "raw-data redistribution is Unknown"
+    },
+    { "candidate_id": "c-043-creator-calculator-guide", "decision": "selected_for_fact_free_brief" }
+  ]
+}

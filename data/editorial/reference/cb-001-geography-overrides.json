@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "reference_id": "cb-001-explicit-source-aggregates",
+  "version": "2026-09-23",
+  "description": "Exact non-M49 entities present in the pinned OWID internet-use fact pack that are visibly aggregate geographies. No prefix-based automatic classification is used.",
+  "evidence": {
+    "source_metadata_url": "https://ourworldindata.org/grapher/share-of-individuals-using-the-internet",
+    "metadata_snapshot_sha256": "c8a247f2162e467e2e09f689bbfde4ee508bd51a30dc6277c294851f3d6d6f9b",
+    "note": "Names and codes are checked against the source fact pack; OWID/WB regional and income-group labels are classified as aggregates. Kosovo remains unresolved because its source code has no matching ISO-alpha3 entry in the selected UN M49 table."
+  },
+  "aggregates": [
+    { "code": "WB_EAP", "name": "East Asia and Pacific (WB)" },
+    { "code": "WB_ECA", "name": "Europe and Central Asia (WB)" },
+    { "code": "OWID_HIC", "name": "High-income countries" },
+    { "code": "WB_LAC", "name": "Latin America and Caribbean (WB)" },
+    { "code": "OWID_LIC", "name": "Low-income countries" },
+    { "code": "OWID_LMC", "name": "Lower-middle-income countries" },
+    {
+      "code": "WB_MENAP",
+      "name": "Middle East, North Africa, Afghanistan and Pakistan (WB)"
+    },
+    { "code": "WB_NA", "name": "North America (WB)" },
+    { "code": "WB_SA", "name": "South Asia (WB)" },
+    { "code": "WB_SSA", "name": "Sub-Saharan Africa (WB)" },
+    { "code": "OWID_UMC", "name": "Upper-middle-income countries" },
+    { "code": "OWID_WRL", "name": "World" }
+  ],
+  "unresolved": [{ "code": "OWID_KOS", "name": "Kosovo" }]
+}

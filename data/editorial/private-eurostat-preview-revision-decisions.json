@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "step": 20,
+  "workflow_role": "Luna",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "indexable": false,
+  "public_route_created": false,
+  "sitemap_changed": false,
+  "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+  "decisions": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_sha256": "40cfab87d2c7bd8aa683cb9e699c9aeb4969d3cb56fdab78e401fec5d789e436",
+      "preview_sha256": "a0cd178ee89dd23f6bfa6d9b6e72629682802458bd0dcde7ab43f28bb39cb290",
+      "substantive_words": 591,
+      "decision": "private_revision_ready_for_sol_review",
+      "changes": [
+        "Replaced the mismatched consolidated-directive adjacency with the official Eurostat 2024 transport note.",
+        "Split transport and heating/cooling explanations so each method claim has its own adjacent source.",
+        "Kept the 2020–2021 methodology break and separate-indicator warning explicit."
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_sha256": "dfd79de90f9e9f5336f6e3e4ff7543ab0f07d7af94edcddbeee14ccd590f13b1",
+      "preview_sha256": "e937d528758dcc5ec5e2643edeeb27fd67ed41741fd0e1ccbfe776786d0c5887",
+      "substantive_words": 715,
+      "decision": "private_revision_ready_for_sol_review",
+      "changes": [
+        "Constrained the line chart to a consistent x-domain containing every year through 2025.",
+        "Added y-axis tick values, plotted point markers, and direct value labels while retaining the equivalent table.",
+        "Added and rendered Eurostat's direct HICP dataset-mapping note for the PRC_HICP_AINR/ECOICOP version-2 claim."
+      ]
+    }
+  ],
+  "browser_visual_qa": "not_completed_no_permitted_browser_surface",
+  "global_release_status": "blocked_until_step_21_sol_review_and_rights_identity_checks"
+}

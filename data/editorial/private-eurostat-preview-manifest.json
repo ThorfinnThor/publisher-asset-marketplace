@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0.0",
+  "step": 36,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-26",
+  "publication_effect": "none",
+  "indexable": false,
+  "sitemap_changed": false,
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "previews": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_path": "content/editorial/drafts/reading-eu-renewables-by-energy-use.json",
+      "draft_sha256": "da4a0e4489ca13877d61081f9b77caec724a95442497c7a524960919e8efaff4",
+      "preview_path": "docs/editorial/previews/cb-002-renewables-private-rendered.html",
+      "preview_sha256": "9c405aff27dfa7c8b1f7fb3ef5c3c50d450781a6ed910070739fed972a211323",
+      "displayed_metric_refs": [
+        "renewable:2024:REN",
+        "renewable:2024:REN_ELC",
+        "renewable:2024:REN_TRA",
+        "renewable:2024:REN_HEAT_CL",
+        "renewable-change:2021-2024:REN",
+        "renewable-change:2021-2024:REN_ELC",
+        "renewable-change:2021-2024:REN_TRA",
+        "renewable-change:2021-2024:REN_HEAT_CL"
+      ],
+      "citation_adjacency": "each_method_claim_has_direct_source_link",
+      "status": "approved_for_protected_production_preview"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_path": "content/editorial/drafts/what-eu-hicp-inflation-rate-means.json",
+      "draft_sha256": "ea0eb4b65f7e64d2927f7b6ff175b6e1ea940f3c24750ecc557675c639a3d2ce",
+      "preview_path": "docs/editorial/previews/cb-003-hicp-private-rendered.html",
+      "preview_sha256": "8e4585c6a4536ee61f2eb8cec484048fb11df27662695b5a08dbc1ca74a2694d",
+      "displayed_metric_refs": [
+        "hicp-rate:2018",
+        "hicp-rate:2019",
+        "hicp-rate:2020",
+        "hicp-rate:2021",
+        "hicp-rate:2022",
+        "hicp-rate:2023",
+        "hicp-rate:2024",
+        "hicp-rate:2025"
+      ],
+      "citation_adjacency": "each_method_claim_has_direct_source_link",
+      "status": "approved_for_protected_production_preview"
+    }
+  ],
+  "browser_visual_qa": "step_35_pass_inherited; step_36_rebind_changed_only_evidence_hash_text_and_was_regression_checked",
+  "release_status": "approved_for_protected_preview_deployment"
+}

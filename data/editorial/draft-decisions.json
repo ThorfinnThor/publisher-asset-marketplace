@@ -1,0 +1,156 @@
+{
+  "schema_version": "1.0.0",
+  "step": 9,
+  "review_date": "2026-09-23",
+  "reviewer_role": "Sol",
+  "status": "interpretation_review_complete",
+  "publication_effect": "none",
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "decisions": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "decision": "approved_for_scoped_draft",
+      "format": "paired_cohort_trend_analysis",
+      "working_title": "Internet use grew at different speeds across countries and areas, 2000–2024",
+      "question": "How much did the share using the Internet change among places with observations in both 2000 and 2024?",
+      "thesis": "The 175 comparable UN M49 country-or-area entities show a wide distribution of percentage-point changes; the middle change was 67.9 points in the reviewed snapshot.",
+      "allowed_metric_ids": [
+        "internet-distribution-p25:2000-2024",
+        "internet-distribution-p50:2000-2024",
+        "internet-distribution-p75:2000-2024"
+      ],
+      "allowed_metric_prefixes": ["internet-change:"],
+      "allowed_coverage_refs": ["coverage:paired_entity_count"],
+      "required_labels": [
+        "Fixed 2000/2024 paired cohort of 175 UN M49 country-or-area entities; each entity has equal weight in the distribution.",
+        "Changes are percentage points, not relative percentage growth.",
+        "Indicator is Internet use in the previous three months, not connection quality or affordability."
+      ],
+      "blocked_claims": [
+        "2024 levels form a quantified distribution or ranking: no such distribution metric was approved in Step 8.",
+        "The 175 entities are all sovereign countries or represent the entire world.",
+        "Regional aggregates, OWID_KOS, or sparse 2025 observations belong in the paired cohort.",
+        "A cause of the differing changes is established by these observations."
+      ],
+      "draft_requirements": [
+        "Use the corrected title, question, and thesis rather than the original latest-year distribution premise.",
+        "Tie every numeric example to its source fact IDs and identify the 175-entity cohort next to distribution statistics.",
+        "Credit ITU via World Bank and Our World in Data."
+      ]
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "decision": "approved_for_scoped_draft",
+      "format": "eu_indicator_comparison",
+      "working_title": "Why the EU's renewable energy shares differ by use",
+      "question": "What do the EU27's 2024 overall, electricity, transport, and heating/cooling renewable shares each measure?",
+      "thesis": "The EU27's four reported renewable shares describe different energy uses and denominators; each can be compared with its own 2021 value, but the four shares cannot be added or averaged.",
+      "allowed_metric_ids": [
+        "renewable:2024:REN",
+        "renewable:2024:REN_ELC",
+        "renewable:2024:REN_TRA",
+        "renewable:2024:REN_HEAT_CL",
+        "renewable-change:2021-2024:REN",
+        "renewable-change:2021-2024:REN_ELC",
+        "renewable-change:2021-2024:REN_TRA",
+        "renewable-change:2021-2024:REN_HEAT_CL"
+      ],
+      "allowed_metric_prefixes": [],
+      "required_labels": [
+        "EU27_2020 aggregate only, annual shares, 2024 common year.",
+        "Each 2021–2024 change is within the same nrg_bal category and expressed in percentage points.",
+        "Eurostat's RED I/RED II change creates a break between 2020 and 2021."
+      ],
+      "blocked_claims": [
+        "These facts compare EU member countries or rank them.",
+        "The four shares have one denominator, can be summed, or establish one overall sector gap.",
+        "2020-to-2021 is an ordinary like-for-like change.",
+        "Provisional, incomplete 2025 values support the same four-category comparison."
+      ],
+      "draft_requirements": [
+        "Replace the original country-comparison format and title with the revised EU27 category explanation.",
+        "Label any Cite Supply presentation as a modification of Eurostat data and include Eurostat's required non-responsibility disclaimer.",
+        "Cite the dataset code, access date, source link, and methodology break."
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "decision": "approved_for_scoped_draft",
+      "format": "indicator_explainer",
+      "working_title": "What the EU's annual HICP inflation rate measures",
+      "question": "How should publishers read the EU27 annual-average HICP rate through 2025?",
+      "thesis": "The annual-average rate describes a change in a harmonised consumer-price index; the positive 2025 rate of 2.5% means the rate was 0.1 percentage points below 2024, not that prices fell.",
+      "allowed_metric_ids": ["hicp-rate-change:2024-2025"],
+      "allowed_metric_prefixes": ["hicp-rate:"],
+      "required_labels": [
+        "EU27_2020, annual frequency, unit RCH_A_AVG, COICOP 2018 TOTAL, 2018–2025 snapshot.",
+        "The 2024–2025 comparison is a change in the annual-average rate, not the index level.",
+        "HICP covers household final monetary consumption expenditure across the territory, not any single household's experience."
+      ],
+      "blocked_claims": [
+        "The data supports country or euro-area comparisons.",
+        "A slower positive inflation rate is a fall in the price level.",
+        "Adding the annual rates yields cumulative inflation.",
+        "The 2018–2025 series can be silently joined to 2026 data under the revised classification."
+      ],
+      "draft_requirements": [
+        "Use the revised EU27 question rather than the original cross-country premise.",
+        "Keep annual-average rates distinct from monthly and year-on-year monthly measures.",
+        "Label modifications to Eurostat data and include its non-responsibility disclaimer."
+      ]
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "decision": "approved_for_scoped_draft",
+      "format": "period_mean_comparison",
+      "working_title": "How burned area changed across four land-cover types in the World series",
+      "question": "How do the source's World burned-area estimates for 2002–2006 compare with 2021–2025 within four land-cover types?",
+      "thesis": "In each selected land-cover series, the 2021–2025 mean annual burned area is lower than the 2002–2006 mean in the reviewed source snapshot.",
+      "allowed_metric_ids": [],
+      "allowed_metric_prefixes": [
+        "wildfire-mean:",
+        "wildfire-mean-difference:",
+        "wildfire-relative-change:"
+      ],
+      "required_labels": [
+        "Source-provided World entity OWID_WRL; two five-year arithmetic means, not a two-year comparison.",
+        "Forest, savannas, shrublands/grasslands, and croplands remain separate categories.",
+        "Historical satellite detection can miss burned area and fires."
+      ],
+      "blocked_claims": [
+        "The four categories sum to total global burned area.",
+        "The figures count fires or measure severity, emissions, damages, or personal risk.",
+        "The source establishes why burned area changed or that every fire was detected.",
+        "World-only results support any country or regional comparison."
+      ],
+      "draft_requirements": [
+        "Show both five-year windows beside each comparison and prefer category-specific presentation.",
+        "Credit Global Wildfire Information System and Our World in Data; label transformations and limitations.",
+        "Do not imply this result is a universal decline in wildfire harm."
+      ]
+    },
+    {
+      "brief_id": "cb-005-embedding-reviewed-calculators",
+      "decision": "held_live_checks",
+      "format": "tool_supported_guide",
+      "working_title": "How to embed a reviewed calculator",
+      "question": "What should a publisher verify before embedding a creator-hosted calculator?",
+      "thesis": "A calculator needs separate checks for embedding, attribution, functionality, and factual data rights.",
+      "allowed_metric_ids": [],
+      "allowed_metric_prefixes": [],
+      "required_labels": [],
+      "blocked_claims": [
+        "A prepared checklist means a creator calculator was tested and verified."
+      ],
+      "draft_requirements": [
+        "Complete and record the live rights, route, embed-function, attribution, keyboard, and mobile checks before drafting."
+      ]
+    }
+  ],
+  "global_draft_conditions": [
+    "Drafts remain private, non-indexable, and absent from every sitemap.",
+    "Use only approved metric IDs or source fact IDs from the matched reviewed pack; never calculate new displayed numbers in prose.",
+    "Keep the revised thesis and method visible; every number, source date, and source citation must trace to a fact or source record.",
+    "Draft approval is not publication approval. Recheck exact asset availability, source freshness, and current asset-level reuse rights before any public launch."
+  ]
+}

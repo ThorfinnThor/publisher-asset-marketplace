@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "step": 15,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "minimum_substantive_words": 500,
+  "count_policy": "Count reader-facing prose, finding, method, and limitation block text; exclude headings, tables, metadata, links, citations, and legal or attribution boilerplate. Human quality review remains mandatory.",
+  "responsive_visual_qa": "not_completed_browser_policy_blocked_local_file_preview",
+  "decisions": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "draft_sha256": "3fa95379ac5bc01d0b1d0e4ef37ab805a2f2a9b9d021e8a59df0452075bd3799",
+      "substantive_words": 359,
+      "decision": "revise_private_only",
+      "required_work": [
+        "Reach at least 500 useful narrative words",
+        "Render the full article from pinned metric values",
+        "Complete permitted responsive and accessibility QA"
+      ]
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_sha256": "3689fe0e70f877fdfaba5409fe5239c839a0501fc62cea9532a2f4d5304052ae",
+      "substantive_words": 478,
+      "decision": "revise_private_only",
+      "required_work": [
+        "Reach at least 500 useful narrative words",
+        "Clarify separate transport and heating/cooling denominators from primary methodology",
+        "Keep citations adjacent to the definitions"
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_sha256": "0c3ba93e55f01cc49ef4ae485d5af3418a4ef2e2b539ce2969b550b2f0c3f3ca",
+      "substantive_words": 374,
+      "decision": "revise_private_only",
+      "required_work": [
+        "Reach at least 500 useful narrative words",
+        "Develop a source-backed reading path and purposeful visual",
+        "Keep annual-average rate and index level distinct"
+      ]
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "draft_sha256": "dc5b2b03afb56930c18febcc3d4f8074c1bde78ea2064c1c9aa46c418be6f38c",
+      "substantive_words": 293,
+      "decision": "hold_source_lineage_unresolved",
+      "required_work": [
+        "Confirm exact GWIS/OWID 2025 release and API lineage",
+        "Confirm asset-level reuse rights",
+        "Only then consider a distinctive 500-plus-word analysis"
+      ]
+    }
+  ],
+  "global_release_status": "blocked"
+}

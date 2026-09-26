@@ -1,6 +1,6 @@
 import { SITE_ORIGIN } from "@/lib/seo";
 
-const excludedPaths = ["/api/", "/e/", "/embed/"];
+const excludedPaths = ["/_editorial/", "/api/", "/e/", "/embed/"];
 
 export function GET(): Response {
   const rules = [

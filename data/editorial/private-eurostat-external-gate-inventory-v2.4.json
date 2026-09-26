@@ -1,0 +1,97 @@
+{
+  "schema_version": "2.4.0",
+  "step": 35,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-26T09:31:26Z",
+  "publication_effect": "none",
+  "production_data_effect": "none",
+  "deployment": "not_performed",
+  "supersedes": "data/editorial/private-eurostat-external-gate-inventory-v2.3.json",
+  "base_contract": {
+    "path": "data/editorial/private-eurostat-external-gate-inventory-v2.3.json",
+    "sha256": "ea1737a00db0f6fe65b9f8d61f9d7d96839995bda92b986aef0656800fc66441",
+    "inheritance": "All identity, rights, source-freshness, source-policy, authorization, indexing, and fail-closed rules remain unchanged unless this file explicitly overrides their Step-35 state or artifact hash."
+  },
+  "resolves_review": "data/editorial/private-eurostat-preview-implementation-review-step34.json",
+  "global_status": "blocked_pending_step_36_final_release_review",
+  "release_policy": "No article may be released until Step 36 independently accepts this browser-QA evidence, reruns the complete release suite, deploys, and verifies production.",
+  "private_article_preview_contract": {
+    "route": "https://citesupply.com/_editorial/preview/<brief-id>",
+    "current_route_status": "implemented_and_locally_browser_verified_not_deployed",
+    "gate_state": "pass_local_responsive_accessibility_link_and_security_header_qa",
+    "access_model": "authenticated D1-backed admin session; all anonymous, invalid, unknown, and encoded private-namespace requests fail as non-indexable 404 responses",
+    "verified_viewports": [
+      { "name": "smartphone", "width": 390, "height": 844 },
+      { "name": "tablet", "width": 768, "height": 1024 },
+      { "name": "small_desktop", "width": 1280, "height": 800 },
+      { "name": "large_desktop", "width": 1440, "height": 900 }
+    ],
+    "required_headers": {
+      "cache_control": "private, no-store",
+      "x_robots_tag": "noindex, nofollow, noarchive",
+      "referrer_policy": "no-referrer",
+      "x_frame_options": "DENY",
+      "content_security_policy": "default-src 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; frame-src 'none'; connect-src 'none'"
+    }
+  },
+  "step_35_amendments": [
+    {
+      "id": "S35-01",
+      "severity": "medium",
+      "finding": "At 390px the fixed-width chart and table increased the root document scroll width even though the figure itself was intended to be the horizontal scroll container.",
+      "resolution": "The rendered preview now constrains the root and body inline size, isolates the figure with inline-size containment, and preserves horizontal scrolling inside the figure. Root overflow is false at all eight article/viewport combinations."
+    },
+    {
+      "id": "S35-02",
+      "severity": "low",
+      "finding": "Figure title and subtitle rendered without visible separation.",
+      "resolution": "The figcaption is now a small grid with an explicit gap."
+    },
+    {
+      "id": "S35-03",
+      "severity": "medium",
+      "finding": "The mobile horizontal chart/table region was not in the keyboard tab order.",
+      "resolution": "Both figures now have tabindex=0, use the existing 3px focus indicator, and respond to horizontal arrow-key scrolling. Equivalent accessible tables and SVG descriptions remain present."
+    }
+  ],
+  "previews": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "article_asset_slug": "eurostat-nrg_ind_ren",
+      "rendered_preview_sha256": "09dfddbfc124b17f9de74e8b3e446c106a83b22662e20213a94806db006a754a",
+      "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+      "visible_browser_word_count": 901,
+      "gate_states": {
+        "live_asset_identity": "pass_from_step32_after_contract_correction",
+        "asset_level_rights": "pass_from_step32",
+        "source_freshness": "pass_from_step32",
+        "source_policy": "pass_from_step32",
+        "private_article_preview": "pass_from_step34_plus_step35_local_browser_qa",
+        "responsive_and_assistive_qa": "pass"
+      },
+      "release_decision": "blocked_pending_step_36"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "article_asset_slug": "eurostat-tec00118",
+      "rendered_preview_sha256": "bdb290abb4b04b27a0c1a4477702c74700b4aeaf9c24b0790bd0982f995c99af",
+      "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+      "visible_browser_word_count": 1007,
+      "gate_states": {
+        "live_asset_identity": "pass_from_step32_after_contract_correction",
+        "asset_level_rights": "pass_from_step32",
+        "source_freshness": "pass_from_step32",
+        "source_policy": "pass_from_step32",
+        "private_article_preview": "pass_from_step34_plus_step35_local_browser_qa",
+        "responsive_and_assistive_qa": "pass"
+      },
+      "release_decision": "blocked_pending_step_36"
+    }
+  ],
+  "evidence": "data/editorial/private-eurostat-preview-browser-qa-step35.json",
+  "next_step": {
+    "step": 36,
+    "workflow_role": "Sol",
+    "task": "Perform the final release review, rerun all required gates, deploy only if all remain green, and verify the real production routes and controls."
+  }
+}

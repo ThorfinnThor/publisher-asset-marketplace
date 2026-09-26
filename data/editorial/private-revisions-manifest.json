@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "step": 16,
+  "workflow_role": "Luna",
+  "reviewed_at": "2026-09-25T07:21:38Z",
+  "publication_effect": "none",
+  "indexable": false,
+  "public_route_created": false,
+  "sitemap_changed": false,
+  "minimum_substantive_words": 500,
+  "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+  "drafts": [
+    {
+      "brief_id": "cb-001-internet-adoption-gap",
+      "path": "content/editorial/drafts/internet-use-grew-at-different-speeds.json",
+      "sha256": "b4eb495fdc72bf940e44ab762637225b2382b899dc311c795c9defb407b818bf",
+      "substantive_words": 701,
+      "status": "private_revised_depth_pass"
+    },
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "path": "content/editorial/drafts/reading-eu-renewables-by-energy-use.json",
+      "sha256": "19645ca94519861185d65ee6ab54f0ec71ef0d8b2c52f392340d58fb630cad3e",
+      "substantive_words": 561,
+      "status": "private_revised_depth_pass"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "path": "content/editorial/drafts/what-eu-hicp-inflation-rate-means.json",
+      "sha256": "ac08c7e9aded1946b02e3dc5030a1bbd0a78470bc840a6b07363b1c190c18297",
+      "substantive_words": 686,
+      "status": "private_revised_depth_pass"
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "path": "content/editorial/drafts/world-burned-area-across-four-land-cover-types.json",
+      "sha256": "dc5b2b03afb56930c18febcc3d4f8074c1bde78ea2064c1c9aa46c418be6f38c",
+      "substantive_words": 293,
+      "status": "held_source_lineage_and_rights_unresolved"
+    }
+  ],
+  "internet_render": {
+    "script_path": "scripts/editorial/render-internet-preview.ts",
+    "path": "docs/editorial/previews/cb-001-internet-use-private-rendered.html",
+    "sha256": "aa684ddb8dfb2473d93f3f6424bc649b193bb706c67c98fa035ec18042ac80fb",
+    "bound_metric_ids": [
+      "internet-distribution-p25:2000-2024",
+      "internet-distribution-p50:2000-2024",
+      "internet-distribution-p75:2000-2024",
+      "coverage:paired_entity_count"
+    ],
+    "analysis_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+    "visual_browser_review": "pending"
+  },
+  "quality_gate_script": "scripts/editorial/check-draft-depth.ts",
+  "release_status": "private_sol_review_required"
+}

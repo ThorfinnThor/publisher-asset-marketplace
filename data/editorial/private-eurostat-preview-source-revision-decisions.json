@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "step": 22,
+  "workflow_role": "Luna",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "indexable": false,
+  "public_route_created": false,
+  "sitemap_changed": false,
+  "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+  "decisions": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_sha256": "297519e9b1e754432f5db6d1d4041730911d7c3244b91b8587d1095ddde6f4f8",
+      "preview_sha256": "15f5560b8617a0edb6349ec23f973f80811cec4fa5106261dfb66cdf55a6e1a9",
+      "substantive_words": 586,
+      "decision": "private_revision_ready_for_sol_review",
+      "changes": [
+        "Removed unsupported road-and-rail denominator and multiplier wording.",
+        "Kept only the 2024 Eurostat transport-note claims: all transport activities and qualifying renewable inputs.",
+        "Retained the practical limitation that RES-T is not a vehicle, trip, or distance share."
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_sha256": "dfd79de90f9e9f5336f6e3e4ff7543ab0f07d7af94edcddbeee14ccd590f13b1",
+      "preview_sha256": "7a1d1c17e842b9fdd178cf3bd2c94c46c9f326430fbbf10d6ff35722c2ffadce",
+      "substantive_words": 715,
+      "decision": "private_preview_rebound_with_explicit_adjacency",
+      "changes": [
+        "Added explicit block and citation identifiers to rendered method blocks.",
+        "Preserved the corrected chart domain, y-axis labels, point markers, value labels, and equivalent table."
+      ]
+    }
+  ],
+  "checker_changes": [
+    "Required block-to-citation pairs are now verified inside the exact editorial-block wrapper.",
+    "The checker still verifies private directives, approved metric IDs, chart-domain invariants, and preview hashes."
+  ],
+  "browser_visual_qa": "not_completed_no_permitted_browser_surface",
+  "global_release_status": "blocked_until_step_23_sol_review_and_rights_identity_checks"
+}

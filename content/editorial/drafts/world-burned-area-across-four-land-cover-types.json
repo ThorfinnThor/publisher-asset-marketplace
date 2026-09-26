@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0.0",
+  "slug": "world-burned-area-across-four-land-cover-types",
+  "status": "draft",
+  "indexable": false,
+  "language": "en",
+  "format": "period_mean_comparison",
+  "title": "World burned area by land cover: 2002–2006 versus 2021–2025",
+  "seo_title": "Burned Area by Land-Cover Type: Two Periods",
+  "seo_description": "Compare World burned-area estimates for 2002–2006 and 2021–2025 across four separate land-cover types, with source and detection limits explained.",
+  "dek": "The World series shows lower recent five-year means in each selected land-cover category. That pattern describes the source estimates; it does not explain causes or measure wildfire damage.",
+  "thesis": "In the reviewed World series, mean annual burned area is lower in the later five-year window than in the earlier window for each of four separate land-cover types.",
+  "metadata_claim_refs": [
+    "wildfire-mean-difference:forest:early-v-recent",
+    "wildfire-mean-difference:savannas:early-v-recent",
+    "wildfire-mean-difference:shrublands_grasslands:early-v-recent",
+    "wildfire-mean-difference:croplands:early-v-recent"
+  ],
+  "date_created": "2026-09-24T21:06:33.000Z",
+  "date_modified": "2026-09-24T21:18:00.000Z",
+  "date_published": null,
+  "brief_id": "cb-004-wildfire-land-cover",
+  "fact_pack_id": "cb-004-wildfire-land-cover",
+  "fact_pack_sha256": "818fa035ee25753e559c740436b33583114c9ca353d11c07eaf154a38a1a57f9",
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "draft_decisions_sha256": "1a30a3e7a4d95d9c102c43ed5cd0db232aa61260c2c30539489e611565440912",
+  "asset_slugs": ["area-burned-wildfires-by-type"],
+  "citations": [
+    {
+      "id": "owid-wildfire-chart",
+      "title": "Area burned by wildfires by type",
+      "publisher": "Our World in Data; source data from Global Wildfire Information System",
+      "url": "https://ourworldindata.org/grapher/area-burned-wildfires-by-type",
+      "accessed_at": "2026-09-23T10:26:00.000Z"
+    },
+    {
+      "id": "gwis-license",
+      "title": "Global Wildfire Information System data licence",
+      "publisher": "Global Wildfire Information System, European Commission Joint Research Centre",
+      "url": "https://gwis.jrc.ec.europa.eu/about-gwis/data-license",
+      "accessed_at": "2026-09-23T10:26:00.000Z"
+    },
+    {
+      "id": "gwis-burnt-areas-method",
+      "title": "Burnt Areas technical background",
+      "publisher": "Global Wildfire Information System, European Commission Joint Research Centre",
+      "url": "https://gwis.jrc.ec.europa.eu/about-gwis/technical-background/burnt-areas",
+      "accessed_at": "2026-09-24T21:16:00.000Z"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "opening",
+      "type": "prose",
+      "text": "A single global burned-area line can hide what is being counted. The source separates burned area across land-cover types, and those series should remain distinct when read. We compare 2002–2006 with 2021–2025 for the source-provided World entity, using a five-year mean for each category. The result is neither a total of all land nor a count of individual fires.",
+      "claim_refs": [
+        "wildfire-mean:forest:early_2002_2006",
+        "wildfire-mean:forest:recent_2021_2025"
+      ]
+    },
+    {
+      "id": "summary-finding",
+      "type": "finding",
+      "heading": "The later mean is lower in each selected category",
+      "text": "Each selected land-cover series has a lower mean in 2021–2025 than in 2002–2006. Forest is one concrete example: mean annual burned area was 32.5 million hectares in the earlier window and 27.9 million in the later one. The other categories also declined in the reviewed extract, but the comparison does not establish why.",
+      "claim_refs": [
+        "wildfire-mean:forest:early_2002_2006",
+        "wildfire-mean:forest:recent_2021_2025",
+        "wildfire-mean-difference:forest:early-v-recent",
+        "wildfire-mean-difference:savannas:early-v-recent",
+        "wildfire-mean-difference:shrublands_grasslands:early-v-recent",
+        "wildfire-mean-difference:croplands:early-v-recent"
+      ]
+    },
+    {
+      "id": "period-table",
+      "type": "data_table",
+      "heading": "Separate series, separate comparisons",
+      "caption": "Mean annual area burned for 2002–2006 and 2021–2025; the source values are in hectares and the categories are not added together.",
+      "columns": ["Land-cover type", "Earlier-window mean", "Later-window mean", "Difference"],
+      "rows": [
+        {
+          "label": "Forest",
+          "metric_refs": [
+            "wildfire-mean:forest:early_2002_2006",
+            "wildfire-mean:forest:recent_2021_2025",
+            "wildfire-mean-difference:forest:early-v-recent"
+          ]
+        },
+        {
+          "label": "Savannas",
+          "metric_refs": [
+            "wildfire-mean:savannas:early_2002_2006",
+            "wildfire-mean:savannas:recent_2021_2025",
+            "wildfire-mean-difference:savannas:early-v-recent"
+          ]
+        },
+        {
+          "label": "Shrublands and grasslands",
+          "metric_refs": [
+            "wildfire-mean:shrublands_grasslands:early_2002_2006",
+            "wildfire-mean:shrublands_grasslands:recent_2021_2025",
+            "wildfire-mean-difference:shrublands_grasslands:early-v-recent"
+          ]
+        },
+        {
+          "label": "Croplands",
+          "metric_refs": [
+            "wildfire-mean:croplands:early_2002_2006",
+            "wildfire-mean:croplands:recent_2021_2025",
+            "wildfire-mean-difference:croplands:early-v-recent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "why-category-boundaries-matter",
+      "type": "prose",
+      "text": "The rows answer a narrow question: how does each source-defined category compare with itself across the selected windows? They are not components that can safely be summed into a global total. Nor does hectares burned say how many fires occurred, how severe they were, how much carbon they emitted, or what damage people experienced.",
+      "claim_refs": ["wildfire-mean:forest:early_2002_2006"]
+    },
+    {
+      "id": "methodology",
+      "type": "method",
+      "heading": "How to read the period means",
+      "text": "Each value is the arithmetic mean of annual source observations within the 2002–2006 or 2021–2025 window for the OWID_WRL World entity and one land-cover series. The displayed difference is the later mean minus the earlier mean. Our World in Data presents the Global Wildfire Information System data; the table makes a separate calculation for each category and does not calculate a global category total.",
+      "claim_refs": [
+        "wildfire-mean:forest:early_2002_2006",
+        "wildfire-mean:forest:recent_2021_2025",
+        "wildfire-mean-difference:forest:early-v-recent"
+      ]
+    },
+    {
+      "id": "limitations",
+      "type": "limitation",
+      "heading": "Detection and interpretation limits",
+      "text": "The source notes that satellite detection can miss burned area and fire occurrence, particularly in historical observations. Changes in observed area can reflect measurement and detection limits as well as real conditions. This comparison does not establish a universal decline in wildfire risk or harm and gives no explanation for changes in the estimates."
+    },
+    {
+      "id": "attribution",
+      "type": "prose",
+      "text": "Source data are attributed to the Global Wildfire Information System and presented through Our World in Data. The figures and period means are a customised presentation; consult the linked licence and source chart for the data terms, attribution details, and context."
+    },
+    {
+      "id": "asset-context",
+      "type": "asset_link",
+      "asset_slug": "area-burned-wildfires-by-type",
+      "label": "Explore the source chart",
+      "context": "Open the reviewed chart to inspect the source series, notes, and full time coverage.",
+      "claim_refs": []
+    }
+  ],
+  "creator_guide_included": false
+}

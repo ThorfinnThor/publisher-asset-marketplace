@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0.0",
+  "step": 24,
+  "workflow_role": "Luna",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "read_only": true,
+  "public_route_created": false,
+  "sitemap_changed": false,
+  "global_status": "blocked_pending_external_gates",
+  "shared_gates": {
+    "live_asset_identity": {
+      "state": "not_run",
+      "required_evidence": [
+        "Resolve the exact published Cite Supply asset slug and persistent database identity from the live search/detail response.",
+        "Confirm the asset is published, not pending or deleted, and that its source dataset/indicator matches the article's declared input.",
+        "Record the canonical asset URL, resolved identifier, observed status, and checked timestamp."
+      ],
+      "permitted_read_path": "Production search and asset detail pages over HTTPS; no direct database mutation.",
+      "fail_closed_if": [
+        "asset is absent, duplicated, pending, deleted, or points to a different dataset",
+        "the live record cannot be tied to the pinned metric IDs"
+      ]
+    },
+    "asset_level_rights": {
+      "state": "not_run",
+      "required_evidence": [
+        "Re-read the live rights panel for the exact resolved asset.",
+        "Capture current commercial-use, modification, marketplace-rendered-embed, citation, and raw-data-redistribution states.",
+        "Re-open the source licence/evidence URL and record its current response status and checksum.",
+        "Confirm that the article's modified presentation and attribution wording fit the current source terms."
+      ],
+      "current_inventory_warning": "The fact-pack rights fields are reviewed candidate evidence, not a live grant.",
+      "permitted_read_path": "Live Cite Supply asset page plus the linked official Eurostat reuse notice and dataset page.",
+      "fail_closed_if": [
+        "any required right is unknown, restricted, revoked, or inconsistent with the article",
+        "the source notice has an exception that has not been resolved for the proposed use"
+      ]
+    },
+    "source_freshness": {
+      "state": "not_run",
+      "required_evidence": [
+        "Re-fetch the complete scoped Eurostat API response for the approved dimensions.",
+        "Record response status, retrieval time, source update timestamp, response checksum, and status flags.",
+        "Compare the live observations with the pinned metric IDs and block release if the selected values, dimensions, or methodology changed.",
+        "For HICP, re-check the annual-average unit, EU27_2020 geography, TOTAL classification, and latest available year."
+      ],
+      "permitted_read_path": "Official Eurostat API, dataset page, metadata, and reporting-year methodology pages over HTTPS.",
+      "fail_closed_if": [
+        "the response cannot be fetched or verified",
+        "a value, dimension, status flag, classification, or methodology differs without a reviewed revision",
+        "the pinned extract is older than the release freshness policy permits"
+      ]
+    },
+    "responsive_and_assistive_qa": {
+      "state": "not_run",
+      "required_evidence": [
+        "Use a permitted HTTPS production URL for the resolved asset or an explicitly approved staging URL; do not open local files or start a local server as a workaround.",
+        "Test smartphone 390x844, tablet 768x1024, small desktop 1280x800, and large desktop 1440x900.",
+        "Check chart/table equivalence, no horizontal overflow outside intentional table scrolling, readable labels, focus order, keyboard activation, heading order, accessible SVG names, and source-link announcements.",
+        "Record console errors, failed network requests, screenshots, and the URL plus viewport for each run."
+      ],
+      "permitted_read_path": "Browser QA skill against an approved HTTPS route after live asset identity is resolved.",
+      "fail_closed_if": [
+        "there is no permitted browser URL",
+        "the chart is not understandable with the equivalent table or keyboard/screen-reader navigation",
+        "the production route differs from the reviewed private rendering"
+      ]
+    }
+  },
+  "previews": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "article_asset_slug": "eurostat-nrg_ind_ren",
+      "pinned_canonical_url": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+      "asset_id": null,
+      "asset_id_resolution": "public_route_only",
+      "draft_sha256": "297519e9b1e754432f5db6d1d4041730911d7c3244b91b8587d1095ddde6f4f8",
+      "preview_sha256": "15f5560b8617a0edb6349ec23f973f80811cec4fa5106261dfb66cdf55a6e1a9",
+      "source_dataset": "nrg_ind_ren",
+      "source_evidence_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+      "rights_evidence_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "methodology_urls": [
+        "https://ec.europa.eu/eurostat/cache/metadata/en/nrg_ind_share_esmsip2.htm",
+        "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260121-1",
+        "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260126-1"
+      ],
+      "gate_states": {
+        "live_asset_identity": "not_run",
+        "asset_level_rights": "not_run",
+        "source_freshness": "not_run",
+        "responsive_and_assistive_qa": "not_run"
+      },
+      "release_decision": "blocked"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "article_asset_slug": "eurostat-tec00118",
+      "pinned_canonical_url": "https://citesupply.com/asset/eurostat-tec00118",
+      "asset_id": null,
+      "asset_id_resolution": "public_route_only",
+      "draft_sha256": "dfd79de90f9e9f5336f6e3e4ff7543ab0f07d7af94edcddbeee14ccd590f13b1",
+      "preview_sha256": "7a1d1c17e842b9fdd178cf3bd2c94c46c9f326430fbbf10d6ff35722c2ffadce",
+      "source_dataset": "tec00118 / PRC_HICP_AINR",
+      "source_evidence_url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "rights_evidence_url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "methodology_urls": [
+        "https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm",
+        "https://ec.europa.eu/eurostat/databrowser-backend/api/public/explanatory-notes/get/Info_note_HICP_COICOP18_20260128.pdf"
+      ],
+      "gate_states": {
+        "live_asset_identity": "not_run",
+        "asset_level_rights": "not_run",
+        "source_freshness": "not_run",
+        "responsive_and_assistive_qa": "not_run"
+      },
+      "release_decision": "blocked"
+    }
+  ],
+  "next_step": {
+    "step": 25,
+    "workflow_role": "Sol",
+    "task": "Independently review this inventory for completeness and reject any gate that lacks a reproducible HTTPS evidence path."
+  }
+}

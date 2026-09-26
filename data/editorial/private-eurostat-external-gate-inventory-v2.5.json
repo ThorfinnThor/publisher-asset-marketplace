@@ -1,0 +1,75 @@
+{
+  "schema_version": "2.5.0",
+  "step": 36,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-26",
+  "publication_effect": "private_admin_preview_only",
+  "production_data_effect": "none",
+  "deployment": "pending_after_commit",
+  "indexable": false,
+  "sitemap_changed": false,
+  "supersedes": "data/editorial/private-eurostat-external-gate-inventory-v2.4.json",
+  "base_contract": {
+    "path": "data/editorial/private-eurostat-external-gate-inventory-v2.4.json",
+    "sha256": "86b86fd245cc28e0d99356c87485bb7208d2e2114e6fb0d980eb8adbc7c3f218",
+    "inheritance": "All identity, rights, source-freshness, source-policy, authorization, indexing, and fail-closed rules remain unchanged unless this file explicitly records a refreshed evidence hash."
+  },
+  "reviewed_evidence": {
+    "step_32_external_gate_results": {
+      "path": "data/editorial/private-eurostat-external-gate-results-step32.json",
+      "sha256": "2d5c814c7c3cc0de99da64f8f5dea05ce4b5edc466b89df7af340d668e4bb39f"
+    },
+    "step_34_implementation_review": {
+      "path": "data/editorial/private-eurostat-preview-implementation-review-step34.json",
+      "sha256": "f29d4999226505275a327628dd7fe5fe3d3a348e9fe41e77bfb2a3a758daa13d"
+    },
+    "step_35_browser_qa": {
+      "path": "data/editorial/private-eurostat-preview-browser-qa-step35.json",
+      "sha256": "2b3f8b18cf7b76e54faa355e4fb8799a892d97f6029f5c05a68b8e5794cc869b"
+    }
+  },
+  "step_36_evidence_refresh": {
+    "reason": "A final reproducibility run refreshed upstream retrieval metadata. The derived Eurostat values, article claims, layout, rights contract, and route behavior did not change.",
+    "fact_pack_generation_status_sha256": "afcb7b2f332712def197eb8ad0d0a08376d5590c0b4a9673d951f385af731635",
+    "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+    "draft_decisions_sha256": "1a30a3e7a4d95d9c102c43ed5cd0db232aa61260c2c30539489e611565440912",
+    "fact_pack_sha256": {
+      "cb-001-internet-adoption-gap": "18caf49193eb48eb76ef06be0df5d4a87ebefd23e9fd160d00ac6f559861c116",
+      "cb-002-eu-renewable-share-patterns": "ba03848c94751576ee31b3ebebf38532a6eaa65ac22402623fa64eda3ca90345",
+      "cb-003-hicp-inflation-explainer": "7dfa0c81be45158c20d1041a74761ca7a60c5f1088eeb6807c83910bf60f9ad6",
+      "cb-004-wildfire-land-cover": "818fa035ee25753e559c740436b33583114c9ca353d11c07eaf154a38a1a57f9"
+    }
+  },
+  "previews": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "article_asset_slug": "eurostat-nrg_ind_ren",
+      "draft_sha256": "da4a0e4489ca13877d61081f9b77caec724a95442497c7a524960919e8efaff4",
+      "rendered_preview_sha256": "9c405aff27dfa7c8b1f7fb3ef5c3c50d450781a6ed910070739fed972a211323",
+      "release_decision": "approved_for_protected_preview_deployment"
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "article_asset_slug": "eurostat-tec00118",
+      "draft_sha256": "ea0eb4b65f7e64d2927f7b6ff175b6e1ea940f3c24750ecc557675c639a3d2ce",
+      "rendered_preview_sha256": "8e4585c6a4536ee61f2eb8cec484048fb11df27662695b5a08dbc1ca74a2694d",
+      "release_decision": "approved_for_protected_preview_deployment"
+    }
+  ],
+  "final_predeployment_gates": {
+    "external_eurostat_http_and_tls": "pass",
+    "pinned_dataset_hashes": "pass",
+    "reuse_policy_phrases": "pass",
+    "draft_schema_and_depth": "pass",
+    "static_preview_integrity": "pass",
+    "full_check": "pass_67_files_372_tests_and_production_build",
+    "wrangler_dry_run": "pass",
+    "local_submission_e2e": "pass",
+    "local_url_scan_conversion_e2e": "pass",
+    "browser_e2e": "deferred_to_linux_ci_because_macos_sandbox_prevented_headless_chrome_debug_target",
+    "secret_scan": "pass",
+    "diff_check": "pass_for_authored_source_config_tests_and_non_evidence_artifacts; immutable upstream captures and intentional Markdown hard breaks excluded"
+  },
+  "global_status": "approved_for_protected_preview_deployment",
+  "release_policy": "Only the authenticated, noindex admin previews may deploy. Public article publication, sitemap inclusion, navigation links, and production asset or rights mutations remain prohibited."
+}

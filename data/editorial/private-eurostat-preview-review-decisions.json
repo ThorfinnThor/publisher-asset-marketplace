@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0",
+  "step": 19,
+  "workflow_role": "Sol",
+  "reviewed_at": "2026-09-25",
+  "publication_effect": "none",
+  "analysis_results_sha256": "be9a848d8eaef59ff605ddc16e04a82010e755b0f83c78803790854aa466b991",
+  "responsive_visual_qa": "not_completed_no_permitted_browser_url_for_private_local_files",
+  "assistive_technology_qa": "not_completed_no_permitted_browser_surface",
+  "decisions": [
+    {
+      "brief_id": "cb-002-eu-renewable-share-patterns",
+      "draft_sha256": "f42112eff785b87d55cc1fbe89034cafc10436cc825d77828998c3e4a5cf292c",
+      "preview_sha256": "3ca61e224bb287413cdfb78ad4ecbddc67d418ab45e7d2da22544096ea4873e1",
+      "decision": "private_preview_revision_required",
+      "findings": [
+        "The adjacent transport citation points to the 20 November 2023 consolidated directive, while the paragraph describes the earlier RED II Article 27 road-and-rail denominator used for the 2021-2024 series; cite a reporting-year-applicable official text instead.",
+        "The combined transport and heating/cooling paragraph renders only the directive citation; the heating/cooling examples and heat-pump double-counting rule need the 2024 Eurostat heating/cooling source directly adjacent.",
+        "Static structure passes, but actual responsive and assistive-technology behaviour remains untested."
+      ]
+    },
+    {
+      "brief_id": "cb-003-hicp-inflation-explainer",
+      "draft_sha256": "538d5e9fba6fc40d90fe80a1daa0b61eef6c6a0b2a0d781161f6095dac5abfcf",
+      "preview_sha256": "1d4ce754d1115941f254ac819c6a6e52b9133c595d611eb54f1ce84f0dae7416",
+      "decision": "private_preview_revision_required",
+      "findings": [
+        "The line chart's final 2025 point is at x=686 while the x-axis and grid stop at x=650, so the visual domain is internally inconsistent.",
+        "The chart has no plotted value labels or y-axis tick values; the table preserves exact values, but the chart itself is not yet a sufficiently self-explanatory reading path.",
+        "The classification paragraph should cite Eurostat's dataset mapping note directly alongside the general HICP metadata because it names PRC_HICP_AINR and the version-2 mapping.",
+        "Static structure passes, but actual responsive and assistive-technology behaviour remains untested."
+      ]
+    },
+    {
+      "brief_id": "cb-004-wildfire-land-cover",
+      "draft_sha256": "dc5b2b03afb56930c18febcc3d4f8074c1bde78ea2064c1c9aa46c418be6f38c",
+      "decision": "hold_source_lineage_and_rights_unresolved",
+      "findings": [
+        "No new evidence resolves the GWIS/OWID 2025 source-lineage discrepancy or asset-level rights."
+      ]
+    }
+  ],
+  "global_release_status": "blocked"
+}

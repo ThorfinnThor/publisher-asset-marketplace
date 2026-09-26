@@ -8,3 +8,7 @@ worker-configuration.d.ts
 package-lock.json
 3000_reusable_embed_assets_master.xlsx
 publisher_asset_marketplace_implementation_plan.md
+
+# Immutable upstream evidence and generated, hash-bound editorial previews.
+data/editorial/source-snapshots/
+docs/editorial/previews/
