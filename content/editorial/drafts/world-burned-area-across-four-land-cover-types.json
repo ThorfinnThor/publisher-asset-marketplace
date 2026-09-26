@@ -131,6 +131,29 @@
       ]
     },
     {
+      "id": "why-period-means",
+      "type": "method",
+      "heading": "Why compare multi-year windows",
+      "text": "Burned area can move sharply from one season to the next. Comparing multi-year means reduces the influence of any single unusually high or low annual observation, but it does not turn the result into a trend model. Every annual observation in a window receives equal weight. The comparison does not adjust for changes in climate, vegetation, land management, population, suppression capacity, or satellite performance. It is a descriptive summary of two selected parts of the source series and should be read alongside the full chart rather than as a forecast.",
+      "claim_refs": [
+        "wildfire-mean:forest:early_2002_2006",
+        "wildfire-mean:forest:recent_2021_2025"
+      ]
+    },
+    {
+      "id": "what-land-cover-means",
+      "type": "prose",
+      "text": "Land-cover categories describe the type of surface associated with the detected burned area. They do not classify the ignition source, the legal status of the event, or whether a burn was planned. A lower estimate in one category can coexist with severe fire seasons in particular places, and a worldwide mean can conceal large regional differences. The source chart is therefore useful for comparing its global categories over time, but not for evaluating a local hazard, estimating insured losses, or judging the ecological consequences of a specific event.",
+      "claim_refs": []
+    },
+    {
+      "id": "source-version-note",
+      "type": "limitation",
+      "heading": "A source-version caveat for the newest observations",
+      "text": "The reviewed Our World in Data extract identifies the Global Wildfire Information System as its source and contains observations through the end of the later window used here. The separate GWIS public technical page still describes an earlier coverage endpoint. Because those public pages are not synchronized, the newest observations should be understood as values in the reviewed OWID-distributed, GWIS-labelled extract—not as a release that Cite Supply independently matched to a current GWIS publication page. This distinction matters for provenance even though it does not change the arithmetic shown in the table.",
+      "claim_refs": ["wildfire-mean:forest:recent_2021_2025"]
+    },
+    {
       "id": "limitations",
       "type": "limitation",
       "heading": "Detection and interpretation limits",

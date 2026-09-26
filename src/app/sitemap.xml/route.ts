@@ -1,7 +1,8 @@
 import { getDatabase } from "@/lib/db/client";
+import { PUBLIC_EDITORIAL_ARTICLES } from "@/lib/editorial/public-articles";
 
 const SITE_ORIGIN = "https://citesupply.com";
-const staticPaths = ["/", "/creator/guide"];
+const staticPaths = ["/", "/creator/guide", "/insights"];
 
 type SitemapRow = {
   slug: string;
@@ -22,6 +23,12 @@ export async function GET(): Promise<Response> {
 
   const entries = [
     ...staticPaths.map((path) => sitemapEntry(new URL(path, SITE_ORIGIN).toString(), null)),
+    ...PUBLIC_EDITORIAL_ARTICLES.map((article) =>
+      sitemapEntry(
+        new URL(`/insights/${article.draft.slug}`, SITE_ORIGIN).toString(),
+        article.dateModified,
+      ),
+    ),
     ...result.results.map((asset) =>
       sitemapEntry(
         new URL(`/asset/${encodeURIComponent(asset.slug)}`, SITE_ORIGIN).toString(),
