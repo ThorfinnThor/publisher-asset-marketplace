@@ -2,7 +2,7 @@ import { getDatabase } from "@/lib/db/client";
 import { PUBLIC_EDITORIAL_ARTICLES } from "@/lib/editorial/public-articles";
 
 const SITE_ORIGIN = "https://citesupply.com";
-const staticPaths = ["/", "/creator/guide", "/insights"];
+const staticPaths = ["/", "/creator/guide", "/insights", "/topics"];
 
 type SitemapRow = {
   slug: string;

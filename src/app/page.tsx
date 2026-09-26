@@ -157,7 +157,7 @@ export default async function HomePage() {
         title="Find it. Check it. Publish it."
       />
 
-      <section className="featured-section" id="topics">
+      <section className="featured-section">
         <div className="page-shell">
           <div className="section-header">
             <div>

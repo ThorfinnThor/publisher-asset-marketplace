@@ -17,11 +17,12 @@ describe("selective sitemap", () => {
     mocks.all.mockResolvedValue({ results: [] });
   });
 
-  it("includes the insights hub and all four approved articles", async () => {
+  it("includes the public hubs and all four approved articles", async () => {
     const response = await GET();
     const xml = await response.text();
     expect(response.headers.get("content-type")).toContain("application/xml");
     expect(xml).toContain("<loc>https://citesupply.com/insights</loc>");
+    expect(xml).toContain("<loc>https://citesupply.com/topics</loc>");
     for (const article of PUBLIC_EDITORIAL_ARTICLES) {
       expect(xml).toContain(`<loc>https://citesupply.com/insights/${article.draft.slug}</loc>`);
     }

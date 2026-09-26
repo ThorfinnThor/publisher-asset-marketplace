@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ArrowUpRightIcon } from "@/components/design-system";
-import {
-  PUBLIC_EDITORIAL_ARTICLES,
-  editorialArticleWordCount,
-} from "@/lib/editorial/public-articles";
+import { PUBLIC_EDITORIAL_ARTICLES } from "@/lib/editorial/public-articles";
 
 export const metadata: Metadata = {
   title: "Data insights",
@@ -41,7 +38,6 @@ export default function InsightsPage() {
               Four evidence-led reads
             </h2>
           </div>
-          <p>Each article is independently structured and contains at least 500 words.</p>
         </div>
 
         <div className="insight-grid">
@@ -49,9 +45,6 @@ export default function InsightsPage() {
             <article className="insight-card" key={article.draft.slug}>
               <div className="insight-card__meta">
                 <span>{article.section}</span>
-                <span>
-                  {editorialArticleWordCount(article.draft).toLocaleString("en-US")} words
-                </span>
               </div>
               <h3>
                 <Link href={`/insights/${article.draft.slug}`}>{article.draft.title}</Link>

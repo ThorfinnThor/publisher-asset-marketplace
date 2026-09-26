@@ -70,7 +70,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             <nav aria-label="Primary" className="site-nav">
               <Link href="/search">Browse</Link>
               <Link href="/insights">Insights</Link>
-              <Link href="/#topics">Topics</Link>
+              <Link href="/topics">Topics</Link>
               <Link href="/#publishers">For publishers</Link>
               <Link href="/#for-creators">For creators</Link>
               <Link href="/creator/guide">Creator guide</Link>
@@ -107,6 +107,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             <nav aria-label="Footer">
               <Link href="/search">Browse</Link>
               <Link href="/insights">Insights</Link>
+              <Link href="/topics">Topics</Link>
               <Link href="/submit">Publish</Link>
               <Link href="/creator/guide">Creator guide</Link>
               <Link href="/creator/terms">Creator terms</Link>
