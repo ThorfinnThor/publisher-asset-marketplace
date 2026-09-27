@@ -23,6 +23,9 @@ describe("production security headers", () => {
     expect(response.headers.get("x-content-type-options")).toBe("nosniff");
     expect(response.headers.get("x-frame-options")).toBe("DENY");
     expect(response.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
+    expect(response.headers.get("content-security-policy")).toContain(
+      "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
+    );
     expect(response.headers.get("strict-transport-security")).toContain("max-age=31536000");
     expect(await response.text()).toBe("ok");
   });
@@ -34,6 +37,9 @@ describe("production security headers", () => {
     expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("content-security-policy")).toContain("frame-ancestors *");
     expect(response.headers.get("content-security-policy")).toContain("script-src 'none'");
+    expect(response.headers.get("content-security-policy")).not.toContain(
+      "static.cloudflareinsights.com",
+    );
   });
 
   it("allows public submission previews to render across the legacy and custom domains", () => {

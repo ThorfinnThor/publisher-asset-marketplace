@@ -65,7 +65,36 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="3. Accounts and sign-in">
+          <PrivacySection title="3. Cloudflare Web Analytics">
+            <p>
+              Cite Supply uses Cloudflare Web Analytics, including Real User Measurements (RUM), to
+              understand how public pages are used and how they perform in visitors&apos; browsers.
+              The Cloudflare beacon can process the requested hostname and path, referring hostname,
+              country, browser, operating system, device type, navigation type, page-load timings,
+              and Core Web Vitals. Cloudflare Web Analytics does not record URL query strings.
+            </p>
+            <p>
+              The beacon does not set analytics cookies and Cite Supply does not use a persistent
+              browser identifier for this measurement. The information is used for aggregate traffic
+              and performance analysis, troubleshooting, and improving the service—not for
+              cross-site advertising or user profiling. Cloudflare describes Web Analytics as a
+              privacy-first service that does not collect or use visitors&apos; personal data.
+            </p>
+            <p>
+              The legal basis is Article 6(1)(f) GDPR: our legitimate interest in measuring whether
+              the public service is used, detecting technical problems, and improving page
+              performance. Cloudflare processes the measurements as our service provider and makes
+              Web Analytics data available in the dashboard for up to six months. The beacon may not
+              run when it is blocked by a browser, extension, or network setting. See the official{" "}
+              <a href="https://developers.cloudflare.com/web-analytics/">
+                Cloudflare Web Analytics documentation
+              </a>{" "}
+              and Cloudflare&apos;s{" "}
+              <a href="https://www.cloudflare.com/privacypolicy/">Privacy Policy</a>.
+            </p>
+          </PrivacySection>
+
+          <PrivacySection title="4. Accounts and sign-in">
             <p>
               Creator accounts can use GitHub or Google OAuth. When you choose a provider, you are
               redirected to that provider and it learns that you are attempting to sign in to Cite
@@ -90,7 +119,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="4. Search, asset actions, and embed measurements">
+          <PrivacySection title="5. Search, asset actions, and embed measurements">
             <p>
               To improve search quality and show creators useful demand signals, we record search
               wording, normalized search wording, result counts, displayed asset identifiers and
@@ -113,7 +142,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="5. Submissions, scans, and preview images">
+          <PrivacySection title="6. Submissions, scans, and preview images">
             <p>
               When you submit an asset, we process the canonical, embed, attribution, and preview
               URLs; title and description; source identity; rights declarations; Creator Terms
@@ -130,7 +159,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="6. Source previews, embeds, and external links">
+          <PrivacySection title="7. Source previews, embeds, and external links">
             <p>
               Some preview images and embeds are delivered directly by the named data source or the
               creator&apos;s approved host. Loading that content sends a request to the external
@@ -146,7 +175,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="7. Email and reports">
+          <PrivacySection title="8. Email and reports">
             <p>
               Messages sent to {publicContactEmail} are processed with the sender address, message,
               attachments, and related correspondence to answer the request, handle a rights notice,
@@ -160,13 +189,14 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="8. Cookies and browser storage">
+          <PrivacySection title="9. Cookies and browser storage">
             <p>
-              Public browsing does not use Cite Supply advertising cookies or persist an analytics
-              identifier in browser storage. Necessary authentication cookies are set only when you
-              start or use sign-in, account linking, or the creator dashboard. Because these cookies
-              provide an expressly requested security and account function, they are treated as
-              strictly necessary under Section 25(2) TDDDG.
+              Public browsing does not use Cite Supply advertising cookies. Cloudflare Web Analytics
+              does not set analytics cookies or persist an analytics identifier in browser storage.
+              Necessary authentication cookies are set only when you start or use sign-in, account
+              linking, or the creator dashboard. Because these cookies provide an expressly
+              requested security and account function, they are treated as strictly necessary under
+              Section 25(2) TDDDG.
             </p>
             <p>
               If future features require non-essential cookies or comparable device storage, they
@@ -174,7 +204,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="9. Recipients and international transfers">
+          <PrivacySection title="10. Recipients and international transfers">
             <p>
               Data is disclosed only where needed to operate the service, comply with law, or
               protect legal rights. Relevant recipients can include Cloudflare and its
@@ -189,7 +219,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="10. Retention">
+          <PrivacySection title="11. Retention">
             <ul>
               <li>Authentication sessions expire after no more than 30 days.</li>
               <li>
@@ -208,13 +238,16 @@ export default function PrivacyPage() {
                 troubleshooting, and abuse prevention, then deleted or aggregated.
               </li>
               <li>
+                Cloudflare Web Analytics data is available through the service for up to six months.
+              </li>
+              <li>
                 Correspondence is retained until the request is resolved and longer only where legal
                 claims or statutory duties require it.
               </li>
             </ul>
           </PrivacySection>
 
-          <PrivacySection title="11. Your rights">
+          <PrivacySection title="12. Your rights">
             <p>
               Subject to the GDPR&apos;s conditions, you can request access, correction, deletion,
               restriction, data portability, and information about recipients. You can object to
@@ -232,10 +265,10 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="12. Changes">
+          <PrivacySection title="13. Changes">
             <p>
               We update this policy when the service, providers, or legal requirements change. The
-              current version is published here. Last updated: 22 September 2026.
+              current version is published here. Last updated: 27 September 2026.
             </p>
           </PrivacySection>
         </article>
