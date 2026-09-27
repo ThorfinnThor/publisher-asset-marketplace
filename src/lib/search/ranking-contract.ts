@@ -12,6 +12,7 @@ export type SearchRequest = {
   query: string;
   filters?: SearchFilters;
   limit?: number;
+  offset?: number;
   cursor?: string;
 };
 
@@ -27,6 +28,7 @@ export const searchRankingV1 = {
   default_limit: 24,
   maximum_limit: 50,
   primary_candidate_limit: 100,
+  maximum_candidate_limit: 500,
   fallback_result_threshold: 3,
   query: {
     maximum_characters: 120,

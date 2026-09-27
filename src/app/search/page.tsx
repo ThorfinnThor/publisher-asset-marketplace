@@ -105,8 +105,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </p>
             </div>
             <span className="result-count">
-              {loaded.results.length} {loaded.results.length === 1 ? "result" : "results"}
-              {loaded.nextCursor ? " shown" : ""}
+              Page {parsed.page} · {loaded.results.length}{" "}
+              {loaded.results.length === 1 ? "result" : "results"}
             </span>
           </div>
 
@@ -155,15 +155,55 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <SearchResultCard key={result.asset.id} result={result} />
             ))}
           </div>
-          {loaded.nextCursor ? (
-            <div className="search-results__pagination">
-              <Link
-                className="button button--secondary"
-                href={nextPageHref(parsed, loaded.nextCursor)}
-              >
-                Next results
-              </Link>
-            </div>
+          {!loaded.unavailable &&
+          shouldLoadResults &&
+          loaded.results.length > 0 &&
+          (parsed.page > 1 || loaded.nextCursor) ? (
+            <nav className="search-results__pagination" aria-label="Search result pages">
+              <div className="search-results__pagination-edge">
+                {parsed.page > 1 ? (
+                  <Link
+                    className="button button--secondary button--small"
+                    href={searchPageHref(parsed, parsed.page - 1)}
+                    rel="prev"
+                  >
+                    Previous
+                  </Link>
+                ) : null}
+              </div>
+              <div className="search-results__page-numbers">
+                {parsed.page > 1 ? (
+                  <Link
+                    aria-label={`Go to results page ${parsed.page - 1}`}
+                    href={searchPageHref(parsed, parsed.page - 1)}
+                  >
+                    {parsed.page - 1}
+                  </Link>
+                ) : null}
+                <span aria-current="page" aria-label={`Results page ${parsed.page}`}>
+                  {parsed.page}
+                </span>
+                {loaded.nextCursor ? (
+                  <Link
+                    aria-label={`Go to results page ${parsed.page + 1}`}
+                    href={searchPageHref(parsed, parsed.page + 1)}
+                  >
+                    {parsed.page + 1}
+                  </Link>
+                ) : null}
+              </div>
+              <div className="search-results__pagination-edge search-results__pagination-edge--next">
+                {loaded.nextCursor ? (
+                  <Link
+                    className="button button--secondary button--small"
+                    href={searchPageHref(parsed, parsed.page + 1)}
+                    rel="next"
+                  >
+                    Next
+                  </Link>
+                ) : null}
+              </div>
+            </nav>
           ) : null}
           <SearchAnalyticsBeacon
             query={parsed.query}
@@ -314,9 +354,9 @@ function SearchResultCard({ result }: { result: SearchResultContract<SearchAsset
   );
 }
 
-function nextPageHref(
+function searchPageHref(
   parsed: Awaited<ReturnType<typeof parseSearchPageParams>>,
-  cursor: string,
+  page: number,
 ): string {
   const params = new URLSearchParams();
   if (parsed.query) params.set("q", parsed.query);
@@ -325,7 +365,7 @@ function nextPageHref(
   for (const rights of parsed.selectedRights) params.append("rights", rights);
   if (parsed.commercialUseOnly) params.set("commercial", "allowed");
   if (parsed.selectedFreshness !== "any") params.set("freshness", parsed.selectedFreshness);
-  params.set("cursor", cursor);
+  if (page > 1) params.set("page", String(page));
   return `/search?${params.toString()}`;
 }
 

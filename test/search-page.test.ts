@@ -41,6 +41,19 @@ describe("search page filters", () => {
     expect(parsed.query).toBe("internet");
     expect(parsed.selectedFreshness).toBe("any");
     expect(parsed.request.filters).toEqual({});
+    expect(parsed.page).toBe(1);
+  });
+
+  it("maps page numbers to stable result offsets", () => {
+    const parsed = parseSearchPageParams({ q: "population", page: "3" }, now);
+
+    expect(parsed.page).toBe(3);
+    expect(parsed.request).toMatchObject({ limit: 24, offset: 48 });
+  });
+
+  it("rejects malformed page numbers", () => {
+    expect(parseSearchPageParams({ q: "population", page: "2.5" }, now).page).toBe(1);
+    expect(parseSearchPageParams({ q: "population", page: "-2" }, now).page).toBe(1);
   });
 
   it("supports the integrated public data sources as filter options", () => {

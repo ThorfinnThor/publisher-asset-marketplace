@@ -348,6 +348,7 @@ export function buildFallbackSearchSql(
 export function buildBrowseSearchSql(
   filters: SearchRequest["filters"] = {},
   includeCursor = false,
+  includeOffset = false,
 ): string {
   const eligibility = filterSql(filters).sql;
   const continuation = includeCursor
@@ -373,7 +374,7 @@ export function buildBrowseSearchSql(
     WHERE ${eligibility}
     ${continuation}
     ORDER BY COALESCE(a.source_updated_at, '') DESC, a.title COLLATE NOCASE, a.slug
-    LIMIT ?
+    LIMIT ?${includeOffset ? " OFFSET ?" : ""}
   `;
 }
 
@@ -393,6 +394,7 @@ export async function searchAssets(
     searchRankingV1.maximum_limit,
     Math.max(1, request.limit ?? searchRankingV1.default_limit),
   );
+  const offset = Math.max(0, Math.trunc(request.offset ?? 0));
   const { bindings } = filterSql(request.filters);
   if (request.query.trim() === "") {
     const cursor = cursorDecode(request.cursor);
@@ -408,8 +410,15 @@ export async function searchAssets(
         ]
       : [];
     const browsed = await db
-      .prepare(buildBrowseSearchSql(request.filters, Boolean(browseCursor)))
-      .bind(...bindings, ...cursorBindings, limit + 1)
+      .prepare(
+        buildBrowseSearchSql(request.filters, Boolean(browseCursor), !browseCursor && offset > 0),
+      )
+      .bind(
+        ...bindings,
+        ...cursorBindings,
+        limit + 1,
+        ...(!browseCursor && offset > 0 ? [offset] : []),
+      )
       .all<SearchRow>();
     const page = browsed.results.slice(0, limit);
     const last = page.at(-1);
@@ -435,7 +444,14 @@ export async function searchAssets(
   if (!matchExpression) return { results: [], next_cursor: null };
   const primary = await db
     .prepare(buildPrimarySearchSql(request.filters))
-    .bind(matchExpression, ...bindings, searchRankingV1.primary_candidate_limit)
+    .bind(
+      matchExpression,
+      ...bindings,
+      Math.min(
+        searchRankingV1.maximum_candidate_limit,
+        Math.max(searchRankingV1.primary_candidate_limit, offset + limit + 1),
+      ),
+    )
     .all<SearchRow>();
   const now = options.now ?? new Date().toISOString();
   let ranked = rankSearchCandidates(
@@ -476,7 +492,9 @@ export async function searchAssets(
     }
   }
 
-  const remaining = applyCursor(ranked, cursorDecode(request.cursor));
+  const remaining = request.cursor
+    ? applyCursor(ranked, cursorDecode(request.cursor))
+    : ranked.slice(offset);
   const page = remaining.slice(0, limit);
   const last = page.at(-1);
   return {

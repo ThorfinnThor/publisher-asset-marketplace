@@ -31,6 +31,7 @@ export type SearchPageParams = {
   rights?: SearchPageParam;
   commercial?: SearchPageParam;
   freshness?: SearchPageParam;
+  page?: SearchPageParam;
   cursor?: SearchPageParam;
 };
 
@@ -41,8 +42,13 @@ export type ParsedSearchPage = {
   selectedRights: Array<"safe" | "restricted">;
   commercialUseOnly: boolean;
   selectedFreshness: string;
+  page: number;
   request: SearchRequest;
 };
+
+const resultsPerPage = 24;
+const maximumRankedPage = 21;
+const maximumBrowsePage = 500;
 
 function values(value: SearchPageParam): string[] {
   if (Array.isArray(value)) return value;
@@ -63,6 +69,12 @@ function isSourceForOptions(value: string, options: readonly SearchSourceOption[
 
 function isRights(value: string): value is "safe" | "restricted" {
   return value === "safe" || value === "restricted";
+}
+
+function pageNumber(value: string, maximum: number): number {
+  if (!/^\d+$/.test(value)) return 1;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) ? Math.min(maximum, Math.max(1, parsed)) : 1;
 }
 
 export function freshnessDate(value: string, now = new Date()): string | undefined {
@@ -88,6 +100,8 @@ export function parseSearchPageParams(
     ? requestedFreshness
     : "any";
   const updatedSince = freshnessDate(selectedFreshness, now);
+  const page = pageNumber(first(params.page), query ? maximumRankedPage : maximumBrowsePage);
+  const offset = (page - 1) * resultsPerPage;
 
   const request: SearchRequest = {
     query,
@@ -98,8 +112,9 @@ export function parseSearchPageParams(
       ...(commercialUseOnly ? { commercial_use: true as const } : {}),
       ...(updatedSince ? { updated_since: updatedSince } : {}),
     },
-    limit: 24,
-    ...(first(params.cursor) ? { cursor: first(params.cursor) } : {}),
+    limit: resultsPerPage,
+    ...(offset > 0 ? { offset } : {}),
+    ...(page === 1 && first(params.cursor) ? { cursor: first(params.cursor) } : {}),
   };
 
   return {
@@ -109,6 +124,7 @@ export function parseSearchPageParams(
     selectedRights,
     commercialUseOnly,
     selectedFreshness,
+    page,
     request,
   };
 }

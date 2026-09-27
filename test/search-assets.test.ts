@@ -181,6 +181,58 @@ describe("C2 search function", () => {
     expect(result.next_cursor).toBeNull();
   });
 
+  it("uses an offset for numbered catalogue pages", async () => {
+    let sql = "";
+    let bindings: unknown[] = [];
+    const db = {
+      prepare(value: string) {
+        sql = value;
+        return {
+          bind: (...values: unknown[]) => ({
+            all: async () => {
+              bindings = values;
+              return { results: [], success: true, meta: {} };
+            },
+          }),
+        };
+      },
+    } as unknown as D1Database;
+
+    await searchAssets(db, { query: "", limit: 24, offset: 48 });
+
+    expect(sql).toContain("LIMIT ? OFFSET ?");
+    expect(bindings).toEqual([25, 48]);
+  });
+
+  it("returns the requested numbered page for ranked searches", async () => {
+    const candidates = [
+      candidate("alpha", "Population alpha", "safe", { fts_rank: 1 }),
+      candidate("beta", "Population beta", "safe", { fts_rank: 2 }),
+      candidate("gamma", "Population gamma", "safe", { fts_rank: 3 }),
+      candidate("delta", "Population delta", "safe", { fts_rank: 4 }),
+    ];
+    const db = {
+      prepare(sql: string) {
+        return {
+          bind: () => ({
+            all: async () => ({
+              results: sql.includes("assets_fts MATCH")
+                ? candidates.map((value, index) => ({ ...value, bm25_rank: index + 1 }))
+                : [],
+              success: true,
+              meta: {},
+            }),
+          }),
+        };
+      },
+    } as unknown as D1Database;
+
+    const result = await searchAssets(db, { query: "population", limit: 2, offset: 2 }, { now });
+
+    expect(result.results.map((item) => item.asset.slug)).toEqual(["gamma", "delta"]);
+    expect(result.next_cursor).toBeNull();
+  });
+
   it("continues browse results without repeating the first page", async () => {
     const first = candidate("alpha", "Alpha population", "safe", {
       source_updated_at: "2026-09-01",
