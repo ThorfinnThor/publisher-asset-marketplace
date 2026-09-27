@@ -9,6 +9,7 @@ vi.mock("@/lib/db/client", () => ({
 }));
 
 import { PUBLIC_EDITORIAL_ARTICLES } from "../src/lib/editorial/public-articles";
+import { TOPICS } from "../src/lib/topics";
 import { GET } from "../src/app/sitemap.xml/route";
 
 describe("selective sitemap", () => {
@@ -25,6 +26,9 @@ describe("selective sitemap", () => {
     expect(xml).toContain("<loc>https://citesupply.com/topics</loc>");
     for (const article of PUBLIC_EDITORIAL_ARTICLES) {
       expect(xml).toContain(`<loc>https://citesupply.com/insights/${article.draft.slug}</loc>`);
+    }
+    for (const topic of TOPICS) {
+      expect(xml).toContain(`<loc>https://citesupply.com/topics/${topic.slug}</loc>`);
     }
   });
 

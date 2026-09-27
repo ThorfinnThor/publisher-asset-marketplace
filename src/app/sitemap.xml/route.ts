@@ -1,5 +1,6 @@
 import { getDatabase } from "@/lib/db/client";
 import { PUBLIC_EDITORIAL_ARTICLES } from "@/lib/editorial/public-articles";
+import { TOPICS } from "@/lib/topics";
 
 const SITE_ORIGIN = "https://citesupply.com";
 const staticPaths = ["/", "/creator/guide", "/insights", "/topics"];
@@ -17,12 +18,18 @@ export async function GET(): Promise<Response> {
        WHERE status = 'published'
          AND rights_status = 'safe'
          AND search_indexable = 1
+         AND length(trim(title)) >= 8
+         AND length(trim(description)) >= 50
+         AND canonical_url LIKE 'https://%'
        ORDER BY slug`,
     )
     .all<SitemapRow>();
 
   const entries = [
     ...staticPaths.map((path) => sitemapEntry(new URL(path, SITE_ORIGIN).toString(), null)),
+    ...TOPICS.map((topic) =>
+      sitemapEntry(new URL(`/topics/${topic.slug}`, SITE_ORIGIN).toString(), null),
+    ),
     ...PUBLIC_EDITORIAL_ARTICLES.map((article) =>
       sitemapEntry(
         new URL(`/insights/${article.draft.slug}`, SITE_ORIGIN).toString(),

@@ -15,8 +15,8 @@ import { getDatabase } from "@/lib/db/client";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import { parseSourcePreview } from "@/lib/assets/source-data-preview";
 import { parseWorldBankIndicator } from "@/lib/assets/worldbank-chart";
-import { buildAssetJsonLd } from "@/lib/seo";
-import { assetRobotsMetadata } from "@/lib/seo/indexability";
+import { buildAssetJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { assetRobotsMetadata, isAssetSeoEligible } from "@/lib/seo/indexability";
 import {
   getPublishedAssetBySlug,
   type PublishedAssetDetail,
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
   return {
     title: record.asset.title,
     description: record.asset.description,
-    robots: assetRobotsMetadata(record.asset.search_indexable),
+    robots: assetRobotsMetadata(isAssetSeoEligible(record.asset)),
     alternates: { canonical: `/asset/${record.asset.slug}` },
     openGraph: {
       type: "article",
@@ -111,6 +111,12 @@ export default async function AssetPage({ params }: AssetPageProps) {
   return (
     <main className="asset-detail page-shell">
       <JsonLd value={buildAssetJsonLd(asset)} />
+      <JsonLd
+        value={buildBreadcrumbJsonLd([
+          { name: "Browse", path: "/search" },
+          { name: asset.title, path: `/asset/${asset.slug}` },
+        ])}
+      />
       <AssetAnalyticsBeacon assetSlug={asset.slug} />
       <nav aria-label="Breadcrumb" className="breadcrumb">
         <Link href="/search">Browse</Link>

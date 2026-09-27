@@ -295,6 +295,12 @@ function filterSql(filters: SearchRequest["filters"]): { sql: string; bindings: 
     clauses.push("a.source_updated_at >= ?");
     bindings.push(filters.updated_since);
   }
+  if (filters?.search_indexable_only === true) {
+    clauses.push("a.search_indexable = 1");
+    clauses.push("length(trim(a.title)) >= 8");
+    clauses.push("length(trim(a.description)) >= 50");
+    clauses.push("a.canonical_url LIKE 'https://%'");
+  }
   return { sql: clauses.join(" AND "), bindings };
 }
 

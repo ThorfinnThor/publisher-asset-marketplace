@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ArrowUpRightIcon } from "@/components/design-system";
+import { JsonLd } from "@/components/json-ld";
+import { SITE_ORIGIN, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { TOPICS } from "@/lib/topics";
 
 export const metadata: Metadata = {
   title: "Topics",
@@ -17,49 +20,6 @@ export const metadata: Metadata = {
   },
 };
 
-const topics = [
-  {
-    name: "Population and society",
-    description: "Population, migration, households, cities and social conditions.",
-    query: "population",
-  },
-  {
-    name: "Economy and finance",
-    description: "Growth, prices, trade, banking, public finance and business indicators.",
-    query: "economy",
-  },
-  {
-    name: "Health",
-    description: "Life expectancy, mortality, healthcare and public-health measures.",
-    query: "health",
-  },
-  {
-    name: "Energy and climate",
-    description: "Electricity, renewables, emissions, climate and energy prices.",
-    query: "energy",
-  },
-  {
-    name: "Technology and infrastructure",
-    description: "Internet access, digital adoption, transport and infrastructure.",
-    query: "internet",
-  },
-  {
-    name: "Education and work",
-    description: "Education, skills, employment, wages and labor-market indicators.",
-    query: "education",
-  },
-  {
-    name: "Environment and land",
-    description: "Land use, agriculture, forests, biodiversity, water and wildfires.",
-    query: "environment",
-  },
-  {
-    name: "Publisher tools",
-    description: "Calculators, benchmarks and interactive tools made for practical use.",
-    query: "calculator",
-  },
-] as const;
-
 const formats = [
   { label: "Charts", query: "chart" },
   { label: "Tables", query: "table" },
@@ -71,6 +31,26 @@ const formats = [
 export default function TopicsPage() {
   return (
     <main className="page-shell topics-page">
+      <JsonLd value={buildBreadcrumbJsonLd([{ name: "Topics", path: "/topics" }])} />
+      <JsonLd
+        value={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Cite Supply topics",
+          description: metadata.description,
+          url: `${SITE_ORIGIN}/topics`,
+          isPartOf: { "@id": `${SITE_ORIGIN}/#website` },
+          mainEntity: {
+            "@type": "ItemList",
+            itemListElement: TOPICS.map((topic, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: topic.name,
+              url: `${SITE_ORIGIN}/topics/${topic.slug}`,
+            })),
+          },
+        }}
+      />
       <header className="topics-page__header">
         <p className="eyebrow">Browse by subject</p>
         <h1 className="page-title">Start with the question you are researching.</h1>
@@ -90,12 +70,8 @@ export default function TopicsPage() {
           </div>
         </div>
         <div className="topics-grid">
-          {topics.map((topic, index) => (
-            <Link
-              className="topic-card"
-              href={`/search?q=${encodeURIComponent(topic.query)}`}
-              key={topic.name}
-            >
+          {TOPICS.map((topic, index) => (
+            <Link className="topic-card" href={`/topics/${topic.slug}`} key={topic.name}>
               <span className="topic-card__number" aria-hidden="true">
                 {String(index + 1).padStart(2, "0")}
               </span>

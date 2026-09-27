@@ -1,4 +1,5 @@
 import type { PublishedAssetDetail } from "@/lib/assets/get-asset";
+import { publicContactEmail } from "@/lib/site-identity";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 
 export const SITE_ORIGIN = "https://citesupply.com";
@@ -18,7 +19,19 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         "@id": `${SITE_ORIGIN}/#organization`,
         name: "Cite Supply",
         url: SITE_ORIGIN,
-        logo: `${SITE_ORIGIN}/citesupply-logo.png`,
+        logo: {
+          "@type": "ImageObject",
+          url: `${SITE_ORIGIN}/citesupply-mark.png`,
+          width: 256,
+          height: 256,
+        },
+        email: `mailto:${publicContactEmail}`,
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: publicContactEmail,
+          availableLanguage: ["English", "German"],
+        },
       },
       {
         "@type": "WebSite",
@@ -27,6 +40,15 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         alternateName: "Where publishers find data",
         url: SITE_ORIGIN,
         description: siteSeo.description,
+        publisher: { "@id": `${SITE_ORIGIN}/#organization` },
+        inLanguage: "en",
+      },
+      {
+        "@type": "DataCatalog",
+        "@id": `${SITE_ORIGIN}/#catalog`,
+        name: "Cite Supply catalog",
+        description: siteSeo.description,
+        url: `${SITE_ORIGIN}/topics`,
         publisher: { "@id": `${SITE_ORIGIN}/#organization` },
         inLanguage: "en",
       },
@@ -47,8 +69,7 @@ export function buildAssetJsonLd(asset: PublishedAssetDetail): Record<string, un
     description: structuredDescription(asset.description, sourceName),
     url: pageUrl,
     mainEntityOfPage: pageUrl,
-    sameAs: asset.canonical_url,
-    isBasedOn: asset.canonical_url,
+    ...(asset.source_id ? { sameAs: asset.canonical_url } : { isBasedOn: asset.canonical_url }),
     creator: {
       "@type": "Organization",
       name: sourceName,
@@ -93,6 +114,29 @@ export function buildAssetJsonLd(asset: PublishedAssetDetail): Record<string, un
     "@type": "CreativeWork",
     ...common,
     additionalType: `https://schema.org/${asset.asset_type === "benchmark" ? "Dataset" : "ImageObject"}`,
+  };
+}
+
+export function buildBreadcrumbJsonLd(
+  items: ReadonlyArray<{ name: string; path: string }>,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Cite Supply",
+        item: SITE_ORIGIN,
+      },
+      ...items.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 2,
+        name: item.name,
+        item: new URL(item.path, SITE_ORIGIN).toString(),
+      })),
+    ],
   };
 }
 

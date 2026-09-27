@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import type { PublishedAssetDetail } from "@/lib/assets/get-asset";
-import { buildAssetJsonLd, buildSiteJsonLd, serializeJsonLd } from "@/lib/seo";
-import { assetRobotsMetadata, isSearchIndexable } from "@/lib/seo/indexability";
+import {
+  buildAssetJsonLd,
+  buildBreadcrumbJsonLd,
+  buildSiteJsonLd,
+  serializeJsonLd,
+} from "@/lib/seo";
+import { assetRobotsMetadata, isAssetSeoEligible, isSearchIndexable } from "@/lib/seo/indexability";
 
 const asset: PublishedAssetDetail = {
   id: "asset-1",
@@ -37,6 +42,9 @@ describe("SEO structured data", () => {
     expect(value).toMatchObject({ "@context": "https://schema.org" });
     expect(JSON.stringify(value)).toContain('"@type":"WebSite"');
     expect(JSON.stringify(value)).toContain('"@type":"Organization"');
+    expect(JSON.stringify(value)).toContain('"@type":"DataCatalog"');
+    expect(JSON.stringify(value)).toContain("citesupply-mark.png");
+    expect(JSON.stringify(value)).toContain("info@citesupply.com");
   });
 
   it("marks dataset assets with source provenance and catalog membership", () => {
@@ -47,6 +55,23 @@ describe("SEO structured data", () => {
       sameAs: asset.canonical_url,
       creator: { name: "World Bank Open Data" },
       includedInDataCatalog: { name: "Cite Supply" },
+    });
+    expect(buildAssetJsonLd(asset)).not.toHaveProperty("isBasedOn");
+  });
+
+  it("describes visible breadcrumb paths", () => {
+    expect(
+      buildBreadcrumbJsonLd([
+        { name: "Topics", path: "/topics" },
+        { name: "Health", path: "/topics/health" },
+      ]),
+    ).toMatchObject({
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { position: 1, name: "Cite Supply", item: "https://citesupply.com" },
+        { position: 2, name: "Topics", item: "https://citesupply.com/topics" },
+        { position: 3, name: "Health", item: "https://citesupply.com/topics/health" },
+      ],
     });
   });
 
@@ -74,5 +99,12 @@ describe("search indexability", () => {
       follow: true,
       googleBot: { index: true, follow: true },
     });
+  });
+
+  it("requires safe rights, useful copy and a public canonical URL", () => {
+    expect(isAssetSeoEligible(asset)).toBe(true);
+    expect(isAssetSeoEligible({ ...asset, rights_status: "restricted" })).toBe(false);
+    expect(isAssetSeoEligible({ ...asset, description: "Too short" })).toBe(false);
+    expect(isAssetSeoEligible({ ...asset, canonical_url: "http://example.com" })).toBe(false);
   });
 });

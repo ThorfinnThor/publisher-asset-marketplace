@@ -10,7 +10,7 @@ import {
   getPublicEditorialArticle,
   type PublicEditorialArticle,
 } from "@/lib/editorial/public-articles";
-import { SITE_ORIGIN } from "@/lib/seo";
+import { buildBreadcrumbJsonLd, SITE_ORIGIN } from "@/lib/seo";
 
 type InsightPageProps = {
   params: Promise<{ slug: string }>;
@@ -52,6 +52,12 @@ export default async function InsightPage({ params }: InsightPageProps) {
   return (
     <main className="page-shell insight-article">
       <JsonLd value={buildArticleJsonLd(article)} />
+      <JsonLd
+        value={buildBreadcrumbJsonLd([
+          { name: "Insights", path: "/insights" },
+          { name: article.draft.title, path: `/insights/${article.draft.slug}` },
+        ])}
+      />
       <nav aria-label="Breadcrumb" className="breadcrumb">
         <Link href="/insights">Insights</Link>
         <span aria-hidden="true">/</span>
@@ -185,6 +191,7 @@ function buildArticleJsonLd(article: PublicEditorialArticle): Record<string, unk
     inLanguage: "en",
     author: { "@id": `${SITE_ORIGIN}/#organization` },
     publisher: { "@id": `${SITE_ORIGIN}/#organization` },
+    image: `${SITE_ORIGIN}/opengraph-image`,
     citation: article.draft.citations.map((citation) => citation.url),
     about: article.section,
   };

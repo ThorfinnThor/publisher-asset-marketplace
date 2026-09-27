@@ -6,6 +6,7 @@ export type SearchFilters = {
   rights_statuses?: Array<"safe" | "restricted">;
   commercial_use?: true;
   updated_since?: string;
+  search_indexable_only?: true;
 };
 
 export type SearchRequest = {

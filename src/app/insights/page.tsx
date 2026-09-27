@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ArrowUpRightIcon } from "@/components/design-system";
+import { JsonLd } from "@/components/json-ld";
 import { PUBLIC_EDITORIAL_ARTICLES } from "@/lib/editorial/public-articles";
+import { buildBreadcrumbJsonLd, SITE_ORIGIN } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Data insights",
@@ -21,6 +23,26 @@ export const metadata: Metadata = {
 export default function InsightsPage() {
   return (
     <main className="page-shell insights-index">
+      <JsonLd value={buildBreadcrumbJsonLd([{ name: "Insights", path: "/insights" }])} />
+      <JsonLd
+        value={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Cite Supply data insights",
+          description: metadata.description,
+          url: `${SITE_ORIGIN}/insights`,
+          isPartOf: { "@id": `${SITE_ORIGIN}/#website` },
+          mainEntity: {
+            "@type": "ItemList",
+            itemListElement: PUBLIC_EDITORIAL_ARTICLES.map((article, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: article.draft.title,
+              url: `${SITE_ORIGIN}/insights/${article.draft.slug}`,
+            })),
+          },
+        }}
+      />
       <header className="insights-index__header">
         <p className="eyebrow">Cite Supply insights</p>
         <h1 className="page-title">Read the data, not just the headline.</h1>
