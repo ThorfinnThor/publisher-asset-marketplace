@@ -1,5 +1,10 @@
+import { PUBLIC_EDITORIAL_ARTICLES } from "../src/lib/editorial/public-articles";
+import { TOPICS } from "../src/lib/topics";
+
 const defaultBaseUrl = "https://publisher-asset-marketplace.shuu9599.workers.dev";
 const baseUrl = (process.env.RELEASE_BASE_URL ?? defaultBaseUrl).replace(/\/$/u, "");
+const sitemapPublicHubCount = 4 + TOPICS.length + PUBLIC_EDITORIAL_ARTICLES.length;
+const sitemapMaximumAssetCount = 500;
 
 type SmokeCheck = {
   path: string;
@@ -27,6 +32,21 @@ const checks: SmokeCheck[] = [
       "Sitemap: https://citesupply.com/sitemap.xml",
     ],
     responseHeaders: { "content-type": "text/plain; charset=utf-8" },
+  },
+  {
+    path: "/llms.txt",
+    expectedStatus: 200,
+    includes: [
+      "# Cite Supply",
+      "## Topic guides",
+      "## Published data insights",
+      "Check each asset page before reuse",
+      "https://citesupply.com/topics/energy-and-climate",
+    ],
+    responseHeaders: {
+      "content-type": "text/markdown; charset=utf-8",
+      "x-content-type-options": "nosniff",
+    },
   },
   {
     path: "/sitemap.xml",
@@ -182,7 +202,12 @@ async function run(): Promise<void> {
       });
       body = await response.text();
       const sitemapUrlCount = body.match(/<url>/gu)?.length ?? 0;
-      if (check.path !== "/sitemap.xml" || sitemapUrlCount <= 503 || attempt === maxAttempts) break;
+      if (
+        check.path !== "/sitemap.xml" ||
+        sitemapUrlCount <= sitemapPublicHubCount + sitemapMaximumAssetCount ||
+        attempt === maxAttempts
+      )
+        break;
       await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
     }
     if (!response) throw new Error(`No response received for ${check.path}`);
@@ -209,9 +234,12 @@ async function run(): Promise<void> {
     }
     if (check.path === "/sitemap.xml") {
       const urlCount = body.match(/<url>/gu)?.length ?? 0;
-      if (urlCount < 3 || urlCount > 502) {
+      if (
+        urlCount < sitemapPublicHubCount + 1 ||
+        urlCount > sitemapPublicHubCount + sitemapMaximumAssetCount
+      ) {
         failures.push(
-          `${check.path}: expected 2 static URLs plus 1-500 curated assets, got ${urlCount} URLs`,
+          `${check.path}: expected ${sitemapPublicHubCount} curated hubs plus 1-${sitemapMaximumAssetCount} assets, got ${urlCount} URLs`,
         );
       }
     }
