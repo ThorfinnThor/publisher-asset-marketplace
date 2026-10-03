@@ -112,7 +112,10 @@ export async function recordEmbedUsage(
   slug: string,
   request: Request,
   provenance: EmbedProvenance,
-  now = new Date(),
+  options: {
+    now?: Date;
+    writeD1Aggregates?: boolean;
+  } = {},
 ): Promise<void> {
   if (!isIframeEmbedRequest(request)) return;
 
@@ -128,6 +131,9 @@ export async function recordEmbedUsage(
     indexes: [samplingIndex],
   });
 
+  if (options.writeD1Aggregates !== true) return;
+
+  const now = options.now ?? new Date();
   const createdAt = now.toISOString();
   const usageDate = createdAt.slice(0, 10);
   const statements = [

@@ -91,7 +91,7 @@ describe("embed usage analytics", () => {
     expect(publisherOriginFromRequest(missing)).toBeNull();
   });
 
-  it("writes hashed publisher usage to Analytics Engine and compact daily D1 aggregates", async () => {
+  it("writes hashed publisher usage to Analytics Engine without D1 writes by default", async () => {
     const { db, prepared, batches } = recordingDatabase();
     const points: AnalyticsEngineDataPoint[] = [];
     const analytics: AnalyticsEngineDataset = {
@@ -106,14 +106,9 @@ describe("embed usage analytics", () => {
       },
     });
 
-    await recordEmbedUsage(
-      db,
-      analytics,
-      "solar-pv-prices",
-      request,
-      "source_hosted",
-      new Date("2026-09-19T12:34:56.000Z"),
-    );
+    await recordEmbedUsage(db, analytics, "solar-pv-prices", request, "source_hosted", {
+      now: new Date("2026-09-19T12:34:56.000Z"),
+    });
 
     expect(points).toHaveLength(1);
     expect(points[0]?.blobs?.[0]).toBe("solar-pv-prices");
@@ -122,6 +117,32 @@ describe("embed usage analytics", () => {
     expect(points[0]?.blobs?.[2]).toBe("source_hosted");
     expect(points[0]?.doubles).toEqual([1]);
     expect(points[0]?.indexes?.[0]).toMatch(/^[a-f0-9]{64}$/u);
+    expect(prepared).toHaveLength(0);
+    expect(batches).toHaveLength(0);
+  });
+
+  it("writes compact daily D1 aggregates only after an explicit opt-in", async () => {
+    const { db, prepared, batches } = recordingDatabase();
+    const points: AnalyticsEngineDataPoint[] = [];
+    const analytics: AnalyticsEngineDataset = {
+      writeDataPoint(point) {
+        points.push(point ?? {});
+      },
+    };
+    const request = new Request("https://citesupply.com/e/solar-pv-prices", {
+      headers: {
+        referer: "https://publisher.example/article/private-path?campaign=one",
+        "sec-fetch-dest": "iframe",
+      },
+    });
+
+    await recordEmbedUsage(db, analytics, "solar-pv-prices", request, "source_hosted", {
+      now: new Date("2026-09-19T12:34:56.000Z"),
+      writeD1Aggregates: true,
+    });
+
+    expect(points).toHaveLength(1);
+    expect(points[0]?.blobs?.[1]).toMatch(/^[a-f0-9]{64}$/u);
     expect(prepared).toHaveLength(2);
     expect(prepared[0]?.values).toEqual([
       "solar-pv-prices",
@@ -157,7 +178,10 @@ describe("embed usage analytics", () => {
         headers: { "sec-fetch-dest": "iframe" },
       }),
       "marketplace_rendered",
-      new Date("2026-09-19T23:00:00.000Z"),
+      {
+        now: new Date("2026-09-19T23:00:00.000Z"),
+        writeD1Aggregates: true,
+      },
     );
 
     expect(points[0]?.blobs).toEqual([

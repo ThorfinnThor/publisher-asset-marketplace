@@ -126,7 +126,10 @@ describe("asset refresh runner", () => {
     expect(plan.counts).toEqual({ candidates: 1, refreshed: 1, hidden: 0, errors: 0 });
     expect(plan.updates[0]?.refreshed.status).toBe("review");
     expect(plan.updates[0]?.refreshed.source_updated_at).toBe("2026-09-01");
-    expect(buildAssetRefreshSql(plan)).toContain("INSERT INTO refresh_results");
+    const sql = buildAssetRefreshSql(plan);
+    expect(sql).toContain("INSERT INTO refresh_results");
+    expect(sql).toContain("WHERE id IN ('asset_stale-chart')");
+    expect(sql).not.toContain("DELETE FROM asset_search_trigrams;");
   });
 
   it("hides only HTTP 404 sources and keeps transient failures retryable", async () => {
@@ -213,5 +216,29 @@ describe("asset refresh runner", () => {
     expect(result.database_written).toBe(true);
     expect(calls.some((call) => call.includes("refresh_results"))).toBe(true);
     expect(calls.some((call) => call.includes("last_checked_at"))).toBe(true);
+    expect(calls.some((call) => call === "DELETE FROM asset_search_trigrams")).toBe(false);
+  });
+
+  it("refuses an incremental refresh large enough to become a full-index rewrite", () => {
+    const base = {
+      run_id: "refresh_cost_guard",
+      source_id: "source_owid",
+      started_at: now,
+      completed_at: now,
+      status: "succeeded" as const,
+      candidates: [],
+      hidden: [],
+      failed: [],
+      results: [],
+      counts: { candidates: 101, refreshed: 101, hidden: 0, errors: 0 },
+    };
+    const updates = Array.from({ length: 101 }, (_, index) => {
+      const existing = row(`asset-${index}`);
+      return { existing, refreshed: existing as never };
+    });
+
+    expect(() => buildAssetRefreshSql({ ...base, updates })).toThrow(
+      "Refusing to rebuild 101 search-index entries",
+    );
   });
 });

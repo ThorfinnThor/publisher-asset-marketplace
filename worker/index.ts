@@ -1,6 +1,7 @@
 import handler from "vinext/server/fetch-handler";
 
 import { runDemandAggregation } from "../src/lib/analytics/demand-aggregation";
+import { d1EmbedAggregatesEnabled } from "../src/lib/analytics/write-policy";
 import {
   marketplaceEmbedSlug,
   recordEmbedUsage,
@@ -209,17 +210,17 @@ function scheduleEmbedUsage(
   provenance: EmbedProvenance,
 ): void {
   context.waitUntil(
-    recordEmbedUsage(env.DB, env.EMBED_ANALYTICS, slug, request, provenance).catch(
-      (error: unknown) => {
-        console.error(
-          JSON.stringify({
-            event: "embed_usage_record_failed",
-            slug,
-            provenance,
-            message: error instanceof Error ? error.message : "unknown_error",
-          }),
-        );
-      },
-    ),
+    recordEmbedUsage(env.DB, env.EMBED_ANALYTICS, slug, request, provenance, {
+      writeD1Aggregates: d1EmbedAggregatesEnabled(env),
+    }).catch((error: unknown) => {
+      console.error(
+        JSON.stringify({
+          event: "embed_usage_record_failed",
+          slug,
+          provenance,
+          message: error instanceof Error ? error.message : "unknown_error",
+        }),
+      );
+    }),
   );
 }

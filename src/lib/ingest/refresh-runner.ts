@@ -2,12 +2,16 @@ import { buildImportAssetRecord, type ImportAssetRecord } from "./import-runner"
 import { OwidSourceClient, type OwidAssetFetch } from "./owid-source-client";
 import { classifyRights, type RightsEvidence } from "../rights/classify-rights";
 import type { RightsStatus } from "../rights/contracts";
-import { rebuildAssetSearchTrigrams, rebuildAssetSearchTrigramsSql } from "../search/search-index";
+import {
+  rebuildSelectedAssetSearchTrigrams,
+  rebuildSelectedAssetSearchTrigramsSql,
+} from "../search/search-index";
 
 const DEFAULT_SOURCE_ID = "source_owid";
 const DEFAULT_MAX_ASSETS = 25;
 const DEFAULT_MIN_CHECK_INTERVAL_HOURS = 24;
 const DEFAULT_STALE_AFTER_DAYS = 730;
+const MAX_INCREMENTAL_SEARCH_INDEX_ASSETS = 100;
 const millisecondsPerHour = 60 * 60 * 1_000;
 const millisecondsPerDay = 24 * millisecondsPerHour;
 
@@ -375,6 +379,7 @@ export async function writeAssetRefresh(
   db: D1Database,
   plan: RefreshPlan,
 ): Promise<RefreshRunResult> {
+  const updatedAssetIds = incrementalSearchIndexAssetIds(plan);
   await db.prepare(insertRunSql).bind(plan.run_id, plan.source_id, plan.started_at).run();
   try {
     const statements = [
@@ -410,7 +415,9 @@ export async function writeAssetRefresh(
     if (statements.length > 0) {
       await db.batch(statements);
     }
-    await rebuildAssetSearchTrigrams(db);
+    if (updatedAssetIds.length > 0) {
+      await rebuildSelectedAssetSearchTrigrams(db, updatedAssetIds);
+    }
     await db
       .prepare(updateRunSql)
       .bind(
@@ -460,6 +467,7 @@ export async function runAssetRefresh(
 }
 
 export function buildAssetRefreshSql(plan: RefreshPlan): string {
+  const updatedAssetIds = incrementalSearchIndexAssetIds(plan);
   const statements = [
     "BEGIN TRANSACTION;",
     `INSERT INTO refresh_runs (id, source_id, status, candidate_count, refreshed_count, hidden_count, error_count, started_at, completed_at) VALUES (${sqlLiteral(plan.run_id)}, ${sqlLiteral(plan.source_id)}, 'running', 0, 0, 0, 0, ${sqlLiteral(plan.started_at)}, NULL);`,
@@ -476,10 +484,19 @@ export function buildAssetRefreshSql(plan: RefreshPlan): string {
       (result) =>
         `INSERT INTO refresh_results (id, refresh_run_id, asset_id, outcome, reason_code, detail_json, created_at) VALUES (${[result.id, plan.run_id, result.asset_id, result.outcome, result.reason_code, result.detail_json, result.created_at].map(sqlLiteral).join(", ")});`,
     ),
-    "DELETE FROM asset_search_trigrams;",
-    `${rebuildAssetSearchTrigramsSql.trim()};`,
+    ...(updatedAssetIds.length > 0 ? [rebuildSelectedAssetSearchTrigramsSql(updatedAssetIds)] : []),
     `UPDATE refresh_runs SET status = ${sqlLiteral(plan.status)}, candidate_count = ${plan.counts.candidates}, refreshed_count = ${plan.counts.refreshed}, hidden_count = ${plan.counts.hidden}, error_count = ${plan.counts.errors}, completed_at = ${sqlLiteral(plan.completed_at)} WHERE id = ${sqlLiteral(plan.run_id)};`,
     "COMMIT;",
   ];
   return `${statements.join("\n\n")}\n`;
+}
+
+function incrementalSearchIndexAssetIds(plan: RefreshPlan): string[] {
+  const ids = [...new Set(plan.updates.map(({ existing }) => existing.id))];
+  if (ids.length > MAX_INCREMENTAL_SEARCH_INDEX_ASSETS) {
+    throw new Error(
+      `Refusing to rebuild ${ids.length} search-index entries during an incremental refresh.`,
+    );
+  }
+  return ids;
 }

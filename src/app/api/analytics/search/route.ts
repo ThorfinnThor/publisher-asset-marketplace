@@ -1,4 +1,7 @@
+import { env } from "cloudflare:workers";
+
 import { isAnonymousSessionId } from "@/lib/analytics/events";
+import { d1SearchAnalyticsEnabled } from "@/lib/analytics/write-policy";
 import { getDatabase } from "@/lib/db/client";
 import { normalizeQuery } from "@/lib/search/normalize-query";
 
@@ -9,6 +12,10 @@ type SearchEventBody = {
 };
 
 export async function POST(request: Request): Promise<Response> {
+  if (!d1SearchAnalyticsEnabled(env)) {
+    return Response.json({ ok: true, recorded: false }, { status: 202 });
+  }
+
   const anonymousSessionId = request.headers.get("x-anonymous-session-id") ?? "";
   if (!isAnonymousSessionId(anonymousSessionId)) {
     return Response.json({ error: "A valid anonymous session id is required." }, { status: 400 });
@@ -38,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const db = getDatabase();
-    const validIds = await findPublishedAssetIds(db, assetIds as string[]);
+    const validIds = await findPublishedCreatorAssetIds(db, assetIds as string[]);
     const searchEventId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
     const statements = [
@@ -92,7 +99,10 @@ export async function POST(request: Request): Promise<Response> {
   }
 }
 
-async function findPublishedAssetIds(db: D1Database, assetIds: string[]): Promise<Set<string>> {
+async function findPublishedCreatorAssetIds(
+  db: D1Database,
+  assetIds: string[],
+): Promise<Set<string>> {
   if (assetIds.length === 0) return new Set();
   const placeholders = assetIds.map(() => "?").join(", ");
   const result = await db
@@ -103,6 +113,7 @@ async function findPublishedAssetIds(db: D1Database, assetIds: string[]): Promis
         WHERE id IN (${placeholders})
           AND status = 'published'
           AND rights_status IN ('safe', 'restricted')
+          AND creator_id IS NOT NULL
       `,
     )
     .bind(...assetIds)

@@ -9,6 +9,8 @@
     "PREVIEW_GC_DELETE_ENABLED": "false",
     "PREVIEW_GC_RETENTION_DAYS": "90",
     "PREVIEW_GC_CONFIRMATION_DAYS": "7",
+    "D1_SEARCH_ANALYTICS_ENABLED": "false",
+    "D1_EMBED_AGGREGATES_ENABLED": "false",
   },
   "triggers": {
     "crons": ["0 3 * * *"],
