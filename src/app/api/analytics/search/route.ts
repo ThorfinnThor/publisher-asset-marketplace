@@ -12,10 +12,6 @@ type SearchEventBody = {
 };
 
 export async function POST(request: Request): Promise<Response> {
-  if (!d1SearchAnalyticsEnabled(env)) {
-    return Response.json({ ok: true, recorded: false }, { status: 202 });
-  }
-
   const anonymousSessionId = request.headers.get("x-anonymous-session-id") ?? "";
   if (!isAnonymousSessionId(anonymousSessionId)) {
     return Response.json({ error: "A valid anonymous session id is required." }, { status: 400 });
@@ -41,6 +37,10 @@ export async function POST(request: Request): Promise<Response> {
   const queryNormalized = normalizeQuery(queryRaw);
   if (!queryNormalized) {
     return Response.json({ error: "A non-empty query is required." }, { status: 400 });
+  }
+
+  if (!d1SearchAnalyticsEnabled(env)) {
+    return Response.json({ ok: true, recorded: false }, { status: 202 });
   }
 
   try {
