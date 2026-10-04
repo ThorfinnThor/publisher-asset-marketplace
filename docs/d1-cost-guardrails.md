@@ -31,3 +31,13 @@ not with the full marketplace catalogue.
 
 The Cloudflare account should also retain a D1 budget alert. An alert is a backstop, not a substitute
 for these code-level limits.
+
+## Deferred follow-up
+
+- [ ] Design and implement a cost-bounded daily rollup from Analytics Engine into D1 so the creator
+      dashboard can again show `Embed loads (actual)` and `Publisher sites` without performing a D1
+      write for every embed request.
+- Keep `D1_EMBED_AGGREGATES_ENABLED` set to `false` until the rollup has explicit per-run limits,
+  idempotency, write-budget tests, and production monitoring.
+- Re-enable dashboard counters only after the bounded rollup has passed review and a production
+  smoke test. The public website and embeds must remain independent of this reporting pipeline.

@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "asset_eurostat_nrg_ind_ren",
+  "asset_slug": "eurostat-nrg_ind_ren",
+  "content_version": "1.0.0",
+  "review_state": "approved",
+  "language": "en",
+  "question": "What do the EU renewable-energy indicators measure across the covered energy-balance categories?",
+  "direct_answer": "For the EU27 in 2024, renewables supplied 25.2% of the overall measure, 11.2% in transport, 47.5% in electricity, and 26.7% in heating and cooling. These are four separate percentages with different sector denominators; they must not be added together.",
+  "methodology": [
+    "The reviewed presentation retains annual Eurostat observations for EU27_2020 and the category codes REN, REN_TRA, REN_ELC and REN_HEAT_CL. Values are read directly from the pinned JSON-stat response and rounded to one decimal place for display.",
+    "Trend comparisons should begin in 2021 or explicitly explain the methodology break between 2020 and 2021. Provisional 2025 observations are excluded from the reviewed comparison."
+  ],
+  "limitations": [
+    "Each percentage has a category-specific denominator and the four values cannot be summed into a combined renewable share.",
+    "The reviewed scope describes the EU27 aggregate and does not represent every member state individually.",
+    "The 2020–2021 methodology break affects comparisons across that boundary.",
+    "The asset page is a dataset reference; broader interpretation belongs in the linked Cite Supply insight."
+  ],
+  "observation_coverage": {
+    "unit": "Percentage",
+    "period": "2020–2024",
+    "geography": "European Union — 27 countries from 2020 (EU27_2020)",
+    "frequency": "Annual",
+    "series_scope": "Overall renewables, transport, electricity, and heating and cooling"
+  },
+  "source_contract": {
+    "source_id": "source_eurostat",
+    "canonical_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+    "expected_source_updated_at": "2026-09-15T23:00:00+0200",
+    "source_version": "2026-09-15T23:00:00+0200",
+    "source_version_label": "Eurostat update 15 Sep 2026",
+    "transformation_id": "eurostat-nrg-ind-ren-approved-metrics-v2",
+    "evidence_sha256": [
+      "251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7",
+      "ba03848c94751576ee31b3ebebf38532a6eaa65ac22402623fa64eda3ca90345",
+      "3e3099a8a7503f8fd2673bcffe0e6156fa9ce8d9b1457c53a20c8bb87d1ac8f4"
+    ]
+  },
+  "related_links": [
+    {
+      "path": "/topics/energy-and-climate",
+      "label": "Explore energy and climate data",
+      "context": "Browse related indicators while keeping their units and denominators distinct."
+    },
+    {
+      "path": "/insights/reading-eu-renewables-by-energy-use",
+      "label": "How to read EU renewable-energy shares",
+      "context": "Read the broader interpretation of the sector measures and their different denominators."
+    }
+  ],
+  "review": {
+    "brief_id": "ab-003-eurostat-renewable-energy",
+    "reviewer_role": "Sol",
+    "approved_at": "2026-10-04T00:00:00.000Z",
+    "evidence_review_sha256": "3e3099a8a7503f8fd2673bcffe0e6156fa9ce8d9b1457c53a20c8bb87d1ac8f4"
+  }
+}

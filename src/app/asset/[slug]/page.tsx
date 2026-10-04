@@ -10,6 +10,10 @@ import { JsonLd } from "@/components/json-ld";
 import { SourceDataPreview } from "@/components/source-data-preview";
 import { WorldBankDataChart } from "@/components/worldbank-data-chart";
 import { buildEmbedMarkup, canCopyEmbed, parseEmbedRights } from "@/lib/assets/embed";
+import {
+  resolveAssetEditorialOverlay,
+  type AssetEditorialOverlay,
+} from "@/lib/assets/editorial/asset-editorial-overlay";
 import { obligationLabel, permissionLabel, rightsValueState } from "@/lib/assets/rights-labels";
 import { getDatabase } from "@/lib/db/client";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
@@ -107,6 +111,9 @@ export default async function AssetPage({ params }: AssetPageProps) {
   const marketplaceEmbed =
     embedRights.embed_provenance === "marketplace_rendered" &&
     embedRights.marketplace_rendered_embed_allowed === true;
+  const editorialResolution = resolveAssetEditorialOverlay(asset);
+  const editorialOverlay =
+    editorialResolution.status === "approved_fresh" ? editorialResolution.overlay : null;
 
   return (
     <main className="asset-detail page-shell">
@@ -232,6 +239,8 @@ export default async function AssetPage({ params }: AssetPageProps) {
         </div>
       </section>
 
+      {editorialOverlay ? <AssetEditorialContext overlay={editorialOverlay} /> : null}
+
       <div className="asset-detail__columns">
         <section className="detail-panel" aria-labelledby="rights-heading">
           <div className="detail-panel__heading">
@@ -346,6 +355,80 @@ export default async function AssetPage({ params }: AssetPageProps) {
 
 async function loadAsset(slug: string) {
   return getPublishedAssetBySlug(getDatabase(), slug);
+}
+
+function AssetEditorialContext({ overlay }: { overlay: AssetEditorialOverlay }) {
+  const coverage = [
+    ["Unit", overlay.observation_coverage.unit],
+    ["Period", overlay.observation_coverage.period],
+    ["Geography", overlay.observation_coverage.geography],
+    ["Frequency", overlay.observation_coverage.frequency],
+    ["Series", overlay.observation_coverage.series_scope],
+  ] as const;
+
+  return (
+    <section className="asset-editorial" aria-labelledby="asset-editorial-heading">
+      <div className="asset-editorial__header">
+        <div>
+          <p className="eyebrow">Reviewed context</p>
+          <h2 id="asset-editorial-heading">What this data shows</h2>
+        </div>
+        <p className="asset-editorial__version">
+          {overlay.source_contract.source_version_label} · Editorial version{" "}
+          {overlay.content_version}
+        </p>
+      </div>
+
+      <p className="asset-editorial__question">{overlay.question}</p>
+      <p className="asset-editorial__answer">{overlay.direct_answer}</p>
+
+      <div className="asset-editorial__grid">
+        <section className="asset-editorial__panel" aria-labelledby="asset-methodology-heading">
+          <h3 id="asset-methodology-heading">How to read it</h3>
+          <div className="asset-editorial__prose">
+            {overlay.methodology.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        </section>
+
+        <section className="asset-editorial__panel" aria-labelledby="asset-coverage-heading">
+          <h3 id="asset-coverage-heading">Observation coverage</h3>
+          <dl className="asset-editorial__coverage">
+            {coverage.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section className="asset-editorial__panel" aria-labelledby="asset-limitations-heading">
+          <h3 id="asset-limitations-heading">Limitations</h3>
+          <ul className="asset-editorial__list">
+            {overlay.limitations.map((limitation) => (
+              <li key={limitation}>{limitation}</li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      {overlay.related_links.length > 0 ? (
+        <nav className="asset-editorial__links" aria-label="Related reading">
+          <p>Continue with related context</p>
+          <ul>
+            {overlay.related_links.map((link) => (
+              <li key={link.path}>
+                <Link href={link.path}>{link.label}</Link>
+                <span>{link.context}</span>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
+    </section>
+  );
 }
 
 function RelatedAssets({ assets }: { assets: RelatedAsset[] }) {

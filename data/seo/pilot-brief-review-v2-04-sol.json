@@ -1,0 +1,233 @@
+{
+  "schema_version": "1.0.0",
+  "step": "V2-04-sol-review",
+  "reviewed_at": "2026-10-04",
+  "reviewer_role": "Sol",
+  "status": "approved_for_v2_05_overlay_implementation_not_publication",
+  "inputs": {
+    "luna_briefs_path": "data/seo/locked-pilot-briefs-v2-04-luna.json",
+    "luna_briefs_sha256": "97cefcf663f75e00839bc66771c1cfb696d5e8edd948e49e8d792589cc28b16f",
+    "pilot_selection_path": "data/seo/pilot-selection-v2-02-sol.json",
+    "pilot_selection_sha256": "3456d0953c266585f3c3a2862bb146997e71e7f1b19401f1bc90f0250af45f6c",
+    "eurostat_fact_pack_path": "data/editorial/fact-packs/cb-002-eu-renewable-share-patterns.json",
+    "eurostat_fact_pack_sha256": "ba03848c94751576ee31b3ebebf38532a6eaa65ac22402623fa64eda3ca90345"
+  },
+  "production_d1_read": false,
+  "production_d1_write": false,
+  "deployment": false,
+  "source_retrieval": {
+    "retrieved_at": "2026-10-04",
+    "storage": "temporary_review_files_not_committed",
+    "fixture_work_deferred_to": "V2-06",
+    "requests": [
+      {
+        "url": "https://ourworldindata.org/grapher/years-of-fossil-fuel-reserves-left.metadata.json",
+        "sha256": "ba3c93f2c6001496069d9ef9d0f8a585b0f7ace800374eb9bbd139907e9a0d96"
+      },
+      {
+        "url": "https://ourworldindata.org/grapher/years-of-fossil-fuel-reserves-left.csv",
+        "sha256": "235136205893e6a03713ce5ad13f66e13a6672df865a29550b361021424ee730"
+      },
+      {
+        "url": "https://api.ourworldindata.org/v1/indicators/1295444.metadata.json",
+        "sha256": "7b67ed2adb4db5a55dd4e71d613c973bd6aae1ba7e43c21ce43f1cdd522c896b"
+      },
+      {
+        "url": "https://api.ourworldindata.org/v1/indicators/1295391.metadata.json",
+        "sha256": "c9bc4a413705592fee35651d43d5a3bcf0a7f516c568c10475088715897b2b27"
+      },
+      {
+        "url": "https://api.ourworldindata.org/v1/indicators/1295488.metadata.json",
+        "sha256": "8736c7ce01a6457a5ecfe4c3027590dc102350417a7e902192ef3f710ef638a4"
+      },
+      {
+        "url": "https://ourworldindata.org/grapher/solar-pv-prices.metadata.json",
+        "sha256": "3ac71f2696a67a413182c50d6c650be51c8b0d9546b9dfd5b780fb1fde85863b"
+      },
+      {
+        "url": "https://ourworldindata.org/grapher/solar-pv-prices.csv",
+        "sha256": "26941d3ff4f7bb11916bf6e36937064fe9f65f91c281d2f5250cb6e24da589dc"
+      },
+      {
+        "url": "https://api.ourworldindata.org/v1/indicators/1305867.metadata.json",
+        "sha256": "d065aa8eaf988e8c437295c457ee11bd54e0ba5bbdd3188fa215406caa193710"
+      }
+    ]
+  },
+  "decisions": [
+    {
+      "brief_id": "ab-001-fossil-reserves",
+      "asset_slug": "years-of-fossil-fuel-reserves-left",
+      "decision": "approved_for_overlay_implementation",
+      "approved_question": "What does the reserves-to-production ratio say about remaining fossil-fuel reserves?",
+      "approved_answer": "The chart shows how many years proved reserves would last if production continued at that year's rate. It is a conditional ratio based on known reserves and present production, not a forecast of depletion.",
+      "source_contract": {
+        "source_family": "owid",
+        "source_dataset": "Energy Institute Statistical Review of World Energy (2026), processed by Our World in Data",
+        "dataset_version": "2026-06-30",
+        "entity": "World",
+        "entity_code": "OWID_WRL",
+        "unit": "years",
+        "series": [
+          {
+            "indicator_id": 1295444,
+            "name": "Gas reserves-to-production ratio",
+            "timespan": "1980-2020",
+            "last_observation": {
+              "year": 2020,
+              "value": 48.503418
+            }
+          },
+          {
+            "indicator_id": 1295391,
+            "name": "Coal reserves-to-production ratio",
+            "timespan": "2020-2020",
+            "last_observation": {
+              "year": 2020,
+              "value": 140.34598
+            }
+          },
+          {
+            "indicator_id": 1295488,
+            "name": "Oil reserves-to-production ratio",
+            "timespan": "1980-2020",
+            "last_observation": {
+              "year": 2020,
+              "value": 56.391872
+            }
+          }
+        ],
+        "transformation": "proved reserves divided by production of the same fossil fuel in the same year, calculated by Our World in Data"
+      },
+      "approved_numeric_scope": {
+        "values_may_be_used": true,
+        "display_precision": 1,
+        "headline_numeric_claim_required": false,
+        "must_label_observation_year": 2020,
+        "must_not_call_current": true
+      },
+      "required_limitations": [
+        "The latest observations in this chart are from 2020 even though the source metadata was updated in 2026.",
+        "The ratio changes when reserves, production, prices, technology or reporting change.",
+        "Coal has only one observation in the supplied chart and must not be shown as a trend.",
+        "The series is global and does not describe individual countries."
+      ],
+      "rights_decision": {
+        "chart_reuse": "CC BY 4.0 with attribution",
+        "source_hosted_embed": "allowed",
+        "commercial_use": "allowed",
+        "raw_data_redistribution": "not_approved_by_this_review",
+        "reason": "The chart page exposes an OWID CC BY chart license, while the underlying Energy Institute origins retain provider-specific copyright terms."
+      }
+    },
+    {
+      "brief_id": "ab-002-solar-module-prices",
+      "asset_slug": "solar-pv-prices",
+      "decision": "approved_for_overlay_implementation",
+      "approved_question": "How have inflation-adjusted solar photovoltaic module prices changed over the available series?",
+      "approved_answer": "The source series falls from 132.3757 constant 2025 US dollars per watt in 1975 to 0.26518628 in 2024, a decrease of about 99.8%. The series measures module prices, not a complete installed solar system or electricity price.",
+      "source_contract": {
+        "source_family": "owid",
+        "source_dataset": "IRENA (2025), Nemet (2009), and Farmer and Lafond (2016), processed by Our World in Data",
+        "dataset_version": "2026-07-28",
+        "indicator_id": 1305867,
+        "entity": "World",
+        "entity_code": "OWID_WRL",
+        "unit": "constant 2025 US$ per watt",
+        "timespan": "1975-2024",
+        "source_segments": [
+          "Nemet (2009) for 1975-2003",
+          "Farmer and Lafond (2016) for 2004-2009",
+          "IRENA and European pvXchange benchmarks from 2010 onward"
+        ],
+        "transformation": "Historical prices are converted to constant 2025 US dollars using the US GDP deflator; Cite Supply may round for display only."
+      },
+      "approved_numeric_scope": {
+        "start": {
+          "year": 1975,
+          "value": 132.3757
+        },
+        "end": {
+          "year": 2024,
+          "value": 0.26518628
+        },
+        "derived_decline_percent": 99.79967148049076,
+        "approved_display": "about 99.8% lower",
+        "display_price_precision": 2
+      },
+      "required_limitations": [
+        "The series combines three source periods and changes to European market benchmarks from 2010 onward because of limited data availability.",
+        "It covers the module itself, excluding installation and other system components.",
+        "Constant-dollar values depend on the stated US GDP deflator and base year.",
+        "A module-price decline is not the same as a decline in total installed-system cost or electricity prices."
+      ],
+      "rights_decision": {
+        "chart_reuse": "CC BY 4.0 with attribution",
+        "source_hosted_embed": "allowed",
+        "commercial_use": "allowed",
+        "raw_data_redistribution": "not_approved_by_this_review",
+        "reason": "The chart page exposes an OWID CC BY chart license, while the underlying series includes IRENA and other provider terms."
+      }
+    },
+    {
+      "brief_id": "ab-003-eurostat-renewable-energy",
+      "asset_slug": "eurostat-nrg_ind_ren",
+      "decision": "approved_for_overlay_implementation_with_noindex_gate",
+      "approved_question": "What do the EU renewable-energy indicators measure across the covered energy-balance categories?",
+      "approved_answer": "The four approved series are separate EU27 annual percentages for the overall renewable share, transport, electricity, and heating and cooling. They use different sector denominators and must not be added together.",
+      "source_contract": {
+        "source_family": "eurostat",
+        "source_dataset": "nrg_ind_ren",
+        "entity": "EU27_2020",
+        "unit": "percentage",
+        "frequency": "annual",
+        "timespan": "2020-2024 in the pinned fact pack",
+        "approved_categories": ["REN", "REN_TRA", "REN_ELC", "REN_HEAT_CL"],
+        "response_sha256": "251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7"
+      },
+      "approved_numeric_scope": {
+        "year": 2024,
+        "values": [
+          {
+            "category": "REN",
+            "value": 25.241
+          },
+          {
+            "category": "REN_TRA",
+            "value": 11.2
+          },
+          {
+            "category": "REN_ELC",
+            "value": 47.503
+          },
+          {
+            "category": "REN_HEAT_CL",
+            "value": 26.738
+          }
+        ],
+        "display_precision": 1
+      },
+      "required_limitations": [
+        "The category percentages have different denominators and must not be summed.",
+        "The 2020-2021 methodology break must be explained for trend comparisons.",
+        "Only the pinned EU27_2020 scope and approved category codes may support the overlay.",
+        "The page must remain narrower than the existing EU-renewables insight."
+      ],
+      "rights_decision": {
+        "commercial_use": "allowed",
+        "marketplace_rendered_embed": "allowed",
+        "source_hosted_embed": "not_allowed",
+        "raw_data_redistribution": "allowed_with_attribution_and_policy_exceptions",
+        "attribution": "required"
+      },
+      "indexing_decision": "retain_noindex_until_v2_07_full_pilot_qa"
+    }
+  ],
+  "implementation_constraints": [
+    "V2-05 may implement only the approved answer, source contract, limitations and actions in this record.",
+    "V2-05 must not publish temporary review files or infer any additional numeric claim.",
+    "V2-06 must add repository fixtures and deterministic assertions before production release.",
+    "No overlay approval changes assets.search_indexable or sitemap eligibility.",
+    "Raw data redistribution remains disabled for both OWID pilots."
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "step": "V2-03",
+  "status": "architecture_approved_not_implemented",
+  "decided_at": "2026-10-04",
+  "model_role": "Sol",
+  "storage": {
+    "canonical_store": "repository_json",
+    "canonical_path": "content/assets/editorial/<asset-slug>.json",
+    "runtime_form": "validated_bundled_map",
+    "primary_key": "asset_id",
+    "integrity_assertion": "asset_slug",
+    "d1_table": null,
+    "d1_writes": false,
+    "production_migration": false
+  },
+  "record_contract": {
+    "required_fields": [
+      "schema_version",
+      "asset_id",
+      "asset_slug",
+      "content_version",
+      "review_state",
+      "language",
+      "direct_answer",
+      "methodology",
+      "limitations",
+      "observation_coverage",
+      "source_contract",
+      "related_links",
+      "review"
+    ],
+    "review_states": ["draft", "in_review", "approved", "retired"],
+    "derived_runtime_states": ["approved_fresh", "stale", "suppressed", "absent"],
+    "language_initial_value": "en",
+    "content_version_format": "semver",
+    "fixed_minimum_word_count": null
+  },
+  "observation_coverage_contract": {
+    "required_fields": ["unit", "period_start", "period_end", "geography", "series_scope"],
+    "nullable_only_when_evidence_explains_absence": true
+  },
+  "source_contract": {
+    "hash_algorithm": "sha256",
+    "normalization": "stable_key_order_utf8_json_no_display_rounding",
+    "required_inputs": [
+      "source_family",
+      "source_id",
+      "external_identifiers",
+      "canonical_evidence_urls",
+      "measurement_definition",
+      "unit",
+      "geography_scope",
+      "period_start",
+      "period_end",
+      "source_version_or_fixture_hash",
+      "transformation_id_and_version",
+      "approved_fact_or_assertion_ids"
+    ],
+    "exclude_from_hash": [
+      "unrelated_source_metadata",
+      "presentation_whitespace",
+      "display_rounding",
+      "request_time"
+    ],
+    "mismatch_behavior": "suppress_editorial_claim_blocks_and_report_stale_without_d1_write"
+  },
+  "rendering": {
+    "render_only_state": "approved_fresh",
+    "section_order": [
+      "direct_answer",
+      "methodology",
+      "observation_coverage",
+      "limitations",
+      "related_links"
+    ],
+    "legacy_asset_behavior": "unchanged",
+    "rights_precedence": true,
+    "published_asset_required": true,
+    "metadata_must_match_visible_content": true,
+    "stale_content_in_metadata": false,
+    "stale_content_in_json_ld": false
+  },
+  "indexing": {
+    "approval_changes_search_indexable": false,
+    "approval_changes_sitemap": false,
+    "eurostat_pilot_remains_noindex_until_full_qa": true
+  },
+  "write_ownership": {
+    "source_import_or_refresh": [
+      "asset_source_fields",
+      "source_metadata",
+      "source_dates",
+      "source_urls"
+    ],
+    "rights_pipeline": ["rights_status", "publisher_actions"],
+    "reviewed_repository_change": [
+      "direct_answer",
+      "methodology",
+      "limitations",
+      "observation_coverage",
+      "source_contract",
+      "content_version",
+      "related_links",
+      "review_state"
+    ]
+  },
+  "pilot_scope": ["years-of-fossil-fuel-reserves-left", "solar-pv-prices", "eurostat-nrg_ind_ren"],
+  "implementation_authorized": false,
+  "deployment_authorized": false
+}

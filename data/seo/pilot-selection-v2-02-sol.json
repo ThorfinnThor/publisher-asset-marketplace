@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "step": "V2-02-sol-selection",
+  "reviewed_at": "2026-10-04",
+  "reviewer_role": "Sol",
+  "status": "approved_for_locked_briefs_not_publication",
+  "evidence": {
+    "live_browser_review": true,
+    "production_d1_write": false,
+    "deployment": false,
+    "fresh_gsc_export": false,
+    "selection_basis": [
+      "explicit pilot scope in the approved V2 plan",
+      "live route and canonical",
+      "visible reuse and citation state",
+      "source-data readiness",
+      "distinct user question",
+      "duplicate and cannibalization risk"
+    ]
+  },
+  "pilots": [
+    {
+      "rank": 1,
+      "candidate_id": "c-045-fossil-fuel-reserves",
+      "asset_slug": "years-of-fossil-fuel-reserves-left",
+      "public_url": "https://citesupply.com/asset/years-of-fossil-fuel-reserves-left",
+      "canonical": "https://citesupply.com/asset/years-of-fossil-fuel-reserves-left",
+      "robots": "index, follow",
+      "schema_type": "CreativeWork",
+      "visible_rights": {
+        "commercial_use": "allowed",
+        "source_hosted_embed": "allowed",
+        "attribution": "required",
+        "raw_data_redistribution": "unknown"
+      },
+      "decision": "approved_for_locked_brief",
+      "required_brief_focus": "Explain that the reserves-to-production ratio is conditional on known reserves and present production, not a countdown forecast."
+    },
+    {
+      "rank": 2,
+      "candidate_id": "c-044-solar-module-prices",
+      "asset_slug": "solar-pv-prices",
+      "public_url": "https://citesupply.com/asset/solar-pv-prices",
+      "canonical": "https://citesupply.com/asset/solar-pv-prices",
+      "robots": "index, follow",
+      "schema_type": "CreativeWork",
+      "visible_rights": {
+        "commercial_use": "allowed",
+        "source_hosted_embed": "allowed",
+        "attribution": "required",
+        "raw_data_redistribution": "unknown"
+      },
+      "decision": "approved_for_locked_brief",
+      "required_brief_focus": "State currency basis, inflation adjustment, unit per watt, series period and source changes before describing the trend."
+    },
+    {
+      "rank": 3,
+      "candidate_id": "c-003-renewable-share-eurostat",
+      "asset_slug": "eurostat-nrg_ind_ren",
+      "public_url": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+      "canonical": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+      "robots": "noindex, follow",
+      "schema_type": "Dataset",
+      "visible_rights": {
+        "commercial_use": "allowed",
+        "marketplace_rendered_embed": "allowed",
+        "source_hosted_embed": "not_allowed",
+        "attribution": "required",
+        "raw_data_redistribution": "allowed"
+      },
+      "decision": "approved_for_locked_brief_with_indexing_gate",
+      "required_brief_focus": "Keep the asset-page answer distinct from the existing public insight: define the six energy-balance measures, unit, EU27 geography, provisional flags and observation period.",
+      "indexing_gate": "Do not change noindex until the reviewed overlay, canonical/schema consistency, sitemap eligibility and full pilot QA pass."
+    }
+  ],
+  "follow_ons": [
+    "c-004-electricity-access-gap",
+    "c-005-electricity-fuel-mix",
+    "c-006-carbon-emissions-per-capita",
+    "c-007-carbon-intensity",
+    "c-035-freshwater-withdrawals",
+    "c-041-material-footprint",
+    "c-042-data-centres-energy"
+  ],
+  "holds": [
+    {
+      "candidate_id": "c-002-solar-capacity",
+      "reason": "Useful follow-on but not the plan-mandated solar-price pilot; keep separate from price claims."
+    },
+    {
+      "candidate_id": "c-010-electricity-urban-rural",
+      "reason": "Duplicate group with c-004; select one evidence contract before expanding."
+    },
+    {
+      "candidate_id": "c-037-wildfire-area",
+      "reason": "A public wildfire insight already exists; avoid overlapping page intent until cannibalization is reviewed."
+    },
+    {
+      "candidate_id": "eurostat-sdg_07_40",
+      "reason": "The existing editorial workflow dropped this secondary dataset from the approved renewables fact pack; use nrg_ind_ren for the pilot."
+    }
+  ],
+  "open_gate": "Fresh GSC data is still required before interpreting search demand or reprioritizing the cohort based on impressions or clicks."
+}

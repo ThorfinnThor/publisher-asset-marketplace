@@ -1,8 +1,12 @@
-export {};
+import { PUBLIC_EDITORIAL_ARTICLES } from "../src/lib/editorial/public-articles";
+import { TOPICS } from "../src/lib/topics";
 
 const defaultBaseUrl = "https://citesupply.com";
 const baseUrl = (process.env.AUDIT_BASE_URL ?? defaultBaseUrl).replace(/\/$/u, "");
 const concurrency = Number(process.env.AUDIT_CONCURRENCY ?? "2");
+const sitemapMaximumAssetCount = 500;
+const sitemapMaximumUrlCount =
+  4 + TOPICS.length + PUBLIC_EDITORIAL_ARTICLES.length + sitemapMaximumAssetCount;
 
 const publicUtilityPaths = [
   "/search",
@@ -149,8 +153,10 @@ async function run(): Promise<void> {
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/gu)].map((match) =>
     decodeHtml(match[1] ?? ""),
   );
-  if (sitemapUrls.length < 3 || sitemapUrls.length > 502) {
-    failures.push(`sitemap contains ${sitemapUrls.length} URLs; expected 3-502`);
+  if (sitemapUrls.length < 3 || sitemapUrls.length > sitemapMaximumUrlCount) {
+    failures.push(
+      `sitemap contains ${sitemapUrls.length} URLs; expected 3-${sitemapMaximumUrlCount}`,
+    );
   }
 
   const auditUrls = [

@@ -1,0 +1,253 @@
+{
+  "schema_version": "v2.0",
+  "step": "V2-02",
+  "generated_at": "2026-10-04",
+  "workflow_role": "Luna",
+  "status": "mechanical_inventory_for_sol_selection",
+  "provenance": {
+    "source_files": [
+      "data/editorial/article-candidates.json",
+      "docs/seo/citesupply-seo-implementation-plan-v2.md",
+      "data/seed/owid-all-3000.csv",
+      "data/seed/owid-first-10.csv"
+    ],
+    "source_file_role": "prior read-only candidate export plus the two plan-mandated OWID pilot assets",
+    "production_d1_read": "not_available_in_this_run",
+    "gsc_export": "not_available",
+    "writes_or_deployments": false
+  },
+  "interpretation": {
+    "route_status": "unverified",
+    "route_rule": "A Cite Supply asset path is derived from the candidate slug only as a verification target; it is not evidence that the route currently exists.",
+    "rights_status": "inherited evidence requires per-asset recheck before any article or claim is approved",
+    "gsc_status": "unknown until a fresh sc-domain:citesupply.com export is supplied",
+    "selection_status": "no pilot is approved by this file"
+  },
+  "cohorts": {
+    "energy_environment": [
+      {
+        "candidate_id": "c-044-solar-module-prices",
+        "cluster_fit": "direct",
+        "asset_slugs": ["solar-pv-prices"],
+        "source_families": ["owid"],
+        "duplicate_group": "solar-energy"
+      },
+      {
+        "candidate_id": "c-003-renewable-share-eurostat",
+        "cluster_fit": "direct",
+        "asset_slugs": ["eurostat-nrg_ind_ren", "eurostat-sdg_07_40"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "renewable-energy"
+      },
+      {
+        "candidate_id": "c-004-electricity-access-gap",
+        "cluster_fit": "direct",
+        "asset_slugs": [
+          "worldbank-eg.elc.accs.zs",
+          "worldbank-eg.elc.accs.ru.zs",
+          "worldbank-eg.elc.accs.ur.zs"
+        ],
+        "source_families": ["world_bank"],
+        "duplicate_group": "electricity-access"
+      },
+      {
+        "candidate_id": "c-005-electricity-fuel-mix",
+        "cluster_fit": "direct",
+        "asset_slugs": ["eurostat-nrg_cb_pem"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "electricity-mix"
+      },
+      {
+        "candidate_id": "c-006-carbon-emissions-per-capita",
+        "cluster_fit": "direct",
+        "asset_slugs": ["worldbank-en.ghg.co2.pc.ce.ar5"],
+        "source_families": ["world_bank"],
+        "duplicate_group": "carbon-emissions"
+      },
+      {
+        "candidate_id": "c-007-carbon-intensity",
+        "cluster_fit": "direct",
+        "asset_slugs": ["worldbank-en.ghg.co2.rt.gdp.pp.kd"],
+        "source_families": ["world_bank"],
+        "duplicate_group": "carbon-intensity"
+      },
+      {
+        "candidate_id": "c-010-electricity-urban-rural",
+        "cluster_fit": "direct",
+        "asset_slugs": ["access-to-electricity-urban-vs-rural"],
+        "source_families": ["owid"],
+        "duplicate_group": "electricity-access"
+      },
+      {
+        "candidate_id": "c-011-school-electricity",
+        "cluster_fit": "adjacent_infrastructure",
+        "asset_slugs": ["schools-access-to-electricity"],
+        "source_families": ["owid"],
+        "duplicate_group": "education-infrastructure"
+      },
+      {
+        "candidate_id": "c-045-fossil-fuel-reserves",
+        "cluster_fit": "direct",
+        "asset_slugs": ["years-of-fossil-fuel-reserves-left"],
+        "source_families": ["owid"],
+        "duplicate_group": "fossil-reserves"
+      },
+      {
+        "candidate_id": "c-027-urban-housing-adequacy",
+        "cluster_fit": "adjacent",
+        "asset_slugs": ["share-of-urban-population-living-in-inadequate-housing"],
+        "source_families": ["owid"],
+        "duplicate_group": "housing"
+      },
+      {
+        "candidate_id": "c-028-urban-slums",
+        "cluster_fit": "adjacent",
+        "asset_slugs": ["share-of-urban-population-living-in-slums"],
+        "source_families": ["owid"],
+        "duplicate_group": "housing"
+      },
+      {
+        "candidate_id": "c-030-construction-activity",
+        "cluster_fit": "adjacent_infrastructure",
+        "asset_slugs": ["eurostat-ei_isbu_m"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "construction"
+      },
+      {
+        "candidate_id": "c-035-freshwater-withdrawals",
+        "cluster_fit": "direct",
+        "asset_slugs": ["freshwater-withdrawals-as-a-share-of-internal-resources"],
+        "source_families": ["owid"],
+        "duplicate_group": "water"
+      },
+      {
+        "candidate_id": "c-036-freshwater-worldbank",
+        "cluster_fit": "direct",
+        "asset_slugs": ["worldbank-er.h2o.fwtl.zs"],
+        "source_families": ["world_bank"],
+        "duplicate_group": "water"
+      },
+      {
+        "candidate_id": "c-037-wildfire-area",
+        "cluster_fit": "direct",
+        "asset_slugs": ["area-burned-wildfires-by-type"],
+        "source_families": ["owid"],
+        "duplicate_group": "wildfires"
+      },
+      {
+        "candidate_id": "c-038-forest-change",
+        "cluster_fit": "direct",
+        "asset_slugs": ["forest-area-net-change-rate"],
+        "source_families": ["owid"],
+        "duplicate_group": "forests"
+      },
+      {
+        "candidate_id": "c-039-bathing-water",
+        "cluster_fit": "direct",
+        "asset_slugs": ["eurostat-sdg_14_40"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "water-quality"
+      },
+      {
+        "candidate_id": "c-040-ammonia-agriculture",
+        "cluster_fit": "direct",
+        "asset_slugs": ["eurostat-sdg_02_60"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "agriculture-emissions"
+      },
+      {
+        "candidate_id": "c-041-material-footprint",
+        "cluster_fit": "direct",
+        "asset_slugs": ["material-footprint-per-capita", "material-footprint-per-unit-of-gdp"],
+        "source_families": ["owid"],
+        "duplicate_group": "material-footprint"
+      },
+      {
+        "candidate_id": "c-042-data-centres-energy",
+        "cluster_fit": "direct",
+        "asset_slugs": ["data-centers-share-electricity-demand"],
+        "source_families": ["owid"],
+        "duplicate_group": "data-centres"
+      }
+    ],
+    "reserve": [
+      {
+        "candidate_id": "c-001-digital-adoption",
+        "cluster_fit": "technology",
+        "asset_slugs": ["share-of-individuals-using-the-internet"],
+        "source_families": ["owid"],
+        "duplicate_group": "digital-access"
+      },
+      {
+        "candidate_id": "c-008-economic-growth",
+        "cluster_fit": "economy",
+        "asset_slugs": ["annual-gdp-growth"],
+        "source_families": ["owid"],
+        "duplicate_group": "economic-growth"
+      },
+      {
+        "candidate_id": "c-009-import-growth",
+        "cluster_fit": "economy",
+        "asset_slugs": ["annual-growth-of-imports-of-goods-and-services"],
+        "source_families": ["owid"],
+        "duplicate_group": "trade-growth"
+      },
+      {
+        "candidate_id": "c-012-fertility-and-labour",
+        "cluster_fit": "society",
+        "asset_slugs": ["fertility-and-female-labor-force-participation"],
+        "source_families": ["owid"],
+        "duplicate_group": "fertility-labour"
+      },
+      {
+        "candidate_id": "c-013-total-fertility-wb",
+        "cluster_fit": "society",
+        "asset_slugs": ["worldbank-sp.dyn.tfrt.in"],
+        "source_families": ["world_bank"],
+        "duplicate_group": "fertility"
+      },
+      {
+        "candidate_id": "c-014-total-fertility-eurostat",
+        "cluster_fit": "society",
+        "asset_slugs": ["eurostat-tps00199"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "fertility"
+      },
+      {
+        "candidate_id": "c-015-life-expectancy-gender-gap",
+        "cluster_fit": "health",
+        "asset_slugs": ["worldbank-sp.dyn.le00.fe.in", "worldbank-sp.dyn.le00.ma.in"],
+        "source_families": ["world_bank"],
+        "duplicate_group": "life-expectancy"
+      },
+      {
+        "candidate_id": "c-016-life-expectancy-eu",
+        "cluster_fit": "health",
+        "asset_slugs": ["eurostat-tps00208"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "life-expectancy"
+      },
+      {
+        "candidate_id": "c-017-unemployment-by-sex",
+        "cluster_fit": "work",
+        "asset_slugs": ["eurostat-teilm010"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "labour-market"
+      },
+      {
+        "candidate_id": "c-018-youth-unemployment",
+        "cluster_fit": "work",
+        "asset_slugs": ["eurostat-teilm011"],
+        "source_families": ["eurostat"],
+        "duplicate_group": "labour-market"
+      }
+    ]
+  },
+  "required_next_gates": [
+    "Sol verifies the current Cite Supply asset route and canonical URL for every selected candidate.",
+    "Sol rechecks rights evidence, commercial use, citation and the exact embed mode per asset.",
+    "A source-specific fetch is pinned and checked before any numerical claim is drafted.",
+    "Fresh GSC exports are supplied before demand-based prioritization is finalized.",
+    "Duplicate groups are reduced to one pilot question unless distinct denominators or audiences justify separation."
+  ]
+}

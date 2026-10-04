@@ -1,0 +1,244 @@
+{
+  "schema_version": "1.0.0",
+  "step": "V2-04",
+  "workflow_role": "Luna",
+  "generated_at": "2026-10-04",
+  "status": "drafted_for_sol_review_not_publication",
+  "production_d1_read": false,
+  "production_d1_write": false,
+  "deployment": false,
+  "article_drafts": false,
+  "overlay_records": false,
+  "evidence_rule": "Only the cited route, selection record, rights evidence and pinned Eurostat fact pack may support these briefs. Missing source-specific numeric fixtures remain explicit blockers.",
+  "briefs": [
+    {
+      "brief_id": "ab-001-fossil-reserves",
+      "candidate_id": "c-045-fossil-fuel-reserves",
+      "asset": {
+        "asset_id": "asset_owid_years-of-fossil-fuel-reserves-left",
+        "asset_slug": "years-of-fossil-fuel-reserves-left",
+        "public_url": "https://citesupply.com/asset/years-of-fossil-fuel-reserves-left",
+        "source_id": "source_owid",
+        "external_id": "years-of-fossil-fuel-reserves-left"
+      },
+      "question": "What does the reserves-to-production ratio say about remaining fossil-fuel reserves?",
+      "supported_answer_boundary": {
+        "statement": "The series is a conditional reserves-to-production measure: it relates recorded reserves to production under the source's definitions and assumptions. It is not a countdown forecast, a prediction of depletion, or a statement that production will remain constant.",
+        "numeric_claims_allowed_now": false,
+        "numeric_claims_blocker": "A source-specific OWID data fixture, exact indicator definition, unit, geography scope and observation period are not present in the current repository evidence. V2-06 must lock them before any value or trend is written."
+      },
+      "unit_period_scope": {
+        "unit": "years, subject to confirmation from the source indicator metadata",
+        "period": "source-defined first and last observation; pending source-specific fixture",
+        "geography": "source-defined entities; do not imply a global aggregate",
+        "frequency": "source-defined; pending fixture"
+      },
+      "transformation": {
+        "id": "direct-source-series-v1",
+        "description": "Display the reviewed source series without recomputing a depletion date. Any chart rounding must be presentation-only.",
+        "numeric_calculation_allowed": false
+      },
+      "limitations": [
+        "Reserves are estimates defined by the source and can change with discoveries, prices, technology, reporting and revisions.",
+        "A reserves-to-production ratio is conditional on the measured reserves and production definitions; it does not say when the world will run out.",
+        "Countries and fuels may use different coverage, reporting quality and observation periods.",
+        "Raw-data redistribution remains unverified in the current pilot selection and must not be promised."
+      ],
+      "rights_and_actions": {
+        "evidence_reference": "data/seo/pilot-selection-v2-02-sol.json#pilots[0]",
+        "commercial_use": "allowed",
+        "source_hosted_embed": "allowed",
+        "marketplace_rendered_embed": "not_selected",
+        "attribution": "required",
+        "raw_data_redistribution": "unknown",
+        "approved_actions_after_sol_review": [
+          "view_source",
+          "copy_citation",
+          "copy_embed_if_live_rights_match"
+        ]
+      },
+      "additional_cite_supply_value": [
+        "Make the conditional meaning and limitation visible beside the source chart.",
+        "Keep the source, observation coverage and citation in one publisher-facing page.",
+        "Expose only the embed action supported by the reviewed rights record."
+      ],
+      "internal_link_targets": [
+        {
+          "path": "/topics/energy-and-climate",
+          "purpose": "energy topic context"
+        },
+        {
+          "path": "/asset/solar-pv-prices",
+          "purpose": "related energy-cost series; link only as a related comparison, not a causal claim"
+        }
+      ],
+      "source_evidence": {
+        "canonical_url": "https://ourworldindata.org/grapher/years-of-fossil-fuel-reserves-left",
+        "evidence_state": "route_and_selection_only",
+        "required_before_overlay_approval": [
+          "source-specific data response and SHA-256",
+          "indicator definition and unit",
+          "first and last observation period",
+          "geography/entity dimension",
+          "chart-specific reuse evidence"
+        ]
+      },
+      "decision": "blocked_pending_v2_06_source_assertions"
+    },
+    {
+      "brief_id": "ab-002-solar-module-prices",
+      "candidate_id": "c-044-solar-module-prices",
+      "asset": {
+        "asset_id": "asset_owid_solar-pv-prices",
+        "asset_slug": "solar-pv-prices",
+        "public_url": "https://citesupply.com/asset/solar-pv-prices",
+        "source_id": "source_owid",
+        "external_id": "solar-pv-prices"
+      },
+      "question": "How have inflation-adjusted solar photovoltaic module prices changed over the available series?",
+      "supported_answer_boundary": {
+        "statement": "The page may explain what the source's photovoltaic-module price series measures and how its currency, price basis, unit and period should be read. It must not describe a trend until the source series and adjustment metadata are pinned.",
+        "numeric_claims_allowed_now": false,
+        "numeric_claims_blocker": "The repository contains the checked OWID chart URL and seed catalogue entry, but not a locked source-data fixture with currency basis, inflation treatment, unit and observation period."
+      },
+      "unit_period_scope": {
+        "unit": "price per watt, subject to confirmation from source metadata",
+        "period": "source-defined first and last observation; pending source-specific fixture",
+        "geography": "series-defined global or entity scope; must be stated from the fixture",
+        "frequency": "source-defined; pending fixture"
+      },
+      "transformation": {
+        "id": "source-price-basis-v1",
+        "description": "Preserve the source's currency and inflation basis. Cite Supply may round for display only and may not silently convert currencies or rebase prices.",
+        "numeric_calculation_allowed": false
+      },
+      "limitations": [
+        "Price series may combine or revise historical source methods; the source's metadata and version must be visible.",
+        "A module price is not the same as a complete installed-system cost, generation cost or household electricity price.",
+        "Currency, inflation adjustment and unit basis materially affect comparisons.",
+        "Raw-data redistribution is unverified because the source review records mixed underlying terms including IRENA copyright."
+      ],
+      "rights_and_actions": {
+        "evidence_reference": "data/rights/owid-seed-rights-review-v1.json#assets[solar-pv-prices]",
+        "commercial_use": "allowed",
+        "source_hosted_embed": "allowed",
+        "marketplace_rendered_embed": "not_selected",
+        "attribution": "required",
+        "raw_data_redistribution": "unknown",
+        "approved_actions_after_sol_review": [
+          "view_source",
+          "copy_citation",
+          "copy_embed_if_live_rights_match"
+        ]
+      },
+      "additional_cite_supply_value": [
+        "Put the price basis, source date and limitations next to the chart rather than leaving them to an external page.",
+        "Give publishers a stable citation and reviewed embed route.",
+        "Prevent a module-price series from being mistaken for a full solar-system cost."
+      ],
+      "internal_link_targets": [
+        {
+          "path": "/topics/energy-and-climate",
+          "purpose": "energy topic context"
+        },
+        {
+          "path": "/asset/years-of-fossil-fuel-reserves-left",
+          "purpose": "related energy indicator; no shared trend claim"
+        }
+      ],
+      "source_evidence": {
+        "canonical_url": "https://ourworldindata.org/grapher/solar-pv-prices",
+        "evidence_state": "rights_and_route_recorded_data_fixture_missing",
+        "required_before_overlay_approval": [
+          "source-specific data response and SHA-256",
+          "currency and inflation basis",
+          "unit and price definition",
+          "first and last observation period",
+          "chart-specific reuse evidence confirmation"
+        ]
+      },
+      "decision": "blocked_pending_v2_06_source_assertions"
+    },
+    {
+      "brief_id": "ab-003-eurostat-renewable-energy",
+      "candidate_id": "c-003-renewable-share-eurostat",
+      "asset": {
+        "asset_id": "asset_eurostat_nrg_ind_ren",
+        "asset_slug": "eurostat-nrg_ind_ren",
+        "public_url": "https://citesupply.com/asset/eurostat-nrg_ind_ren",
+        "source_id": "source_eurostat",
+        "external_id": "nrg_ind_ren"
+      },
+      "question": "What do the EU renewable-energy indicators measure across the covered energy-balance categories?",
+      "supported_answer_boundary": {
+        "statement": "The dataset contains separate annual percentage indicators for defined EU27 energy-balance categories. The indicators have different denominators and must be read as separate measures, not added into one total.",
+        "numeric_claims_allowed_now": true,
+        "numeric_claims_scope": "Only facts from the pinned nrg_ind_ren snapshot and approved metric IDs may be shown. The current fact pack covers EU27_2020 annual observations from 2020–2024 for the approved categories.",
+        "explicit_exclusion": "Do not use the provisional 2025 observation in comparisons; transport is absent in that period in the pinned scope."
+      },
+      "unit_period_scope": {
+        "unit": "percentage of the source-defined energy measure",
+        "period": "annual, 2020–2024 in the pinned fact pack",
+        "geography": "EU27_2020",
+        "frequency": "annual",
+        "methodology_note": "2020–2021 is a noted methodology break; trend claims should use 2021 onward or explain the discontinuity."
+      },
+      "transformation": {
+        "id": "eurostat-nrg-ind-ren-approved-metrics-v2",
+        "description": "Resolve only approved metric IDs from the pinned JSON-stat response; preserve source dimensions and round only at display time.",
+        "source_response_sha256": "251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7",
+        "snapshot_path": "data/editorial/source-snapshots/cb-002-eu-renewable-share-patterns/251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7/nrg_ind_ren.json",
+        "numeric_calculation_allowed": "only the approved transformation in the fact pack"
+      },
+      "limitations": [
+        "The category percentages use different denominators and must not be summed.",
+        "Eurostat status flags, provisional observations and the methodology break must remain visible when relevant.",
+        "The asset page is a narrow dataset reference; it must not duplicate the broader interpretation in the existing EU-renewables insight.",
+        "The exact source data and reuse conditions remain subject to the cited Eurostat evidence and attribution requirement."
+      ],
+      "rights_and_actions": {
+        "evidence_reference": "data/seo/pilot-selection-v2-02-sol.json#pilots[2]",
+        "commercial_use": "allowed",
+        "source_hosted_embed": "not_allowed",
+        "marketplace_rendered_embed": "allowed",
+        "attribution": "required",
+        "raw_data_redistribution": "allowed",
+        "approved_actions_after_sol_review": [
+          "view_source",
+          "copy_citation",
+          "copy_marketplace_rendered_embed"
+        ]
+      },
+      "additional_cite_supply_value": [
+        "Keep the EU27 scope, unit, period and category dimensions visible beside the data.",
+        "Make the methodology break and provisional-data boundary explicit.",
+        "Provide a marketplace-rendered embed that matches the reviewed Eurostat rights path."
+      ],
+      "internal_link_targets": [
+        {
+          "path": "/topics/energy-and-climate",
+          "purpose": "energy topic context"
+        },
+        {
+          "path": "/insights/reading-eu-renewables-by-energy-use",
+          "purpose": "broader interpretation; keep this asset page narrower and dataset-specific"
+        }
+      ],
+      "source_evidence": {
+        "canonical_url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_ren/default/table?lang=en",
+        "api_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_ind_ren?lang=en&sinceTimePeriod=2020&geo=EU27_2020",
+        "evidence_state": "pinned_fact_pack_available",
+        "fact_pack_id": "cb-002-eu-renewable-share-patterns",
+        "fact_pack_revision": "2.0.0",
+        "copyright_evidence_sha256": "af8717d250713371fedeadb95c803f818aa8155441f11afd7e41ef1485be2c7c"
+      },
+      "decision": "ready_for_sol_source_and_rights_review"
+    }
+  ],
+  "sol_gate": [
+    "Resolve OWID source-specific fixtures and definitions before approving either OWID overlay.",
+    "Confirm asset IDs against the production asset record before implementation; this file does not read production D1.",
+    "Review each transformation and numerical claim against source dimensions and rights.",
+    "Keep Eurostat noindex until V2-07 full pilot QA passes."
+  ]
+}

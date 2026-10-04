@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "asset_eurostat_nrg_ind_ren",
+  "asset_slug": "eurostat-nrg_ind_ren",
+  "source_family": "eurostat",
+  "source_updated_at": "2026-09-15T23:00:00+0200",
+  "source_files": [
+    {
+      "kind": "data",
+      "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_ind_ren?lang=en&sinceTimePeriod=2020&geo=EU27_2020",
+      "sha256": "251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7",
+      "storage": "repository_snapshot",
+      "snapshot_path": "data/editorial/source-snapshots/cb-002-eu-renewable-share-patterns/251b43bc21bf7aae2049c0c20e4641e068a9d3f73d91db58aa296d75339e51d7/nrg_ind_ren.json"
+    }
+  ],
+  "source_schema": {
+    "format": "json-stat2",
+    "signature": ["freq:1", "nrg_bal:6", "unit:1", "geo:1", "time:6"]
+  },
+  "scope": {
+    "entity": "European Union — 27 countries from 2020",
+    "entity_code": "EU27_2020",
+    "unit": "percentage",
+    "approved_start_year": 2020,
+    "approved_end_year": 2024
+  },
+  "series": [
+    {
+      "id": "REN",
+      "label": "Overall renewable share",
+      "first_year": 2020,
+      "last_year": 2024,
+      "observation_count": 5,
+      "asserted_values": [{ "year": 2024, "value": 25.241 }],
+      "asserted_missing_years": []
+    },
+    {
+      "id": "REN_TRA",
+      "label": "Renewable share in transport",
+      "first_year": 2020,
+      "last_year": 2024,
+      "observation_count": 5,
+      "asserted_values": [{ "year": 2024, "value": 11.2 }],
+      "asserted_missing_years": [2025]
+    },
+    {
+      "id": "REN_ELC",
+      "label": "Renewable share in electricity",
+      "first_year": 2020,
+      "last_year": 2024,
+      "observation_count": 5,
+      "asserted_values": [{ "year": 2024, "value": 47.503 }],
+      "asserted_missing_years": []
+    },
+    {
+      "id": "REN_HEAT_CL",
+      "label": "Renewable share in heating and cooling",
+      "first_year": 2020,
+      "last_year": 2024,
+      "observation_count": 5,
+      "asserted_values": [{ "year": 2024, "value": 26.738 }],
+      "asserted_missing_years": []
+    }
+  ],
+  "excluded_observations": [
+    { "series_id": "REN", "year": 2025, "value": 26.2, "status": "p" },
+    { "series_id": "REN_ELC", "year": 2025, "value": 49.9, "status": "p" },
+    { "series_id": "REN_HEAT_CL", "year": 2025, "value": 27.4, "status": "p" }
+  ],
+  "rights_boundary": {
+    "raw_data_redistribution": "allowed_with_attribution_and_policy_exceptions",
+    "repository_payload": "approved_repository_snapshot"
+  },
+  "presentation_contract": {
+    "preview": "d1_imported_source_table",
+    "embed": "marketplace_rendered",
+    "source_match": "source_updated_at_and_repository_snapshot_hash"
+  }
+}

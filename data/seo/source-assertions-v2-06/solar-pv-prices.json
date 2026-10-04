@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "asset_owid_solar-pv-prices",
+  "asset_slug": "solar-pv-prices",
+  "source_family": "owid",
+  "source_updated_at": "2026-07-28",
+  "source_files": [
+    {
+      "kind": "data",
+      "url": "https://ourworldindata.org/grapher/solar-pv-prices.csv",
+      "sha256": "26941d3ff4f7bb11916bf6e36937064fe9f65f91c281d2f5250cb6e24da589dc",
+      "storage": "hash_only_due_rights"
+    },
+    {
+      "kind": "metadata",
+      "url": "https://ourworldindata.org/grapher/solar-pv-prices.metadata.json",
+      "sha256": "3ac71f2696a67a413182c50d6c650be51c8b0d9546b9dfd5b780fb1fde85863b",
+      "storage": "hash_only_due_rights"
+    }
+  ],
+  "source_schema": {
+    "format": "csv",
+    "signature": ["Entity", "Code", "Year", "Solar PV module cost"]
+  },
+  "scope": {
+    "entity": "World",
+    "entity_code": "OWID_WRL",
+    "unit": "constant 2025 US dollars per watt",
+    "approved_start_year": 1975,
+    "approved_end_year": 2024
+  },
+  "series": [
+    {
+      "id": "solar-pv-module-price",
+      "label": "Solar photovoltaic module price",
+      "first_year": 1975,
+      "last_year": 2024,
+      "observation_count": 50,
+      "asserted_values": [
+        { "year": 1975, "value": 132.3757 },
+        { "year": 2024, "value": 0.26518628 }
+      ],
+      "asserted_missing_years": [1974, 2025]
+    }
+  ],
+  "derived_assertions": [
+    {
+      "id": "decline-1975-2024",
+      "operation": "percentage_decrease",
+      "start_year": 1975,
+      "end_year": 2024,
+      "expected_unrounded": 99.79967148049076,
+      "display_decimals": 1,
+      "expected_display": "99.8%"
+    }
+  ],
+  "rights_boundary": {
+    "raw_data_redistribution": "not_approved",
+    "repository_payload": "minimal_reviewed_assertions_only"
+  },
+  "presentation_contract": {
+    "preview": "source_hosted_chart",
+    "embed": "source_hosted",
+    "source_match": "source_updated_at_and_source_file_hashes"
+  }
+}

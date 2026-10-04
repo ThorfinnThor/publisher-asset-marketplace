@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "asset_owid_years-of-fossil-fuel-reserves-left",
+  "asset_slug": "years-of-fossil-fuel-reserves-left",
+  "source_family": "owid",
+  "source_updated_at": "2026-06-30",
+  "source_files": [
+    {
+      "kind": "data",
+      "url": "https://ourworldindata.org/grapher/years-of-fossil-fuel-reserves-left.csv",
+      "sha256": "235136205893e6a03713ce5ad13f66e13a6672df865a29550b361021424ee730",
+      "storage": "hash_only_due_rights"
+    },
+    {
+      "kind": "metadata",
+      "url": "https://ourworldindata.org/grapher/years-of-fossil-fuel-reserves-left.metadata.json",
+      "sha256": "ba3c93f2c6001496069d9ef9d0f8a585b0f7ace800374eb9bbd139907e9a0d96",
+      "storage": "hash_only_due_rights"
+    }
+  ],
+  "source_schema": {
+    "format": "csv",
+    "signature": ["Entity", "Code", "Year", "Gas", "Coal", "Oil"]
+  },
+  "scope": {
+    "entity": "World",
+    "entity_code": "OWID_WRL",
+    "unit": "years",
+    "approved_start_year": 1980,
+    "approved_end_year": 2020
+  },
+  "series": [
+    {
+      "id": "gas",
+      "label": "Gas reserves-to-production ratio",
+      "first_year": 1980,
+      "last_year": 2020,
+      "observation_count": 41,
+      "asserted_values": [{ "year": 2020, "value": 48.503418 }],
+      "asserted_missing_years": []
+    },
+    {
+      "id": "coal",
+      "label": "Coal reserves-to-production ratio",
+      "first_year": 2020,
+      "last_year": 2020,
+      "observation_count": 1,
+      "asserted_values": [{ "year": 2020, "value": 140.34598 }],
+      "asserted_missing_years": [2019]
+    },
+    {
+      "id": "oil",
+      "label": "Oil reserves-to-production ratio",
+      "first_year": 1980,
+      "last_year": 2020,
+      "observation_count": 41,
+      "asserted_values": [{ "year": 2020, "value": 56.391872 }],
+      "asserted_missing_years": []
+    }
+  ],
+  "rights_boundary": {
+    "raw_data_redistribution": "not_approved",
+    "repository_payload": "minimal_reviewed_assertions_only"
+  },
+  "presentation_contract": {
+    "preview": "source_hosted_chart",
+    "embed": "source_hosted",
+    "source_match": "source_updated_at_and_source_file_hashes"
+  }
+}

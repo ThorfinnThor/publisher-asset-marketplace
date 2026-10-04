@@ -11,6 +11,7 @@ describe("C4 published asset detail", () => {
     expect(buildAssetDetailSql()).toContain("a.status = 'published'");
     expect(buildAssetDetailSql()).toContain("a.rights_status IN ('safe', 'restricted')");
     expect(buildAssetDetailSql()).toContain("a.search_indexable");
+    expect(buildAssetDetailSql()).not.toContain("asset_editorial");
     expect(buildRelatedAssetsSql()).toContain("LIMIT 3");
     expect(buildRelatedAssetsSql()).toContain("a.slug <> ?");
     expect(buildRelatedAssetsSql()).toContain("UNION ALL");

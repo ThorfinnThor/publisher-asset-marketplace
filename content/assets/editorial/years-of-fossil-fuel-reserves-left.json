@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "asset_owid_years-of-fossil-fuel-reserves-left",
+  "asset_slug": "years-of-fossil-fuel-reserves-left",
+  "content_version": "1.0.0",
+  "review_state": "approved",
+  "language": "en",
+  "question": "What does the reserves-to-production ratio say about remaining fossil-fuel reserves?",
+  "direct_answer": "The chart shows how many years proved reserves would last if production continued at that year's rate. In the latest observations, which are from 2020, the ratios are 48.5 years for gas, 140.3 years for coal and 56.4 years for oil. These are conditional ratios, not forecasts of when a fuel will run out.",
+  "methodology": [
+    "Our World in Data calculates each ratio by dividing proved reserves by production of the same fossil fuel in the same year, using the Energy Institute Statistical Review of World Energy.",
+    "The displayed values are rounded to one decimal place. The reviewed source values and calculations remain unrounded in the evidence contract."
+  ],
+  "limitations": [
+    "The latest observations in this chart are from 2020 even though the source metadata was updated in 2026.",
+    "Reserves and production can change with discoveries, prices, technology, reporting and revisions, so the ratio is not a fixed countdown.",
+    "Coal has only one observation in this chart and cannot support a trend.",
+    "The series describes the world total and does not represent individual countries."
+  ],
+  "observation_coverage": {
+    "unit": "Years",
+    "period": "1980–2020 for gas and oil; 2020 only for coal",
+    "geography": "World",
+    "frequency": "Annual where observations are available",
+    "series_scope": "Gas, coal and oil reserves-to-production ratios"
+  },
+  "source_contract": {
+    "source_id": "source_owid",
+    "canonical_url": "https://ourworldindata.org/grapher/years-of-fossil-fuel-reserves-left",
+    "expected_source_updated_at": "2026-06-30",
+    "source_version": "2026-06-30",
+    "source_version_label": "Energy Institute 2026 release · OWID update 30 Jun 2026",
+    "transformation_id": "owid-rp-ratio-display-v1",
+    "evidence_sha256": [
+      "235136205893e6a03713ce5ad13f66e13a6672df865a29550b361021424ee730",
+      "ba3c93f2c6001496069d9ef9d0f8a585b0f7ace800374eb9bbd139907e9a0d96",
+      "3e3099a8a7503f8fd2673bcffe0e6156fa9ce8d9b1457c53a20c8bb87d1ac8f4"
+    ]
+  },
+  "related_links": [
+    {
+      "path": "/topics/energy-and-climate",
+      "label": "Explore energy and climate data",
+      "context": "Compare this ratio with other reviewed energy indicators and their measurement boundaries."
+    },
+    {
+      "path": "/asset/solar-pv-prices",
+      "label": "Solar photovoltaic module prices",
+      "context": "Open a separate long-run energy-cost series without treating the two measures as causally equivalent."
+    }
+  ],
+  "review": {
+    "brief_id": "ab-001-fossil-reserves",
+    "reviewer_role": "Sol",
+    "approved_at": "2026-10-04T00:00:00.000Z",
+    "evidence_review_sha256": "3e3099a8a7503f8fd2673bcffe0e6156fa9ce8d9b1457c53a20c8bb87d1ac8f4"
+  }
+}

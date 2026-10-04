@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "asset_owid_solar-pv-prices",
+  "asset_slug": "solar-pv-prices",
+  "content_version": "1.0.0",
+  "review_state": "approved",
+  "language": "en",
+  "question": "How have inflation-adjusted solar photovoltaic module prices changed over the available series?",
+  "direct_answer": "The reviewed series falls from $132.38 per watt in 1975 to $0.27 per watt in 2024, measured in constant 2025 US dollars. That is a decrease of about 99.8%. The measure covers photovoltaic modules themselves, not a complete installed solar system or the price of electricity.",
+  "methodology": [
+    "The series combines Nemet for 1975–2003, Farmer and Lafond for 2004–2009, and IRENA data from 2010 onward. Historical values are converted to constant 2025 US dollars with the US GDP deflator.",
+    "From 2010 onward, the source uses European pvXchange market benchmarks because comparable global price data are limited. Cite Supply rounds prices to two decimal places and the derived decline to one decimal place."
+  ],
+  "limitations": [
+    "The series joins three source periods and therefore is not based on one unchanged collection method.",
+    "The post-2010 observations use European market benchmarks rather than a complete global transaction dataset.",
+    "Module prices exclude installation, inverters, mounting, financing and other system components.",
+    "Constant-dollar comparisons depend on the stated US GDP deflator and 2025 price basis."
+  ],
+  "observation_coverage": {
+    "unit": "Constant 2025 US dollars per watt",
+    "period": "1975–2024",
+    "geography": "World series; European market benchmarks from 2010 onward",
+    "frequency": "Annual",
+    "series_scope": "Solar photovoltaic module price"
+  },
+  "source_contract": {
+    "source_id": "source_owid",
+    "canonical_url": "https://ourworldindata.org/grapher/solar-pv-prices",
+    "expected_source_updated_at": "2026-07-28",
+    "source_version": "2026-07-28",
+    "source_version_label": "OWID dataset update 28 Jul 2026",
+    "transformation_id": "solar-module-price-decline-v1",
+    "evidence_sha256": [
+      "26941d3ff4f7bb11916bf6e36937064fe9f65f91c281d2f5250cb6e24da589dc",
+      "3ac71f2696a67a413182c50d6c650be51c8b0d9546b9dfd5b780fb1fde85863b",
+      "3e3099a8a7503f8fd2673bcffe0e6156fa9ce8d9b1457c53a20c8bb87d1ac8f4"
+    ]
+  },
+  "related_links": [
+    {
+      "path": "/topics/energy-and-climate",
+      "label": "Explore energy and climate data",
+      "context": "Find related energy indicators while keeping units, periods and system boundaries visible."
+    },
+    {
+      "path": "/asset/years-of-fossil-fuel-reserves-left",
+      "label": "Years of fossil-fuel reserves left",
+      "context": "Open a separate energy-supply indicator without treating it as a price comparison."
+    }
+  ],
+  "review": {
+    "brief_id": "ab-002-solar-module-prices",
+    "reviewer_role": "Sol",
+    "approved_at": "2026-10-04T00:00:00.000Z",
+    "evidence_review_sha256": "3e3099a8a7503f8fd2673bcffe0e6156fa9ce8d9b1457c53a20c8bb87d1ac8f4"
+  }
+}
