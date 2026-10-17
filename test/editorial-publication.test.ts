@@ -8,12 +8,14 @@ import {
 } from "../src/lib/editorial/public-articles";
 
 describe("public editorial collection", () => {
-  it("publishes exactly the four reviewed articles with unique routes", () => {
-    expect(PUBLIC_EDITORIAL_ARTICLES).toHaveLength(4);
+  it("publishes the reviewed articles with unique routes", () => {
+    expect(PUBLIC_EDITORIAL_ARTICLES).toHaveLength(6);
     const slugs = PUBLIC_EDITORIAL_ARTICLES.map(({ draft }) => draft.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
     for (const slug of slugs) expect(getPublicEditorialArticle(slug)?.draft.slug).toBe(slug);
     expect(getPublicEditorialArticle("not-an-article")).toBeNull();
+    expect(getPublicEditorialArticle("lower-inflation-does-not-mean-lower-prices")).not.toBeNull();
+    expect(getPublicEditorialArticle("absolute-versus-relative-burned-area-change")).not.toBeNull();
   });
 
   it("keeps every published article substantial and source-led", () => {

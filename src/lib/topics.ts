@@ -152,6 +152,46 @@ export const TOPICS: readonly TopicDefinition[] = [
       "Keep spatial coverage, baseline and measurement method with the result. Do not infer local conditions from national averages when the source does not support that resolution.",
   },
   {
+    slug: "food-and-agriculture",
+    name: "Food and agriculture",
+    description: "Food production, crops, livestock, trade and agricultural resources.",
+    query: "agriculture",
+    seoTitle: "Food and agriculture data",
+    seoDescription:
+      "Browse reviewed food and agriculture datasets with visible sources, units, update dates, geographic scope and reuse conditions.",
+    introduction: [
+      "Food and agriculture data connects production, land, inputs, trade and nutrition, but similarly named indicators can describe very different stages of the system. Crop yields are not production totals, domestic supply is not household consumption, and monetary values depend on their currency and price basis. This collection helps publishers start with the definition rather than the headline.",
+      "The results bring together reviewed assets from public statistical providers and keep their canonical source, freshness and reuse evidence visible. Before comparing countries or years, open the asset and check the commodity, unit, reporting period and whether the value is measured, estimated or modeled. Those details determine which editorial conclusions the data can support.",
+    ],
+    questions: [
+      "Does the indicator measure output, yield, trade, supply or consumption?",
+      "Which commodity, land area and reporting period does the value cover?",
+      "Are monetary series expressed in current prices, constant prices or purchasing-power terms?",
+    ],
+    sourceGuidance:
+      "Keep the commodity definition, unit, geography and reference period beside the figure. Do not treat national food supply as individual intake or infer farm-level conditions from an aggregate unless the source explicitly supports it.",
+  },
+  {
+    slug: "water-and-sanitation",
+    name: "Water and sanitation",
+    description: "Water access, sanitation services, resources, use and water stress.",
+    query: "water",
+    seoTitle: "Water and sanitation data",
+    seoDescription:
+      "Explore reviewed water and sanitation datasets with transparent definitions, geographic coverage, dates, sources and reuse terms.",
+    introduction: [
+      "Water statistics cover several distinct questions: whether households can reach a service, how safely that service is managed, how much water a sector withdraws, and how available resources compare with demand. A high national access rate does not describe service continuity or local scarcity, while a withdrawal total does not by itself measure environmental pressure.",
+      "This topic collects reviewed public-source assets and preserves the information needed to interpret them. Asset pages expose the original provider, latest known update, citation and reuse conditions. Publishers should also inspect whether a measure is a population share, physical volume, rate or modeled estimate, and whether rural and urban coverage are combined.",
+    ],
+    questions: [
+      "Does access mean basic, safely managed or continuously available service?",
+      "Is water use reported as a total volume, sector share or resource-stress ratio?",
+      "Does a national value hide important regional or rural-urban differences?",
+    ],
+    sourceGuidance:
+      "Preserve the service level, denominator, unit and geographic scope used by the provider. Avoid equating access with quality or reliability, and do not convert national resource indicators into local claims without supporting data.",
+  },
+  {
     slug: "publisher-tools",
     name: "Publisher tools",
     description: "Calculators, benchmarks and interactive tools made for practical use.",

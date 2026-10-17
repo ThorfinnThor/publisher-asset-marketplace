@@ -3,11 +3,14 @@ import internetDraftJson from "../../../content/editorial/drafts/internet-use-gr
 import renewablesDraftJson from "../../../content/editorial/drafts/reading-eu-renewables-by-energy-use.json";
 import hicpDraftJson from "../../../content/editorial/drafts/what-eu-hicp-inflation-rate-means.json";
 import wildfireDraftJson from "../../../content/editorial/drafts/world-burned-area-across-four-land-cover-types.json";
+import lowerInflationPublicationJson from "../../../content/editorial/publications/lower-inflation-does-not-mean-lower-prices.json";
+import burnedAreaChangePublicationJson from "../../../content/editorial/publications/absolute-versus-relative-burned-area-change.json";
 
 import type { EditorialAnalysisOutput, AnalysisMetric } from "./analysis";
 import { EditorialArticleDraftSchema, type EditorialArticleDraft } from "./article-schema";
 
 const PUBLICATION_DATE = "2026-09-26T00:00:00.000Z";
+const NEW_PUBLICATION_DATE = "2026-10-17T00:00:00.000Z";
 
 const analysisResults = analysisResultsJson as unknown as EditorialAnalysisOutput;
 
@@ -32,6 +35,18 @@ const publications = [
     section: "Environment",
     sourceLabel: "GWIS via Our World in Data",
   },
+  {
+    draft: lowerInflationPublicationJson,
+    section: "Prices",
+    sourceLabel: "Eurostat",
+    datePublished: NEW_PUBLICATION_DATE,
+  },
+  {
+    draft: burnedAreaChangePublicationJson,
+    section: "Environment",
+    sourceLabel: "GWIS via Our World in Data",
+    datePublished: NEW_PUBLICATION_DATE,
+  },
 ] as const;
 
 export type PublicEditorialArticle = {
@@ -44,21 +59,24 @@ export type PublicEditorialArticle = {
 };
 
 export const PUBLIC_EDITORIAL_ARTICLES: readonly PublicEditorialArticle[] = publications.map(
-  ({ draft: draftInput, section, sourceLabel }) => {
+  (publication) => {
+    const { draft: draftInput, section, sourceLabel } = publication;
     const draft = EditorialArticleDraftSchema.parse(draftInput);
     const analysis = analysisResults.analyses.find((entry) => entry.brief_id === draft.brief_id);
     if (!analysis || analysis.status !== "calculated_for_sol_review") {
       throw new Error(`public_editorial_analysis_missing:${draft.brief_id}`);
     }
+    const datePublished =
+      "datePublished" in publication ? publication.datePublished : PUBLICATION_DATE;
     return {
       draft,
       section,
       sourceLabel,
-      datePublished: PUBLICATION_DATE,
+      datePublished,
       dateModified:
-        Date.parse(draft.date_modified) > Date.parse(PUBLICATION_DATE)
+        Date.parse(draft.date_modified) > Date.parse(datePublished)
           ? draft.date_modified
-          : PUBLICATION_DATE,
+          : datePublished,
       metrics: new Map(analysis.metrics.map((metric) => [metric.metric_id, metric])),
     };
   },

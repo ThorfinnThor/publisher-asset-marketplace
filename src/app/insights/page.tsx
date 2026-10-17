@@ -57,7 +57,7 @@ export default function InsightsPage() {
           <div>
             <p className="eyebrow">Published analysis</p>
             <h2 className="section-heading" id="latest-insights-heading">
-              Four evidence-led reads
+              {PUBLIC_EDITORIAL_ARTICLES.length} evidence-led reads
             </h2>
           </div>
         </div>

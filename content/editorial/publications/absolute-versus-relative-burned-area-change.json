@@ -1,0 +1,161 @@
+{
+  "schema_version": "1.0.0",
+  "slug": "absolute-versus-relative-burned-area-change",
+  "status": "draft",
+  "indexable": false,
+  "language": "en",
+  "format": "measurement_explainer",
+  "title": "Absolute and relative change tell different burned-area stories",
+  "seo_title": "Absolute vs Relative Change in Burned Area",
+  "seo_description": "Compare absolute and relative changes in global burned-area estimates across four land-cover categories and learn why both measures need a clear denominator.",
+  "dek": "The same pair of period means can produce a large change in hectares and a very different ranking when expressed relative to the starting level.",
+  "thesis": "Absolute and relative differences answer separate questions, so burned-area comparisons should show the unit, starting period and land-cover category rather than presenting one ranking as universal.",
+  "metadata_claim_refs": [
+    "wildfire-mean-difference:forest:early-v-recent",
+    "wildfire-relative-change:forest:early-v-recent"
+  ],
+  "date_created": "2026-10-17T10:05:00.000Z",
+  "date_modified": "2026-10-17T10:05:00.000Z",
+  "date_published": null,
+  "brief_id": "cb-004-wildfire-land-cover",
+  "fact_pack_id": "cb-004-wildfire-land-cover",
+  "fact_pack_sha256": "818fa035ee25753e559c740436b33583114c9ca353d11c07eaf154a38a1a57f9",
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "draft_decisions_sha256": "1a30a3e7a4d95d9c102c43ed5cd0db232aa61260c2c30539489e611565440912",
+  "asset_slugs": ["area-burned-wildfires-by-type"],
+  "citations": [
+    {
+      "id": "owid-wildfire-chart",
+      "title": "Area burned by wildfires by type",
+      "publisher": "Our World in Data; source data from Global Wildfire Information System",
+      "url": "https://ourworldindata.org/grapher/area-burned-wildfires-by-type",
+      "accessed_at": "2026-09-23T10:26:00.000Z"
+    },
+    {
+      "id": "gwis-license",
+      "title": "Global Wildfire Information System data licence",
+      "publisher": "Global Wildfire Information System, European Commission Joint Research Centre",
+      "url": "https://gwis.jrc.ec.europa.eu/about-gwis/data-license",
+      "accessed_at": "2026-09-23T10:26:00.000Z"
+    },
+    {
+      "id": "gwis-burnt-areas-method",
+      "title": "Burnt Areas technical background",
+      "publisher": "Global Wildfire Information System, European Commission Joint Research Centre",
+      "url": "https://gwis.jrc.ec.europa.eu/about-gwis/technical-background/burnt-areas",
+      "accessed_at": "2026-09-24T21:16:00.000Z"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "opening",
+      "type": "prose",
+      "text": "A change can look largest or smallest depending on the question asked. An absolute difference reports how many hectares separate two period means. A relative difference divides that change by the earlier mean, showing its scale in relation to the starting value. Neither is inherently superior. The first is useful for understanding physical area; the second helps compare categories with very different starting magnitudes. A responsible chart states which measure it uses and keeps the denominator visible.",
+      "claim_refs": []
+    },
+    {
+      "id": "two-rankings",
+      "type": "finding",
+      "heading": "The largest hectare change is not the largest proportional change",
+      "text": "In the reviewed World series, shrublands and grasslands show an absolute difference of minus 39.0 million hectares between the two five-year means, while croplands show minus 15.1 million hectares. Yet the relative comparisons are about minus 21% for shrublands and grasslands and minus 37% for croplands. The category with the larger physical-area difference is therefore not the category with the larger proportional decline.",
+      "claim_refs": [
+        "wildfire-mean-difference:shrublands_grasslands:early-v-recent",
+        "wildfire-relative-change:shrublands_grasslands:early-v-recent",
+        "wildfire-mean-difference:croplands:early-v-recent",
+        "wildfire-relative-change:croplands:early-v-recent"
+      ]
+    },
+    {
+      "id": "comparison-table",
+      "type": "data_table",
+      "heading": "One comparison, two valid units",
+      "caption": "Later five-year mean minus earlier five-year mean for each separate World land-cover series; relative change uses the earlier mean as its denominator.",
+      "columns": ["Land-cover category", "Absolute difference", "Relative difference"],
+      "rows": [
+        {
+          "label": "Forest",
+          "metric_refs": [
+            "wildfire-mean-difference:forest:early-v-recent",
+            "wildfire-relative-change:forest:early-v-recent"
+          ]
+        },
+        {
+          "label": "Savannas",
+          "metric_refs": [
+            "wildfire-mean-difference:savannas:early-v-recent",
+            "wildfire-relative-change:savannas:early-v-recent"
+          ]
+        },
+        {
+          "label": "Shrublands and grasslands",
+          "metric_refs": [
+            "wildfire-mean-difference:shrublands_grasslands:early-v-recent",
+            "wildfire-relative-change:shrublands_grasslands:early-v-recent"
+          ]
+        },
+        {
+          "label": "Croplands",
+          "metric_refs": [
+            "wildfire-mean-difference:croplands:early-v-recent",
+            "wildfire-relative-change:croplands:early-v-recent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "denominator",
+      "type": "method",
+      "heading": "The denominator changes the interpretation",
+      "text": "Relative change is calculated by dividing the difference between the later and earlier period means by the earlier mean. That starting value matters: the same absolute change produces a larger percentage when the baseline is smaller. Absolute change avoids that scaling but naturally gives more visual weight to categories that cover larger areas. Showing both columns makes the trade-off explicit and prevents a percentage ranking from being mistaken for a ranking by hectares.",
+      "claim_refs": [
+        "wildfire-mean-difference:forest:early-v-recent",
+        "wildfire-relative-change:forest:early-v-recent"
+      ]
+    },
+    {
+      "id": "period-means",
+      "type": "method",
+      "heading": "Why the comparison uses period means",
+      "text": "Each side of the comparison is an arithmetic mean of five annual source observations: an early window from 2002 through 2006 and a recent window from 2021 through 2025. Averaging reduces the influence of one unusually high or low year, but it does not prove a continuous trend between the windows. The method also gives every year inside a window equal weight. It is a descriptive comparison of two selected periods, not a forecast or a causal model.",
+      "claim_refs": [
+        "wildfire-mean:forest:early_2002_2006",
+        "wildfire-mean:forest:recent_2021_2025"
+      ]
+    },
+    {
+      "id": "categories-stay-separate",
+      "type": "prose",
+      "text": "The land-cover rows should remain separate. They describe source-defined surface categories associated with detected burned area, not four guaranteed non-overlapping components of a new total assembled by Cite Supply. A comparison within one category is defensible because its label remains stable inside the reviewed calculation. Adding rows together or using them as a complete measure of global fire activity would require separate methodological evidence.",
+      "claim_refs": []
+    },
+    {
+      "id": "not-risk-or-damage",
+      "type": "limitation",
+      "heading": "Burned area is not the same as fire risk or damage",
+      "text": "A lower global estimate in a land-cover category does not establish that local wildfire danger, human exposure, ecological loss or economic damage declined. The values do not identify ignition causes, planned burning, fire intensity, emissions or recovery. Global averages can also coexist with severe regional seasons. Those questions require geographically and conceptually different evidence, so this table should not be used as a universal score of wildfire outcomes.",
+      "claim_refs": []
+    },
+    {
+      "id": "detection-caveat",
+      "type": "limitation",
+      "heading": "Detection and source-version limits remain",
+      "text": "The source notes limitations in satellite detection, especially for historical burned area and fire occurrence. Changes in observed values may therefore reflect measurement conditions as well as real-world change. The reviewed Our World in Data extract is labelled with Global Wildfire Information System provenance, while the separate public technical page is not synchronized with the newest observations in that extract. The arithmetic here reproduces the reviewed series; it does not independently reconcile those publication versions.",
+      "claim_refs": []
+    },
+    {
+      "id": "reporting-guidance",
+      "type": "prose",
+      "text": "Choose the unit according to the editorial question. Use hectares when the physical scale of changed area is central. Use a relative measure when comparing proportional movement across categories with unequal baselines, but name the baseline and show the original magnitude. When space allows, publish both. In every case, retain the World geography, the two windows, the land-cover label and the source caveats so that a compact statistic does not become a broader claim about fires than the underlying data supports.",
+      "claim_refs": []
+    },
+    {
+      "id": "asset-context",
+      "type": "asset_link",
+      "asset_slug": "area-burned-wildfires-by-type",
+      "label": "Explore the reviewed burned-area chart",
+      "context": "Open the Cite Supply asset to inspect the underlying source chart, provenance, current reuse conditions and citation.",
+      "claim_refs": []
+    }
+  ],
+  "creator_guide_included": false
+}

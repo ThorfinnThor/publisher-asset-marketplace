@@ -4,6 +4,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
+  EditorialArticleDraftSchema,
   validateEditorialArticleDraft,
   type DraftDecision,
 } from "../src/lib/editorial/article-schema";
@@ -25,6 +26,9 @@ const decisions = json<{ decisions: DraftDecision[] }>(
   "data/editorial/draft-decisions.json",
 ).decisions;
 const draftFiles = readdirSync("content/editorial/drafts").filter((name) => name.endsWith(".json"));
+const publicationFiles = readdirSync("content/editorial/publications").filter((name) =>
+  name.endsWith(".json"),
+);
 
 function contextFor(briefId: string) {
   const pack = EditorialFactPackSchema.parse(
@@ -55,6 +59,18 @@ describe("private editorial article drafts", () => {
       expect(draft.status).toBe("draft");
       expect(draft.indexable).toBe(false);
       expect(draft.date_published).toBeNull();
+    }
+  });
+
+  it("validates additional public articles against their reviewed facts and decisions", () => {
+    expect(publicationFiles).toHaveLength(2);
+    for (const file of publicationFiles) {
+      const publication = EditorialArticleDraftSchema.parse(
+        json<unknown>(`content/editorial/publications/${file}`),
+      );
+      expect(() =>
+        validateEditorialArticleDraft(publication, contextFor(publication.brief_id)),
+      ).not.toThrow();
     }
   });
 

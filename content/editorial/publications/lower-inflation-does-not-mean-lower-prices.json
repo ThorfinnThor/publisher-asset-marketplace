@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "slug": "lower-inflation-does-not-mean-lower-prices",
+  "status": "draft",
+  "indexable": false,
+  "language": "en",
+  "format": "concept_explainer",
+  "title": "Why lower inflation does not necessarily mean lower prices",
+  "seo_title": "Why Lower Inflation Does Not Mean Lower Prices",
+  "seo_description": "Learn how to read the EU annual-average HICP inflation rate, why a falling rate can coexist with rising prices, and which conclusions the data cannot support.",
+  "dek": "A slower inflation rate describes a slower pace of price change. It is not evidence that the overall price level has returned to where it started.",
+  "thesis": "Annual inflation rates describe changes in a price index, so a lower positive rate can still mean that the average price level increased compared with the previous year.",
+  "metadata_claim_refs": ["hicp-rate:2024", "hicp-rate:2025"],
+  "date_created": "2026-10-17T10:00:00.000Z",
+  "date_modified": "2026-10-17T10:00:00.000Z",
+  "date_published": null,
+  "brief_id": "cb-003-hicp-inflation-explainer",
+  "fact_pack_id": "cb-003-hicp-inflation-explainer",
+  "fact_pack_sha256": "7dfa0c81be45158c20d1041a74761ca7a60c5f1088eeb6807c83910bf60f9ad6",
+  "analysis_results_sha256": "e04161373a014657b05f7804ee54d0377c2dbb0e6ffe7612e5a4a4317e159008",
+  "draft_decisions_sha256": "1a30a3e7a4d95d9c102c43ed5cd0db232aa61260c2c30539489e611565440912",
+  "asset_slugs": ["eurostat-tec00118"],
+  "citations": [
+    {
+      "id": "eurostat-hicp-table",
+      "title": "HICP - annual data (average index and rate of change)",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/databrowser/view/tec00118/default/table?lang=en",
+      "accessed_at": "2026-09-23T10:01:40.840Z"
+    },
+    {
+      "id": "eurostat-hicp-methodology",
+      "title": "Harmonised index of consumer prices metadata",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm",
+      "accessed_at": "2026-09-24T21:30:00.000Z"
+    },
+    {
+      "id": "eurostat-reuse-terms",
+      "title": "Eurostat copyright notice and reuse policy",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/help/copyright-notice",
+      "accessed_at": "2026-09-23T10:01:40.840Z"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "opening",
+      "type": "prose",
+      "text": "Inflation headlines often use the verbs rise and fall without saying what is moving. Usually it is the inflation rate that has changed, not the price level itself. That distinction matters for household budgets and for accurate reporting. If a positive inflation rate becomes smaller, prices may still be increasing on average; they are simply increasing more slowly under the selected measure. A broad decline in the price level would be a different phenomenon and would require evidence from the index, not just a lower positive rate.",
+      "claim_refs": []
+    },
+    {
+      "id": "recent-rates",
+      "type": "finding",
+      "heading": "A falling rate is a change in pace",
+      "text": "The reviewed Eurostat series reports an EU annual-average HICP rate of 9.2% in 2022, 6.4% in 2023, 2.6% in 2024 and 2.5% in 2025. The sequence shows that the rate slowed after its peak in this selection. Because every listed value remained positive, it does not by itself show that the overall average price level fell in those years.",
+      "claim_refs": ["hicp-rate:2022", "hicp-rate:2023", "hicp-rate:2024", "hicp-rate:2025"]
+    },
+    {
+      "id": "rate-table",
+      "type": "data_table",
+      "heading": "The recent annual-average HICP rates",
+      "caption": "EU annual-average rate of change in the Harmonised Index of Consumer Prices. These are rates, not index levels.",
+      "columns": ["Year", "Annual-average rate"],
+      "rows": [
+        { "label": "2022", "metric_refs": ["hicp-rate:2022"] },
+        { "label": "2023", "metric_refs": ["hicp-rate:2023"] },
+        { "label": "2024", "metric_refs": ["hicp-rate:2024"] },
+        { "label": "2025", "metric_refs": ["hicp-rate:2025"] }
+      ]
+    },
+    {
+      "id": "rate-versus-level",
+      "type": "prose",
+      "text": "Think of the price index as a position and the inflation rate as a speed of movement. Slowing down does not reverse the distance already travelled. In the same way, disinflation means that the inflation rate has decreased; it does not mean that prices have returned to an earlier level. Deflation, by contrast, refers to a decline in the general price level. Individual products can become cheaper while the broad index still rises, because the index combines many categories with expenditure weights rather than tracking a single shopping basket item.",
+      "claim_refs": []
+    },
+    {
+      "id": "small-rate-change",
+      "type": "finding",
+      "heading": "The latest difference is small, but precisely defined",
+      "text": "Between 2024 and 2025, the annual-average rate in the selected EU series moved from 2.6% to 2.5%, a change of minus 0.1 percentage points. Percentage points are the correct unit for subtracting one rate from another. Calling this a 0.1% price decline would be incorrect: the calculation compares two inflation rates and says nothing directly about a fall in the index level.",
+      "claim_refs": ["hicp-rate:2024", "hicp-rate:2025", "hicp-rate-change:2024-2025"]
+    },
+    {
+      "id": "measure-choice",
+      "type": "method",
+      "heading": "Why the annual-average measure matters",
+      "text": "This Eurostat selection uses the annual average rate of change for the EU aggregate and the all-items classification. An annual-average rate compares an average across one calendar year with the average across the preceding calendar year. It can differ from a month-to-month rate or a rate comparing one month with the same month a year earlier. Those measures are not interchangeable. A publication should identify which one it uses, retain the geography and classification, and avoid mixing values from different frequency settings in one trend statement.",
+      "claim_refs": ["hicp-rate:2024", "hicp-rate:2025"]
+    },
+    {
+      "id": "household-experience",
+      "type": "limitation",
+      "heading": "A harmonised average is not every household's experience",
+      "text": "HICP is designed for comparable inflation measurement, but a household's spending pattern may differ from the weights in the index. Someone who spends a larger share on a category with faster price growth can experience a different budget impact from the published aggregate. The series also does not measure income growth, affordability, living standards or the price of one specific product. Those questions require additional data and should not be inferred from the headline rate alone.",
+      "claim_refs": []
+    },
+    {
+      "id": "reporting-checklist",
+      "type": "prose",
+      "text": "A careful sentence names the geography, period and measure before interpreting the direction. Say that the annual-average HICP inflation rate slowed when the rate is lower, rather than saying that prices fell. If the story concerns purchasing power, add verified income or wage data. If it concerns a category such as food or housing, use the relevant detailed index and disclose that narrower scope. This keeps a legitimate inflation statistic from being stretched into a claim it was not designed to answer.",
+      "claim_refs": []
+    },
+    {
+      "id": "asset-context",
+      "type": "asset_link",
+      "asset_slug": "eurostat-tec00118",
+      "label": "Explore the reviewed HICP dataset",
+      "context": "Open the Cite Supply asset to inspect the source table, current reuse conditions, citation and available presentation.",
+      "claim_refs": []
+    }
+  ],
+  "creator_guide_included": false
+}
