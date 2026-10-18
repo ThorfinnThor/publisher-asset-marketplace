@@ -72,60 +72,41 @@ const detailSql = `
   LIMIT 1
 `;
 
-const relatedSql = `
-  WITH target AS (
-    SELECT source_id, asset_type
-    FROM assets
-    WHERE slug = ?
-    LIMIT 1
-  ),
-  same_source AS (
-    SELECT
-      a.id,
-      a.slug,
-      a.title,
-      a.asset_type,
-      COALESCE(s.name, a.attribution_name, '') AS source_name,
-      a.source_updated_at,
-      a.updated_at AS sort_updated_at,
-      1 AS source_priority
-    FROM target t
-    JOIN assets a ON t.source_id IS NOT NULL AND a.source_id = t.source_id
-    LEFT JOIN sources s ON s.id = a.source_id
-    WHERE a.slug <> ?
-      AND a.status = 'published'
-      AND a.rights_status IN ('safe', 'restricted')
-    ORDER BY a.updated_at DESC, a.slug ASC
-    LIMIT 3
-  ),
-  same_type AS (
-    SELECT
-      a.id,
-      a.slug,
-      a.title,
-      a.asset_type,
-      COALESCE(s.name, a.attribution_name, '') AS source_name,
-      a.source_updated_at,
-      a.updated_at AS sort_updated_at,
-      0 AS source_priority
-    FROM target t
-    JOIN assets a ON a.asset_type = t.asset_type
-    LEFT JOIN sources s ON s.id = a.source_id
-    WHERE a.slug <> ?
-      AND a.status = 'published'
-      AND a.rights_status IN ('safe', 'restricted')
-      AND (t.source_id IS NULL OR a.source_id IS NULL OR a.source_id <> t.source_id)
-    ORDER BY a.updated_at DESC, a.slug ASC
-    LIMIT 3
-  ),
-  candidates AS (
-    SELECT * FROM same_source
-    UNION ALL
-    SELECT * FROM same_type
-  )
-  SELECT id, slug, title, asset_type, source_name, source_updated_at
-  FROM candidates
-  ORDER BY source_priority DESC, sort_updated_at DESC, slug ASC
+const relatedBySourceSql = `
+  SELECT
+    a.id,
+    a.slug,
+    a.title,
+    a.asset_type,
+    COALESCE(s.name, a.attribution_name, '') AS source_name,
+    a.source_updated_at
+  FROM assets a
+  LEFT JOIN sources s ON s.id = a.source_id
+  WHERE ? IS NOT NULL
+    AND a.source_id = ?
+    AND a.slug <> ?
+    AND a.status = 'published'
+    AND a.rights_status IN ('safe', 'restricted')
+  ORDER BY a.updated_at DESC, a.slug ASC
+  LIMIT 3
+`;
+
+const relatedByTypeSql = `
+  SELECT
+    a.id,
+    a.slug,
+    a.title,
+    a.asset_type,
+    COALESCE(s.name, a.attribution_name, '') AS source_name,
+    a.source_updated_at
+  FROM assets a
+  LEFT JOIN sources s ON s.id = a.source_id
+  WHERE a.asset_type = ?
+    AND a.slug <> ?
+    AND a.status = 'published'
+    AND a.rights_status IN ('safe', 'restricted')
+    AND (? IS NULL OR a.source_id IS NULL OR a.source_id <> ?)
+  ORDER BY a.updated_at DESC, a.slug ASC
   LIMIT 3
 `;
 
@@ -133,25 +114,31 @@ export function buildAssetDetailSql(): string {
   return detailSql;
 }
 
-export function buildRelatedAssetsSql(): string {
-  return relatedSql;
+export function buildRelatedAssetsSql(): { sameSource: string; sameType: string } {
+  return {
+    sameSource: relatedBySourceSql,
+    sameType: relatedByTypeSql,
+  };
 }
 
 export async function getPublishedAssetBySlug(
   db: D1Database,
   slug: string,
 ): Promise<{ asset: PublishedAssetDetail; related: RelatedAsset[] } | null> {
-  const [detailResult, relatedResult] = (await db.batch([
-    db.prepare(detailSql).bind(slug),
-    db.prepare(relatedSql).bind(slug, slug, slug),
-  ])) as unknown as [{ results: PublishedAssetRow[] }, { results: RelatedAsset[] }];
+  const detailResult = await db.prepare(detailSql).bind(slug).all<PublishedAssetRow>();
   const asset = detailResult.results[0];
   if (!asset) return null;
+
+  const [sameSourceResult, sameTypeResult] = (await db.batch([
+    db.prepare(relatedBySourceSql).bind(asset.source_id, asset.source_id, slug),
+    db.prepare(relatedByTypeSql).bind(asset.asset_type, slug, asset.source_id, asset.source_id),
+  ])) as unknown as [{ results: RelatedAsset[] }, { results: RelatedAsset[] }];
+
   return {
     asset: {
       ...asset,
       embed_url: deriveSourceHostedEmbedUrl(asset.source_id, asset.canonical_url, asset.embed_url),
     },
-    related: relatedResult.results,
+    related: [...sameSourceResult.results, ...sameTypeResult.results].slice(0, 3),
   };
 }
