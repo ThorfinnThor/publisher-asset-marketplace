@@ -4,7 +4,7 @@ import { TOPICS } from "../src/lib/topics";
 const defaultBaseUrl = "https://publisher-asset-marketplace.shuu9599.workers.dev";
 const baseUrl = (process.env.RELEASE_BASE_URL ?? defaultBaseUrl).replace(/\/$/u, "");
 const sitemapPublicHubCount = 4 + TOPICS.length + PUBLIC_EDITORIAL_ARTICLES.length;
-const sitemapMaximumAssetCount = 500;
+const sitemapMaximumAssetCount = 80;
 
 type SmokeCheck = {
   path: string;

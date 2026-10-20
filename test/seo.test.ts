@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { PublishedAssetDetail } from "@/lib/assets/get-asset";
 import {
   buildAssetJsonLd,
+  buildAssetMetaDescription,
   buildBreadcrumbJsonLd,
   buildSiteJsonLd,
   serializeJsonLd,
@@ -106,5 +107,34 @@ describe("search indexability", () => {
     expect(isAssetSeoEligible({ ...asset, rights_status: "restricted" })).toBe(false);
     expect(isAssetSeoEligible({ ...asset, description: "Too short" })).toBe(false);
     expect(isAssetSeoEligible({ ...asset, canonical_url: "http://example.com" })).toBe(false);
+  });
+});
+
+describe("asset meta description", () => {
+  it("leads with source and freshness instead of the verbatim source text", () => {
+    const value = buildAssetMetaDescription(asset);
+    expect(value).toBe(
+      "Dataset from World Bank Open Data, updated Sept 2026: Total population counts by country and reporting year from the source. Reuse rights and exact citation.",
+    );
+    expect(value).not.toBe(asset.description);
+  });
+
+  it("keeps long source descriptions within 160 characters at a word boundary", () => {
+    const value = buildAssetMetaDescription({
+      ...asset,
+      description:
+        "Broad money is the sum of currency outside banks; demand deposits other than those of the central government; the time, savings, and foreign currency deposits of resident sectors.",
+    });
+    expect(value.length).toBeLessThanOrEqual(160);
+    expect(value).toMatch(/… Reuse rights and exact citation\.$/u);
+  });
+
+  it("prefers the reviewed editorial answer when one is available", () => {
+    const value = buildAssetMetaDescription(
+      asset,
+      "Proved reserves cover about 50 years of current oil production. Gas lasts longer.",
+    );
+    expect(value).toContain("Proved reserves cover about 50 years of current oil production.");
+    expect(value).not.toContain("Gas lasts longer");
   });
 });

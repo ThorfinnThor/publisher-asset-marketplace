@@ -4,7 +4,7 @@ import { TOPICS } from "../src/lib/topics";
 const defaultBaseUrl = "https://citesupply.com";
 const baseUrl = (process.env.AUDIT_BASE_URL ?? defaultBaseUrl).replace(/\/$/u, "");
 const concurrency = Number(process.env.AUDIT_CONCURRENCY ?? "2");
-const sitemapMaximumAssetCount = 500;
+const sitemapMaximumAssetCount = 80;
 const sitemapMaximumUrlCount =
   4 + TOPICS.length + PUBLIC_EDITORIAL_ARTICLES.length + sitemapMaximumAssetCount;
 
