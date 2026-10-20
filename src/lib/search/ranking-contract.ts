@@ -7,6 +7,7 @@ export type SearchFilters = {
   commercial_use?: true;
   updated_since?: string;
   search_indexable_only?: true;
+  slugs?: string[];
 };
 
 export type SearchRequest = {

@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/json-ld";
 import { getDatabase } from "@/lib/db/client";
 import { buildBreadcrumbJsonLd, SITE_ORIGIN } from "@/lib/seo";
 import { searchAssets, type SearchAsset } from "@/lib/search/search-assets";
+import { topicAssetSlugs } from "@/lib/topic-assets";
 import { getTopic, TOPICS } from "@/lib/topics";
 
 type TopicPageProps = {
@@ -54,7 +55,7 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
 export default async function TopicPage({ params }: TopicPageProps) {
   const topic = getTopic((await params).slug);
   if (!topic) notFound();
-  const assets = await loadTopicAssets(topic.query);
+  const assets = await loadTopicAssets(topic.slug, topic.query);
   const pageUrl = `${SITE_ORIGIN}/topics/${topic.slug}`;
 
   return (
@@ -168,8 +169,19 @@ export default async function TopicPage({ params }: TopicPageProps) {
   );
 }
 
-async function loadTopicAssets(query: string): Promise<SearchAsset[]> {
+async function loadTopicAssets(topicSlug: string, query: string): Promise<SearchAsset[]> {
+  const curated = topicAssetSlugs(topicSlug);
   try {
+    if (curated.length > 0) {
+      const result = await searchAssets(getDatabase(), {
+        query: "",
+        filters: { rights_statuses: ["safe"], search_indexable_only: true, slugs: [...curated] },
+        limit: curated.length,
+      });
+      const bySlug = new Map(result.results.map(({ asset }) => [asset.slug, asset]));
+      const ordered = curated.flatMap((slug) => bySlug.get(slug) ?? []);
+      if (ordered.length > 0) return ordered;
+    }
     const result = await searchAssets(getDatabase(), {
       query,
       filters: { rights_statuses: ["safe"], search_indexable_only: true },

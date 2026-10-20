@@ -77,6 +77,11 @@ describe("C2 search function", () => {
     expect(sql).toContain("a.embed_origin");
   });
 
+  it("restricts a browse query to an explicit slug list", () => {
+    const sql = buildBrowseSearchSql({ slugs: ["solar-pv-prices", "elec-mix-bar"] });
+    expect(sql).toContain("a.slug IN (?, ?)");
+  });
+
   it("puts safe embeddable assets ahead of restricted ties", () => {
     const results = rankSearchCandidates(
       [
