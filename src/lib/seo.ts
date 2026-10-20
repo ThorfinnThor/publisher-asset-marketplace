@@ -140,6 +140,50 @@ export function buildBreadcrumbJsonLd(
   };
 }
 
+const META_DESCRIPTION_MAX_LENGTH = 160;
+
+// Source descriptions are copied verbatim from OWID, World Bank and Eurostat, so
+// using them as the meta description duplicates the source page. Lead with what
+// this page adds (source, freshness, reuse) and keep only a trimmed summary.
+export function buildAssetMetaDescription(
+  asset: Pick<
+    PublishedAssetDetail,
+    "asset_type" | "attribution_name" | "description" | "source_name" | "source_updated_at"
+  >,
+  directAnswer?: string | null,
+): string {
+  const sourceName = asset.source_name || asset.attribution_name || "an independent source";
+  const updated = monthYear(asset.source_updated_at);
+  const assetType = asset.asset_type.charAt(0).toUpperCase() + asset.asset_type.slice(1);
+  const lead = `${assetType} from ${sourceName}${updated ? `, updated ${updated}` : ""}`;
+  const suffix = "Reuse rights and exact citation.";
+  const summary = firstSentence(directAnswer?.trim() || asset.description);
+  const budget = META_DESCRIPTION_MAX_LENGTH - lead.length - suffix.length - 4;
+  return `${lead}: ${truncateAtWord(summary, budget)} ${suffix}`;
+}
+
+function firstSentence(value: string): string {
+  const trimmed = value.trim().replace(/\s+/gu, " ");
+  const match = trimmed.match(/^.+?[.!?](?=\s|$)/u);
+  return (match ? match[0] : trimmed).replace(/[.!?]$/u, "") + ".";
+}
+
+function truncateAtWord(value: string, maxLength: number): string {
+  if (value.length <= maxLength) return value;
+  const cut = value.slice(0, Math.max(0, maxLength - 1));
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 20 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:]+$/u, "")}…`;
+}
+
+function monthYear(value: string | null): string | null {
+  if (!value || Number.isNaN(Date.parse(value))) return null;
+  return new Intl.DateTimeFormat("en-GB", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(value));
+}
+
 export function serializeJsonLd(value: Record<string, unknown>): string {
   return JSON.stringify(value).replaceAll("<", "\\u003c");
 }

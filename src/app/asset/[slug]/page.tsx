@@ -19,7 +19,7 @@ import { getDatabase } from "@/lib/db/client";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import { parseSourcePreview } from "@/lib/assets/source-data-preview";
 import { parseWorldBankIndicator } from "@/lib/assets/worldbank-chart";
-import { buildAssetJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { buildAssetJsonLd, buildAssetMetaDescription, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { assetRobotsMetadata, isAssetSeoEligible } from "@/lib/seo/indexability";
 import {
   getPublishedAssetBySlug,
@@ -41,16 +41,23 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
   const images = normalizedPreview.ok
     ? [{ url: normalizedPreview.value, alt: record.asset.title }]
     : [{ url: "/opengraph-image", alt: "Cite Supply" }];
+  const editorialResolution = resolveAssetEditorialOverlay(record.asset);
+  const description = buildAssetMetaDescription(
+    record.asset,
+    editorialResolution.status === "approved_fresh"
+      ? editorialResolution.overlay.direct_answer
+      : null,
+  );
   return {
     title: record.asset.title,
-    description: record.asset.description,
+    description,
     robots: assetRobotsMetadata(isAssetSeoEligible(record.asset)),
     alternates: { canonical: `/asset/${record.asset.slug}` },
     openGraph: {
       type: "article",
       url: `/asset/${record.asset.slug}`,
       title: record.asset.title,
-      description: record.asset.description,
+      description,
       siteName: "Cite Supply",
       images,
       ...(record.asset.source_updated_at ? { modifiedTime: record.asset.source_updated_at } : {}),
@@ -58,7 +65,7 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
     twitter: {
       card: "summary_large_image",
       title: record.asset.title,
-      description: record.asset.description,
+      description,
       images: images.map((image) => image.url),
     },
   };
