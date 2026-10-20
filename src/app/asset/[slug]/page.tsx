@@ -16,6 +16,7 @@ import {
 } from "@/lib/assets/editorial/asset-editorial-overlay";
 import { obligationLabel, permissionLabel, rightsValueState } from "@/lib/assets/rights-labels";
 import { getDatabase } from "@/lib/db/client";
+import { topicForAsset } from "@/lib/topic-assets";
 import { normalizePublicHttpsUrl } from "@/lib/submissions/validate";
 import { parseSourcePreview } from "@/lib/assets/source-data-preview";
 import { parseWorldBankIndicator } from "@/lib/assets/worldbank-chart";
@@ -121,21 +122,37 @@ export default async function AssetPage({ params }: AssetPageProps) {
   const editorialResolution = resolveAssetEditorialOverlay(asset);
   const editorialOverlay =
     editorialResolution.status === "approved_fresh" ? editorialResolution.overlay : null;
+  const topic = topicForAsset(asset.slug);
 
   return (
     <main className="asset-detail page-shell">
       <JsonLd value={buildAssetJsonLd(asset)} />
       <JsonLd
         value={buildBreadcrumbJsonLd([
-          { name: "Browse", path: "/search" },
+          ...(topic
+            ? [
+                { name: "Topics", path: "/topics" },
+                { name: topic.name, path: `/topics/${topic.slug}` },
+              ]
+            : [{ name: "Browse", path: "/search" }]),
           { name: asset.title, path: `/asset/${asset.slug}` },
         ])}
       />
       <AssetAnalyticsBeacon assetSlug={asset.slug} />
       <nav aria-label="Breadcrumb" className="breadcrumb">
-        <Link href="/search">Browse</Link>
-        <span aria-hidden="true">/</span>
-        <span>{asset.source_name || "Publisher asset"}</span>
+        {topic ? (
+          <>
+            <Link href="/topics">Topics</Link>
+            <span aria-hidden="true">/</span>
+            <Link href={`/topics/${topic.slug}`}>{topic.name}</Link>
+          </>
+        ) : (
+          <>
+            <Link href="/search">Browse</Link>
+            <span aria-hidden="true">/</span>
+            <span>{asset.source_name || "Publisher asset"}</span>
+          </>
+        )}
       </nav>
 
       <section className="asset-detail__hero">

@@ -295,6 +295,10 @@ function filterSql(filters: SearchRequest["filters"]): { sql: string; bindings: 
     clauses.push("a.source_updated_at >= ?");
     bindings.push(filters.updated_since);
   }
+  if (filters?.slugs && filters.slugs.length > 0) {
+    clauses.push(`a.slug IN (${filters.slugs.map(() => "?").join(", ")})`);
+    bindings.push(...filters.slugs);
+  }
   if (filters?.search_indexable_only === true) {
     clauses.push("a.search_indexable = 1");
     clauses.push("length(trim(a.title)) >= 8");
