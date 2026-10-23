@@ -55,9 +55,10 @@ export function withSecurityHeaders(
     // Embed usage is counted at request time, so browser/CDN reuse must not bypass the Worker.
     headers.set("cache-control", "private, no-store");
   } else {
+    // Google hosts are allowed for consent-gated GA4 only; embeds and private previews exclude them.
     headers.set(
       "content-security-policy",
-      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; frame-src https:; connect-src 'self'",
+      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; frame-src https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
     );
     headers.set("x-frame-options", "DENY");
     headers.set(
