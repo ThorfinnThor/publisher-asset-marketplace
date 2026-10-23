@@ -94,7 +94,50 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="4. Accounts and sign-in">
+          <PrivacySection title="4. Google Analytics 4">
+            <p>
+              If you consent, Cite Supply uses Google Analytics 4, a web analytics service provided
+              by Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland
+              (&quot;Google&quot;). The purpose is audience measurement: understanding how many
+              people visit the public pages, which pages they view, where visits come from, and how
+              visitors move through the site, so that content and navigation can be improved.
+            </p>
+            <p>
+              Google Analytics is loaded only after you click &quot;Accept&quot; in the cookie
+              banner. Before that, and whenever you decline, no Google script is loaded and no data
+              is sent to Google. Google Analytics is never loaded on sign-in, creator dashboard,
+              submission or admin pages, and never inside Cite Supply embeds shown on other
+              websites. We use Google Consent Mode v2 with all consent types set to
+              &quot;denied&quot; by default; only analytics storage is granted after your consent.
+              Advertising storage, ad personalisation, and Google signals are disabled. IP addresses
+              are not logged or stored by Google Analytics 4.
+            </p>
+            <p>
+              When active, Google Analytics sets the cookies <code>_ga</code> (distinguishes
+              browsers, lifetime 2 years) and <code>_ga_&lt;container-id&gt;</code> (keeps the
+              session state, lifetime 2 years) and processes usage data such as the pages visited,
+              referrer, approximate location derived from the IP address, browser, operating system,
+              device type, screen resolution, and time of visit. Event-level and user-level data is
+              retained in Google Analytics for 14 months and then deleted automatically.
+            </p>
+            <p>
+              The legal basis is your consent under Article 6(1)(a) GDPR and Section 25(1) TDDDG
+              (formerly TTDSG). Google may process data in the United States. Google LLC is
+              certified under the EU-US Data Privacy Framework, for which the European Commission
+              has adopted an adequacy decision under Article 45 GDPR; in addition, Google relies on
+              the EU Standard Contractual Clauses.
+            </p>
+            <p>
+              Your choice is stored in your browser&apos;s localStorage. You can withdraw your
+              consent at any time with effect for the future via &quot;Cookie settings&quot; in the
+              footer of every page; the Google Analytics cookies are then deleted and no further
+              data is sent. See Google&apos;s{" "}
+              <a href="https://policies.google.com/privacy">Privacy Policy</a> and{" "}
+              <a href="https://business.safety.google/adsprocessorterms/">data processing terms</a>.
+            </p>
+          </PrivacySection>
+
+          <PrivacySection title="5. Accounts and sign-in">
             <p>
               Creator accounts can use GitHub or Google OAuth. When you choose a provider, you are
               redirected to that provider and it learns that you are attempting to sign in to Cite
@@ -119,7 +162,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="5. Search, asset actions, and embed measurements">
+          <PrivacySection title="6. Search, asset actions, and embed measurements">
             <p>
               To improve search quality and show creators useful demand signals, we record search
               wording, normalized search wording, result counts, displayed asset identifiers and
@@ -142,7 +185,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="6. Submissions, scans, and preview images">
+          <PrivacySection title="7. Submissions, scans, and preview images">
             <p>
               When you submit an asset, we process the canonical, embed, attribution, and preview
               URLs; title and description; source identity; rights declarations; Creator Terms
@@ -159,7 +202,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="7. Source previews, embeds, and external links">
+          <PrivacySection title="8. Source previews, embeds, and external links">
             <p>
               Some preview images and embeds are delivered directly by the named data source or the
               creator&apos;s approved host. Loading that content sends a request to the external
@@ -175,7 +218,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="8. Email and reports">
+          <PrivacySection title="9. Email and reports">
             <p>
               Messages sent to {publicContactEmail} are processed with the sender address, message,
               attachments, and related correspondence to answer the request, handle a rights notice,
@@ -189,28 +232,27 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="9. Cookies and browser storage">
+          <PrivacySection title="10. Cookies and browser storage">
             <p>
               Public browsing does not use Cite Supply advertising cookies. Cloudflare Web Analytics
               does not set analytics cookies or persist an analytics identifier in browser storage.
-              Necessary authentication cookies are set only when you start or use sign-in, account
-              linking, or the creator dashboard. Because these cookies provide an expressly
-              requested security and account function, they are treated as strictly necessary under
-              Section 25(2) TDDDG.
-            </p>
-            <p>
-              If future features require non-essential cookies or comparable device storage, they
-              will not be activated before the required information and consent controls are added.
+              Google Analytics cookies are set only after you accept them in the cookie banner (see
+              section 4); your choice is remembered in localStorage under{" "}
+              <code>citesupply-analytics-consent-v1</code> and can be changed at any time via
+              &quot;Cookie settings&quot; in the footer. Necessary authentication cookies are set
+              only when you start or use sign-in, account linking, or the creator dashboard. Because
+              these cookies provide an expressly requested security and account function, they are
+              treated as strictly necessary under Section 25(2) TDDDG.
             </p>
           </PrivacySection>
 
-          <PrivacySection title="10. Recipients and international transfers">
+          <PrivacySection title="11. Recipients and international transfers">
             <p>
               Data is disclosed only where needed to operate the service, comply with law, or
               protect legal rights. Relevant recipients can include Cloudflare and its
-              sub-processors, the selected OAuth provider, the destination email provider,
-              professional advisers, and authorities where disclosure is legally required. Approved
-              listing content is public.
+              sub-processors, Google if you consent to Google Analytics, the selected OAuth
+              provider, the destination email provider, professional advisers, and authorities where
+              disclosure is legally required. Approved listing content is public.
             </p>
             <p>
               Where data is transferred outside the EEA without an adequacy decision, the transfer
@@ -219,7 +261,7 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="11. Retention">
+          <PrivacySection title="12. Retention">
             <ul>
               <li>Authentication sessions expire after no more than 30 days.</li>
               <li>
@@ -241,13 +283,17 @@ export default function PrivacyPage() {
                 Cloudflare Web Analytics data is available through the service for up to six months.
               </li>
               <li>
+                Google Analytics data is retained for 14 months; the <code>_ga</code> cookies expire
+                after 2 years or when you withdraw consent.
+              </li>
+              <li>
                 Correspondence is retained until the request is resolved and longer only where legal
                 claims or statutory duties require it.
               </li>
             </ul>
           </PrivacySection>
 
-          <PrivacySection title="12. Your rights">
+          <PrivacySection title="13. Your rights">
             <p>
               Subject to the GDPR&apos;s conditions, you can request access, correction, deletion,
               restriction, data portability, and information about recipients. You can object to
@@ -265,10 +311,10 @@ export default function PrivacyPage() {
             </p>
           </PrivacySection>
 
-          <PrivacySection title="13. Changes">
+          <PrivacySection title="14. Changes">
             <p>
               We update this policy when the service, providers, or legal requirements change. The
-              current version is published here. Last updated: 27 September 2026.
+              current version is published here. Last updated: 23 October 2026.
             </p>
           </PrivacySection>
         </article>
@@ -282,7 +328,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="creator-guide__list">
               <li>No advertising cookies.</li>
-              <li>No persistent browser analytics ID.</li>
+              <li>Google Analytics only with your consent.</li>
               <li>OAuth only when you choose a provider.</li>
               <li>Cloudflare hosts and protects the service.</li>
             </ul>

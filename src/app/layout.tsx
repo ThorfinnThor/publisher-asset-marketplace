@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { CookieConsent, CookieSettingsButton } from "@/components/cookie-consent";
 import { JsonLd } from "@/components/json-ld";
 import { buildSiteJsonLd, siteSeo } from "@/lib/seo";
 import { siteBrand } from "@/lib/site-identity";
@@ -117,9 +118,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               <Link href="/privacy">Privacy</Link>
               <Link href="/legal-notice">Legal notice</Link>
               <Link href="/report">Report content</Link>
+              <CookieSettingsButton />
             </nav>
           </div>
         </footer>
+        <CookieConsent />
       </body>
     </html>
   );

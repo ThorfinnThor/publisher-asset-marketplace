@@ -24,7 +24,10 @@ describe("production security headers", () => {
     expect(response.headers.get("x-frame-options")).toBe("DENY");
     expect(response.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
     expect(response.headers.get("content-security-policy")).toContain(
-      "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
+      "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.googletagmanager.com",
+    );
+    expect(response.headers.get("content-security-policy")).toContain(
+      "connect-src 'self' https://*.google-analytics.com",
     );
     expect(response.headers.get("strict-transport-security")).toContain("max-age=31536000");
     expect(await response.text()).toBe("ok");
@@ -40,6 +43,7 @@ describe("production security headers", () => {
     expect(response.headers.get("content-security-policy")).not.toContain(
       "static.cloudflareinsights.com",
     );
+    expect(response.headers.get("content-security-policy")).not.toMatch(/google/u);
   });
 
   it("allows public submission previews to render across the legacy and custom domains", () => {
@@ -76,5 +80,6 @@ describe("production security headers", () => {
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow, noarchive");
     expect(response.headers.get("content-security-policy")).toContain("script-src 'none'");
     expect(response.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
+    expect(response.headers.get("content-security-policy")).not.toMatch(/google/u);
   });
 });
