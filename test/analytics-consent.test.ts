@@ -62,7 +62,11 @@ describe("consent banner paints with the page", () => {
     const banner = readFileSync("src/components/cookie-consent.tsx", "utf8");
     expect(banner).toContain("useState(!excluded)");
     expect(banner).toContain("removeAttribute(consentDecidedAttribute)");
-    expect(readFileSync("src/app/layout.tsx", "utf8")).toMatch(/<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: consentHeadScript \}\} \/>/);
-    expect(readFileSync("src/app/globals.css", "utf8")).toMatch(/html\[data-consent-set\] \.cookie-consent \{\s*display: none;/);
+    expect(readFileSync("src/app/layout.tsx", "utf8")).toMatch(
+      /<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: consentHeadScript \}\} \/>/,
+    );
+    expect(readFileSync("src/app/globals.css", "utf8")).toMatch(
+      /html\[data-consent-set\] \.cookie-consent \{\s*display: none;/,
+    );
   });
 });

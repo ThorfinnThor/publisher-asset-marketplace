@@ -7,8 +7,7 @@ export const openConsentEvent = "citesupply:open-cookie-settings";
 // page, FCP 2.0 s). This runs in <head> before first paint and marks a reader
 // who already chose, so globals.css hides the banner for them without a flash.
 export const consentDecidedAttribute = "data-consent-set";
-export const consentHeadScript =
-  `try{if(localStorage.getItem(${JSON.stringify(consentStorageKey)}))document.documentElement.setAttribute(${JSON.stringify(consentDecidedAttribute)},"")}catch(e){}`;
+export const consentHeadScript = `try{if(localStorage.getItem(${JSON.stringify(consentStorageKey)}))document.documentElement.setAttribute(${JSON.stringify(consentDecidedAttribute)},"")}catch(e){}`;
 
 export type ConsentChoice = "granted" | "denied";
 
