@@ -117,8 +117,10 @@ export default function PrivacyPage() {
               browsers, lifetime 2 years) and <code>_ga_&lt;container-id&gt;</code> (keeps the
               session state, lifetime 2 years) and processes usage data such as the pages visited,
               referrer, approximate location derived from the IP address, browser, operating system,
-              device type, screen resolution, and time of visit. Event-level and user-level data is
-              retained in Google Analytics for 14 months and then deleted automatically.
+              device type, screen resolution, and time of visit. Event-level data is retained in
+              Google Analytics for 2 months and then deleted automatically. User-level data tied to
+              the pseudonymous browser identifier is kept for up to 14 months after your last visit.
+              Aggregated reports without personal data are not affected by these limits.
             </p>
             <p>
               The legal basis is your consent under Article 6(1)(a) GDPR and Section 25(1) TDDDG
@@ -283,8 +285,9 @@ export default function PrivacyPage() {
                 Cloudflare Web Analytics data is available through the service for up to six months.
               </li>
               <li>
-                Google Analytics data is retained for 14 months; the <code>_ga</code> cookies expire
-                after 2 years or when you withdraw consent.
+                Google Analytics event data is retained for 2 months and user-level data for up to
+                14 months after the last visit; the <code>_ga</code> cookies expire after 2 years or
+                when you withdraw consent.
               </li>
               <li>
                 Correspondence is retained until the request is resolved and longer only where legal
@@ -314,7 +317,7 @@ export default function PrivacyPage() {
           <PrivacySection title="14. Changes">
             <p>
               We update this policy when the service, providers, or legal requirements change. The
-              current version is published here. Last updated: 23 October 2026.
+              current version is published here. Last updated: 1 November 2026.
             </p>
           </PrivacySection>
         </article>
