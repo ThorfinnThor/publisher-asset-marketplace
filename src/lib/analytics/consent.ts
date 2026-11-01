@@ -2,6 +2,14 @@ export const gaMeasurementId = "G-NJETCBLLNE";
 export const consentStorageKey = "citesupply-analytics-consent-v1";
 export const openConsentEvent = "citesupply:open-cookie-settings";
 
+// The banner ships in the server HTML so it paints with the page. Appearing only
+// after hydration made its paragraph the mobile LCP element (4.0 s on the home
+// page, FCP 2.0 s). This runs in <head> before first paint and marks a reader
+// who already chose, so globals.css hides the banner for them without a flash.
+export const consentDecidedAttribute = "data-consent-set";
+export const consentHeadScript =
+  `try{if(localStorage.getItem(${JSON.stringify(consentStorageKey)}))document.documentElement.setAttribute(${JSON.stringify(consentDecidedAttribute)},"")}catch(e){}`;
+
 export type ConsentChoice = "granted" | "denied";
 
 type GtagWindow = Window & {

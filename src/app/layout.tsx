@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { CookieConsent, CookieSettingsButton } from "@/components/cookie-consent";
+import { consentHeadScript } from "@/lib/analytics/consent";
 import { JsonLd } from "@/components/json-ld";
 import { buildSiteJsonLd, siteSeo } from "@/lib/seo";
 import { siteBrand } from "@/lib/site-identity";
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: consentHeadScript }} />
         <link href="/llms.txt" rel="describedby" type="text/markdown" />
       </head>
       <body>

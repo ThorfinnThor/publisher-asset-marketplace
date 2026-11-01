@@ -51,3 +51,18 @@ describe("GA4 consent boundaries", () => {
     expect(isGoogleAnalyticsCookie("garden")).toBe(false);
   });
 });
+
+describe("consent banner paints with the page", () => {
+  // Appearing after hydration made the banner paragraph the late mobile LCP element.
+  it("renders open on the server and is hidden before paint once a choice exists", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { consentHeadScript, consentStorageKey } = await import("../src/lib/analytics/consent");
+    expect(consentHeadScript).toContain(JSON.stringify(consentStorageKey));
+    expect(consentHeadScript).toContain('setAttribute("data-consent-set"');
+    const banner = readFileSync("src/components/cookie-consent.tsx", "utf8");
+    expect(banner).toContain("useState(!excluded)");
+    expect(banner).toContain("removeAttribute(consentDecidedAttribute)");
+    expect(readFileSync("src/app/layout.tsx", "utf8")).toMatch(/<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: consentHeadScript \}\} \/>/);
+    expect(readFileSync("src/app/globals.css", "utf8")).toMatch(/html\[data-consent-set\] \.cookie-consent \{\s*display: none;/);
+  });
+});

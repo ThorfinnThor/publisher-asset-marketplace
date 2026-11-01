@@ -5353,3 +5353,8 @@ body:has(.marketplace-embed-shell) > .site-footer {
 .cookie-consent__actions .button {
   flex: 1 1 140px;
 }
+
+/* A reader who already chose: the head script in the root layout sets this before first paint. */
+html[data-consent-set] .cookie-consent {
+  display: none;
+}

@@ -1,9 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
+  consentDecidedAttribute,
   disableGoogleAnalytics,
   isAnalyticsExcludedPath,
   loadGoogleAnalytics,
@@ -17,19 +18,30 @@ import {
 
 // Opt-in banner for Google Analytics 4. Nothing is requested from Google before "Accept";
 // the footer button reopens the banner so consent can be withdrawn at any time.
+// It renders open on the server (outside excluded paths) so it paints with the page;
+// the head script hides it before paint for a reader who already chose, and the first
+// effect run then removes it.
 export function CookieConsent() {
   const pathname = usePathname();
   const excluded = isAnalyticsExcludedPath(pathname);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!excluded);
+  const settled = useRef(false);
 
   useEffect(() => {
-    const reopen = () => setOpen(true);
+    const reopen = () => {
+      document.documentElement.removeAttribute(consentDecidedAttribute);
+      setOpen(true);
+    };
     window.addEventListener(openConsentEvent, reopen);
     return () => window.removeEventListener(openConsentEvent, reopen);
   }, []);
 
   useEffect(() => {
     const stored = readConsent();
+    if (!settled.current) {
+      settled.current = true;
+      if (stored !== null) setOpen(false);
+    }
     if (excluded) {
       pauseGoogleAnalytics();
       return;
